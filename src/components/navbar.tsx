@@ -112,23 +112,6 @@ export function Navbar() {
               ))}
             </div>
 
-            {/* CTA Button */}
-            <div className="hidden md:block">
-              <motion.a
-                href="#contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection('#contact');
-                }}
-                className="relative inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-brand rounded-lg overflow-hidden group"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-brand to-brand-light opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative">Hire Me</span>
-              </motion.a>
-            </div>
-
             {/* Mobile Menu Toggle */}
             <motion.button
               className="md:hidden relative z-10 p-2 text-white"
@@ -173,19 +156,6 @@ export function Navbar() {
                   {link.label}
                 </motion.a>
               ))}
-              <motion.a
-                href="#contact"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection('#contact');
-                }}
-                className="mt-4 inline-flex items-center px-8 py-3 text-lg font-semibold text-white bg-brand rounded-lg"
-              >
-                Hire Me
-              </motion.a>
             </div>
           </motion.div>
         )}

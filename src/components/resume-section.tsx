@@ -235,8 +235,7 @@ export function ResumeSection() {
         {/* Download CV */}
         <ScrollReveal className="text-center">
           <motion.button
-            className="group relative inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold text-white bg-brand rounded-lg overflow-hidden disabled:opacity-50"
-            whileHover={{ scale: 1.05 }}
+            className="portfolio-btn portfolio-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             whileTap={{ scale: 0.95 }}
             disabled={!profile?.cvFile}
             onClick={() => {
@@ -245,9 +244,11 @@ export function ResumeSection() {
               }
             }}
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-brand to-brand-light opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <span className="relative">Download Resume</span>
-            <Download className="relative w-4 h-4" />
+            <span className="portfolio-btn-content">
+              <span>Download Resume</span>
+              <Download className="btn-arrow w-[18px] h-[18px]" />
+            </span>
+            <span className="portfolio-btn-bg" />
           </motion.button>
           {!profile?.cvFile && (
             <p className="mt-3 text-xs text-muted-text">CV file coming soon</p>

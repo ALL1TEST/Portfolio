@@ -74,12 +74,14 @@ export function AboutPreview() {
             <ScrollReveal direction="right" delay={0.3}>
               <motion.button
                 onClick={scrollToResume}
-                className="mt-8 group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white border border-stroke rounded-lg hover:border-brand/50 hover:bg-brand/5 transition-all duration-300"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                className="mt-8 portfolio-btn portfolio-btn-secondary"
+                whileTap={{ scale: 0.95 }}
               >
-                Learn More
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <span className="portfolio-btn-content">
+                  <span>Learn More</span>
+                  <ArrowRight className="btn-arrow w-[18px] h-[18px]" />
+                </span>
+                <span className="portfolio-btn-bg" />
               </motion.button>
             </ScrollReveal>
           </div>

@@ -122,22 +122,26 @@ export function Hero() {
         >
           <motion.button
             onClick={() => scrollToSection('#projects')}
-            className="group relative inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold text-white bg-brand rounded-lg overflow-hidden"
-            whileHover={{ scale: 1.05 }}
+            className="portfolio-btn portfolio-btn-primary"
             whileTap={{ scale: 0.95 }}
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-brand to-brand-light opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <span className="relative">View My Work</span>
-            <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-1" />
+            <span className="portfolio-btn-content">
+              <span>View My Work</span>
+              <ArrowRight className="btn-arrow w-[18px] h-[18px]" />
+            </span>
+            <span className="portfolio-btn-bg" />
           </motion.button>
 
           <motion.button
             onClick={() => scrollToSection('#contact')}
-            className="group relative inline-flex items-center gap-2 px-8 py-3.5 text-sm font-semibold text-white bg-transparent border border-stroke rounded-lg hover:border-brand/50 transition-all duration-300"
-            whileHover={{ scale: 1.05 }}
+            className="portfolio-btn portfolio-btn-secondary"
             whileTap={{ scale: 0.95 }}
           >
-            <span>Contact Me</span>
+            <span className="portfolio-btn-content">
+              <span>Contact Me</span>
+              <ArrowRight className="btn-arrow w-[18px] h-[18px]" />
+            </span>
+            <span className="portfolio-btn-bg" />
           </motion.button>
         </motion.div>
 

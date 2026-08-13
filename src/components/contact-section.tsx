@@ -190,12 +190,14 @@ export function ContactSection() {
 
                 <motion.button
                   type="submit" disabled={submitting || status === 'success'}
-                  className="group relative w-full inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-semibold text-white bg-brand rounded-lg overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
-                  whileHover={{ scale: submitting ? 1 : 1.02 }} whileTap={{ scale: submitting ? 1 : 0.98 }}
+                  className="portfolio-btn portfolio-btn-primary w-full"
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-brand to-brand-light opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative">{submitting ? 'Sending...' : status === 'success' ? 'Sent!' : 'Send Message'}</span>
-                  <Send className="relative w-4 h-4" />
+                  <span className="portfolio-btn-content">
+                    <span>{submitting ? 'Sending...' : status === 'success' ? 'Sent!' : 'Send Message'}</span>
+                    <Send className="btn-arrow w-[18px] h-[18px]" />
+                  </span>
+                  <span className="portfolio-btn-bg" />
                 </motion.button>
               </form>
             </ScrollReveal>
