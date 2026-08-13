@@ -164,20 +164,49 @@
   box-shadow: 0 0 30px rgba(255, 57, 0, 0.3), 0 0 80px rgba(255, 57, 0, 0.1);
 }
 
-/* Marquee animation */
-.marquee {
+/* Tech ticker animation */
+.tech-ticker {
   width: 100%;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.marquee-track {
+.tech-ticker-track {
   display: flex;
   width: max-content;
-  animation: marquee-scroll 25s linear infinite;
+  will-change: transform;
+  animation: technologyTicker 25s linear infinite;
 }
 
-@keyframes marquee-scroll {
+.tech-ticker-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tech-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 28px;
+  color: #9a9a9a;
+  font-size: 16px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.tech-item svg {
+  color: #9a9a9a;
+  fill: currentColor;
+}
+
+.tech-item b {
+  color: #555;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+@keyframes technologyTicker {
   from {
     transform: translateX(0);
   }
@@ -206,7 +235,7 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track {
+  .tech-ticker-track {
     animation: none;
   }
   .animate-pulse-glow {
