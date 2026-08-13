@@ -123,3 +123,29 @@ Work Log:
 Stage Summary:
 - Sidebar navigation now uses `router.push()` instead of `<Link>` for reliable cross-environment navigation
 - All dashboard pages accessible from sidebar without issues
+
+---
+Task ID: 5
+Agent: Main Agent
+Task: Fix persistent ERR_TOO_MANY_REDIRECTS on /dashboard Overview page
+
+Work Log:
+- User still experienced redirect loop when navigating to Overview (/dashboard)
+- Root cause: Server-side `getServerSession()` + `redirect('/login')` in dashboard layout causes infinite redirect through Caddy proxy
+- The proxy doesn't properly forward session cookies for server-side reads, so `getServerSession()` returns null → redirect to /login → loop
+- Fix part 1: Removed `getServerSession()` and `redirect('/login')` from dashboard layout, making it a simple pass-through wrapper
+- Fix part 2: Added `useEffect` in Shell component with `router.replace('/login')` when session status is 'unauthenticated'
+- This moves ALL auth checking to client-side, avoiding server-side redirects entirely
+- The Shell component still shows a loading spinner while session is being checked
+- Browser-verified complete flow:
+  - Unauthenticated access to /dashboard → cleanly redirects to /login (no loop)
+  - Login → redirects to /dashboard with content showing
+  - Overview → Projects → Overview navigation works
+  - All 7 sidebar buttons navigate correctly
+  - Settings → Overview navigation works
+- Lint passes clean
+
+Stage Summary:
+- Eliminated all server-side redirects from the dashboard, fixing ERR_TOO_MANY_REDIRECTS permanently
+- Auth is now entirely client-side via useSession() + router.replace()
+- Dashboard layout is a simple pass-through, Shell component handles all auth logic
