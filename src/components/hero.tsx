@@ -1,8 +1,9 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef, useEffect, useSyncExternalStore } from 'react';
+import { useRef, useSyncExternalStore } from 'react';
 import { ArrowRight, ArrowDown } from 'lucide-react';
+import { useData } from '@/lib/data-provider';
 
 function useMounted() {
   return useSyncExternalStore(
@@ -39,6 +40,12 @@ function AnimatedText({ text, delay = 0 }: { text: string; delay?: number }) {
 
 export function Hero() {
   const mounted = useMounted();
+  const { profile, loading } = useData();
+
+  const fullName = profile?.fullName || 'ABDELLAH AIT-SI';
+  const parts = fullName.split(' ');
+  const firstName = parts[0] || '';
+  const lastName = parts.slice(1).join(' ');
 
   const scrollToSection = (href: string) => {
     const id = href.replace('#', '');
@@ -53,16 +60,11 @@ export function Hero() {
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Gradient Orbs */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-brand/10 rounded-full blur-[128px] animate-pulse-glow" />
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-brand/5 rounded-full blur-[128px] animate-pulse-glow" />
-
-      {/* Grid Overlay */}
       <div className="absolute inset-0 grid-bg opacity-30" />
 
-      {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Status Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={mounted ? { opacity: 1, y: 0 } : {}}
@@ -74,47 +76,44 @@ export function Hero() {
           </span>
         </motion.div>
 
-        {/* Name */}
         <motion.h1
           className="mt-8 text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none"
           initial={{ opacity: 0 }}
           animate={mounted ? { opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <AnimatedText text="ABDELLAH" delay={0.4} />
+          <AnimatedText text={firstName} delay={0.4} />
           <br />
           <span className="text-brand">
-            <AnimatedText text="AIT-SI" delay={0.6} />
+            <AnimatedText text={lastName || 'AIT-SI'} delay={0.6} />
           </span>
         </motion.h1>
 
-        {/* Role */}
         <motion.div
           className="mt-6"
           initial={{ opacity: 0 }}
-          animate={mounted ? { opacity: 1 } : {}}
+          animate={mounted && !loading ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 1.0 }}
         >
           <p className="text-lg sm:text-xl md:text-2xl font-light text-white/80 tracking-wide">
-            Full Stack Developer
-            <span className="text-brand mx-3">|</span>
-            AI & Automation
+            {profile?.professionalTitle?.split('|').map((part, i) => (
+              <span key={i}>
+                {i > 0 && <span className="text-brand mx-3">|</span>}
+                {part.trim()}
+              </span>
+            )) || 'Full Stack Developer | AI & Automation'}
           </p>
         </motion.div>
 
-        {/* Description */}
         <motion.p
           className="mt-6 max-w-2xl mx-auto text-sm sm:text-base text-muted-text leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
-          animate={mounted ? { opacity: 1, y: 0 } : {}}
+          animate={mounted && !loading ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 1.2 }}
         >
-          Building modern web applications and smart automated solutions.
-          Specialized in React, Laravel, and crafting full-stack experiences
-          that drive real impact.
+          {profile?.shortBio || 'Building modern web applications and smart automated solutions.'}
         </motion.p>
 
-        {/* CTA Buttons */}
         <motion.div
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
           initial={{ opacity: 0, y: 20 }}
@@ -142,7 +141,6 @@ export function Hero() {
           </motion.button>
         </motion.div>
 
-        {/* Scroll Indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
           initial={{ opacity: 0 }}

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -16,17 +10,117 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  password  String
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Post {
+model Profile {
+  id               String   @id @default(cuid())
+  fullName         String   @default("ABDELLAH AIT-SI")
+  brandName        String   @default("CodeVirtox")
+  professionalTitle String @default("Full Stack Developer | AI & Automation")
+  shortBio         String   @default("Building modern web applications and smart automated solutions.")
+  aboutText        String   @default("")
+  email            String   @default("contact@codevirtox.com")
+  phone            String   @default("+212 600-000-000")
+  location         String   @default("Oulad Teima, Morocco")
+  githubUrl        String   @default("")
+  linkedinUrl      String   @default("")
+  profileImage     String   @default("")
+  cvFile           String   @default("")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  shortDescription String
+  fullDescription String   @default("")
+  technologies    String   @default("[]")
+  startDate       String
+  endDate         String   @default("")
+  location        String   @default("Oulad Teima, Morocco")
+  projectImage    String   @default("")
+  githubUrl       String   @default("")
+  liveDemoUrl     String   @default("")
+  featured        Boolean  @default(false)
+  displayOrder    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Certificate {
+  id              String   @id @default(cuid())
+  title           String
+  issuer          String
+  issueDate       String
+  skills          String   @default("[]")
+  certificateImage String   @default("")
+  credentialUrl   String   @default("")
+  displayOrder    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Skill {
+  id           String @id @default(cuid())
+  name         String
+  category     String
+  icon         String @default("")
+  displayOrder Int     @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Education {
+  id           String @id @default(cuid())
+  degree       String
+  field        String
+  institution  String
+  location     String @default("")
+  year         String
+  displayOrder Int     @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Experience {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  technologies String   @default("[]")
+  startDate    String
+  endDate      String   @default("")
+  location     String   @default("Oulad Teima, Morocco")
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Language {
+  id           String @id @default(cuid())
+  name         String
+  level        String
+  displayOrder Int     @default(0)
+}
+
+model SoftSkill {
+  id           String @id @default(cuid())
+  name         String
+  icon         String @default("")
+  displayOrder Int     @default(0)
+}
+
+model ContactMessage {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  name      String
+  email     String
+  subject   String
+  message   String
+  read      Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

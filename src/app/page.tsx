@@ -1,5 +1,6 @@
 'use client';
 
+import { DataProvider } from '@/lib/data-provider';
 import { Navbar } from '@/components/navbar';
 import { AnimatedBackground } from '@/components/animated-background';
 import { Hero } from '@/components/hero';
@@ -13,26 +14,21 @@ import { Footer } from '@/components/footer';
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-dark">
-      {/* Animated Background */}
-      <AnimatedBackground />
-
-      {/* Navigation */}
-      <Navbar />
-
-      {/* Main Content */}
-      <main className="relative z-10">
-        <Hero />
-        <TechMarquee />
-        <AboutPreview />
-        <ProjectsSection />
-        <CertificatesSection />
-        <ResumeSection />
-        <ContactSection />
-      </main>
-
-      {/* Footer */}
-      <Footer />
-    </div>
+    <DataProvider>
+      <div className="relative min-h-screen bg-dark">
+        <AnimatedBackground />
+        <Navbar />
+        <main className="relative z-10">
+          <Hero />
+          <TechMarquee />
+          <AboutPreview />
+          <ProjectsSection />
+          <CertificatesSection />
+          <ResumeSection />
+          <ContactSection />
+        </main>
+        <Footer />
+      </div>
+    </DataProvider>
   );
 }
