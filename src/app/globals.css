@@ -165,13 +165,25 @@
 }
 
 /* Marquee animation */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-.animate-marquee {
-  animation: marquee 30s linear infinite;
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 25s linear infinite;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* Pulse glow */
@@ -194,7 +206,7 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .marquee-track {
     animation: none;
   }
   .animate-pulse-glow {
