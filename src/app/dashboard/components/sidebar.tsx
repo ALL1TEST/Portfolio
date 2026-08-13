@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
 import {
   LayoutDashboard,
   FolderOpen,
@@ -12,12 +11,10 @@ import {
   Mail,
   Settings,
   Zap,
-  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SidebarProps {
@@ -37,6 +34,7 @@ const navItems = [
 
 function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -55,6 +53,14 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
     const interval = setInterval(fetchUnread, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleNav = useCallback(
+    (href: string) => {
+      router.push(href);
+      onNavigate?.();
+    },
+    [router, onNavigate]
+  );
 
   return (
     <div className="flex flex-col h-full">
@@ -82,12 +88,11 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
             const Icon = item.icon;
 
             return (
-              <Link
+              <button
                 key={item.href}
-                href={item.href}
-                onClick={onNavigate}
+                onClick={() => handleNav(item.href)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative group',
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative group w-full text-left cursor-pointer',
                   isActive
                     ? 'bg-brand/10 text-brand'
                     : 'text-muted-text hover:text-white hover:bg-surface'
@@ -103,7 +108,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                     {unreadCount}
                   </Badge>
                 )}
-              </Link>
+              </button>
             );
           })}
         </nav>

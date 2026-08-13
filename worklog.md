@@ -106,3 +106,20 @@ Stage Summary:
 - Dashboard redirect loop fixed by removing redundant middleware
 - Auth protection remains fully functional through layout + shell component
 - All 7 dashboard pages verified working end-to-end
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Fix Overview sidebar button not navigating
+
+Work Log:
+- User reported clicking Overview button in dashboard sidebar does nothing
+- Diagnosed: Next.js `<Link>` component for parent route navigation (`/dashboard/projects` → `/dashboard`) can fail in the preview panel iframe (cross-origin environment)
+- Fix: Replaced all sidebar `<Link>` elements with `<button>` elements using `router.push()` for programmatic navigation
+- This ensures reliable navigation regardless of the iframe/proxy environment
+- Verified all 7 sidebar buttons navigate correctly: Overview, Projects, Certificates, Skills, Resume, Messages, Settings
+- Lint passes clean
+
+Stage Summary:
+- Sidebar navigation now uses `router.push()` instead of `<Link>` for reliable cross-environment navigation
+- All dashboard pages accessible from sidebar without issues
