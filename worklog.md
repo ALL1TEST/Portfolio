@@ -149,3 +149,28 @@ Stage Summary:
 - Eliminated all server-side redirects from the dashboard, fixing ERR_TOO_MANY_REDIRECTS permanently
 - Auth is now entirely client-side via useSession() + router.replace()
 - Dashboard layout is a simple pass-through, Shell component handles all auth logic
+
+---
+Task ID: 6
+Agent: Main Agent
+Task: Redesign tech marquee section as clean monochrome infinite scrolling strip
+
+Work Log:
+- Completely rewrote `src/components/tech-marquee.tsx` removing all card-based design
+- Removed: "Technologies I Work With" heading, card backgrounds, borders, rounded rectangles, hover effects
+- Created clean horizontal marquee with SVG technology logos from Simple Icons (React, Laravel, Next.js, Node.js, MySQL, MongoDB, Docker, GitHub, Oracle Cloud)
+- All icons and text in monochrome gray (`text-muted-text/50`) — no brand colors
+- Small dot separators between technology items
+- Uses existing CSS `animate-marquee` keyframes with `translateX(-50%)` for seamless infinite loop
+- Content duplicated 2x for seamless repetition
+- Edge fade gradients on left/right for smooth visual boundaries
+- Responsive: works on mobile (375px) and desktop (1920px) without horizontal overflow
+- Verified: animation running (playState: running, 30s cycle, smooth transform)
+- Verified via VLM: icons and names visible in gray, dots between items, clean strip design
+- Lint passes clean
+
+Stage Summary:
+- Tech marquee replaced with minimalist monochrome scrolling strip matching reference design
+- 9 technologies with authentic SVG logos, all in muted gray
+- Infinite seamless horizontal animation at 30s cycle
+- Fully responsive without horizontal page overflow
