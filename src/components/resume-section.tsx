@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import {
   Code2, Globe, Server, Database, Brain, Layout, Cloud, Search,
-  MapPin, Calendar, Users, Lightbulb, RefreshCw,
+  Users, Lightbulb, RefreshCw,
 } from 'lucide-react';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { ScrollReveal } from './scroll-reveal';
@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const iconMap: Record<string, React.ElementType> = {
   Code2, Globe, Server, Database, Brain, Layout, Cloud, Search,
-  Calendar, Users, Lightbulb, RefreshCw,
+  Users, Lightbulb, RefreshCw,
 };
 
 function SkillCard({ category, skills, index }: {
@@ -98,50 +98,76 @@ export function ResumeSection() {
           )}
         </div>
 
-        {/* Experience */}
+        {/* Experience & Projects — Journey Style */}
         <div className="mb-20">
           <ScrollReveal>
-            <h3 className="text-2xl font-bold text-white mb-8 text-center">Experience & Projects</h3>
-          </ScrollReveal>
-          <div className="max-w-3xl mx-auto space-y-6">
-            {loading ? (
-              [1, 2, 3].map((i) => <Skeleton key={i} className="h-32 rounded-xl" />)
-            ) : (
-              experiences.map((exp, index) => {
-                const techs: string[] = (() => { try { return JSON.parse(exp.technologies); } catch { return []; } })();
-                const dateStr = [exp.startDate, exp.endDate].filter(Boolean).join(' – ');
-                return (
-                  <ScrollReveal key={exp.id} delay={index * 0.1}>
-                    <motion.div
-                      className="group relative p-6 bg-surface/50 border border-stroke/30 rounded-xl hover:border-brand/30 transition-all duration-300"
-                      whileHover={{ x: 4 }}
-                    >
-                      <div className="absolute top-6 -left-3 w-6 h-[1px] bg-stroke/30" />
-                      <div className="flex items-start justify-between flex-wrap gap-2 mb-3">
-                        <div>
-                          <h4 className="text-lg font-bold text-white group-hover:text-brand transition-colors">{exp.title}</h4>
-                          <div className="flex items-center gap-4 mt-1">
-                            <span className="flex items-center gap-1.5 text-xs text-muted-text">
-                              <Calendar className="w-3 h-3" />{dateStr}
-                            </span>
-                            <span className="flex items-center gap-1.5 text-xs text-muted-text">
-                              <MapPin className="w-3 h-3" />{exp.location}
-                            </span>
+            <div className="experience-projects">
+              <div className="experience-projects-inner">
+
+                {/* LEFT SIDE — Sticky heading */}
+                <div className="journey-intro">
+                  <div className="journey-label">MY JOURNEY</div>
+                  <h2 className="journey-title">Experience &amp; Projects</h2>
+                </div>
+
+                {/* RIGHT SIDE — Stacked cards */}
+                <div className="journey-cards">
+                  {loading ? (
+                    [1, 2, 3].map((i) => (
+                      <article key={i} className="journey-card journey-card-skeleton">
+                        <div className="journey-date">—</div>
+                        <div className="journey-card-content">
+                          <Skeleton className="h-8 w-64 mb-4" />
+                          <Skeleton className="h-4 w-full mb-2" />
+                          <Skeleton className="h-4 w-3/4 mb-6" />
+                          <div className="flex gap-2">
+                            <Skeleton className="h-8 w-16 rounded-full" />
+                            <Skeleton className="h-8 w-20 rounded-full" />
                           </div>
                         </div>
-                      </div>
-                      <p className="text-sm text-muted-text mb-3">{exp.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {techs.map((tech) => (
-                          <span key={tech} className="px-2.5 py-1 text-xs text-brand bg-brand/10 border border-brand/20 rounded-full">{tech}</span>
-                        ))}
-                      </div>
-                    </motion.div>
-                  </ScrollReveal>
-                );
-              })
-            )}
-          </div>
+                      </article>
+                    ))
+                  ) : experiences.length === 0 ? (
+                    <p className="text-muted-text">No experience yet.</p>
+                  ) : (
+                    experiences.map((exp, index) => {
+                      const techs: string[] = (() => { try { return JSON.parse(exp.technologies); } catch { return []; } })();
+                      const dateStr = [exp.startDate, exp.endDate].filter(Boolean).join(' – ');
+                      return (
+                        <article
+                          key={exp.id}
+                          className="journey-card"
+                          style={{ animationDelay: `${0.1 + index * 0.1}s` }}
+                        >
+                          <div className="journey-date">{dateStr}</div>
+
+                          <div className="journey-card-content">
+                            <h3 className="journey-card-title">{exp.title}</h3>
+
+                            <p className="journey-card-description">
+                              {exp.description}
+                              {exp.location && (
+                                <span className="journey-card-location"> · {exp.location}</span>
+                              )}
+                            </p>
+
+                            {techs.length > 0 && (
+                              <div className="journey-card-tech">
+                                {techs.map((tech) => (
+                                  <span key={tech} className="journey-tech-item">{tech}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })
+                  )}
+                </div>
+
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
 
         {/* Education */}

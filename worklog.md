@@ -312,3 +312,30 @@ Stage Summary:
 - View button conditionally renders only when credentialUrl exists
 - Fallback shows Award icon when no certificate image
 - All existing certificate data preserved
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Redesign Experience & Projects section with journey-style stacked cards
+
+Work Log:
+- Read resume-section.tsx to understand existing Experience subsection (lines 101-145)
+- Replaced simple bordered cards with full journey-style layout: left sticky heading + right stacked cards
+- Updated HTML structure: .experience-projects > .experience-projects-inner > .journey-intro + .journey-cards
+- Each experience rendered as <article class="journey-card"> with .journey-date, .journey-card-content, .journey-card-title, .journey-card-description, .journey-card-tech
+- Removed unused MapPin/Calendar imports from resume-section.tsx
+- Added ~220 lines of journey CSS to globals.css
+- CSS includes: grid layout, sticky positioning, nth-child backgrounds (#ff3900, #3d3d3d, #1a1a1a, #353535), progressive top offsets, hover lift, date pills with dot, responsive breakpoint at 900px
+- Verified CSS compiles: 30 journey rules in 167KB compiled CSS
+- Verified HTML structure via browser: section found, grid 2-column, sticky heading, "MY JOURNEY" label, "Experience & Projects" title
+- Fixed Calendar reference in iconMap that caused 500 error
+
+Stage Summary:
+- Experience & Projects section redesigned with journey-style stacked cards
+- Left sticky heading with dark gradient badge and large responsive title
+- Right stacked cards with sticky positioning, progressive z-index and top offset
+- First card orange (#FF3900), alternating dark backgrounds
+- Date pills with white dot indicator
+- Tech items as subtle bordered pills
+- Mobile: single column, relative positioning, reduced padding
+- Reduced motion: animations disabled
