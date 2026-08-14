@@ -401,3 +401,23 @@ Stage Summary:
 - Fully responsive: desktop 3-column grid, mobile 2-column compact layout
 - Dashboard management page at /dashboard/education with full CRUD + reorder
 - Sidebar navigation updated with Education entry
+
+---
+Task ID: 6
+Agent: Main Agent
+Task: Fix duplication — Education tab removed from dashboard Resume page
+
+Work Log:
+- User reported duplication: Education appeared in both standalone /dashboard/education page AND as a tab inside /dashboard/resume page
+- Investigated all sections on public page via agent-browser: confirmed no public-facing duplication (each section appears once)
+- The duplication was only in the dashboard admin
+- Removed EducationTab function (~130 lines), Education interface type, emptyEducation constant, GraduationCap import from dashboard/resume/page.tsx
+- Updated Tabs defaultValue from "education" to "experience"
+- Removed Education TabsTrigger and TabsContent from the tab list
+- Resume dashboard page now only contains: Experience, Languages, Soft Skills tabs (3 tabs instead of 4)
+- Lint passes clean
+
+Stage Summary:
+- Dashboard duplication fixed: Education management now lives exclusively at /dashboard/education
+- Resume dashboard page cleaned up to only manage Experience, Languages, and Soft Skills
+- Public portfolio page unaffected — no duplication existed on the public-facing site
