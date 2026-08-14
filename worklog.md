@@ -527,3 +527,26 @@ Work Log:
 Stage Summary:
 - GitHub repository successfully pushed with latest source code
 - Site verified working via browser
+
+---
+Task ID: restore-homepage
+Agent: Main Agent
+Task: Restore all missing homepage sections and styling updates that were previously overwritten
+
+Work Log:
+- Analyzed screenshot showing homepage only had Hero, TechMarquee, AboutPreview, and Footer
+- Identified missing sections: Featured Projects, Certificates with filters, Resume, Contact
+- Created `featured-projects.tsx` component with dynamic featured flag and displayOrder sorting, split-layout cards
+- Updated `projects-section.tsx` with split layout (image top aspect-[16/10], content below with tech pills, title, description, links row)
+- Updated `certificates-section.tsx` with centered filter buttons (All, Cybersecurity, PHP, Python, Computer Hardware), cards showing "Skills • Issued Year" overlay, View Credential pill button
+- Updated `page.tsx` homepage to import all sections: Hero, TechMarquee, AboutPreview, FeaturedProjects, CertificatesSection, ResumeSection, ContactSection
+- Added `visibilitychange` listener to DataProvider for auto-refresh when switching tabs
+- Fixed dashboard certificates JSON parsing in openEdit (parse JSON skills string to comma-separated)
+- Fixed dashboard projects JSON parsing in openEdit (parse JSON technologies string to comma-separated)
+- Verified all sections render correctly via agent-browser — no runtime errors
+- Pushed to GitHub
+
+Stage Summary:
+- All 7 homepage sections restored and working: Hero, TechMarquee, Who I Am, Featured Projects, Certificates (with filters), Resume (Skills + Experience), Contact
+- Dashboard JSON corruption fix applied for both projects and certificates
+- Auto-refresh on tab switch implemented
