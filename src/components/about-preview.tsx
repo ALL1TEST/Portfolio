@@ -17,7 +17,7 @@ export function AboutPreview() {
   return (
     <section id="about" className="relative py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeading label="About" title="Who I Am" align="center" />
+        <SectionHeading title="Who I Am" align="center" />
 
         <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
           <ScrollReveal direction="left">
@@ -67,11 +67,13 @@ export function AboutPreview() {
             </ScrollReveal>
 
             <ScrollReveal direction="right" delay={0.3}>
+              <div className="mt-6">
               <SlideFillButton
                 label="Learn More"
                 variant="secondary"
                 onClick={() => router.push('/resume')}
               />
+              </div>
             </ScrollReveal>
           </div>
         </div>
