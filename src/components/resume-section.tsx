@@ -3,8 +3,9 @@
 import { motion } from 'framer-motion';
 import {
   Code2, Globe, Server, Database, Brain, Layout, Cloud, Search,
-  MapPin, Calendar, Download, Users, Lightbulb, RefreshCw,
+  MapPin, Calendar, Users, Lightbulb, RefreshCw,
 } from 'lucide-react';
+import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionHeading } from './section-heading';
 import { useData } from '@/lib/data-provider';
@@ -234,22 +235,16 @@ export function ResumeSection() {
 
         {/* Download CV */}
         <ScrollReveal className="text-center">
-          <motion.button
-            className="portfolio-btn portfolio-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            whileTap={{ scale: 0.95 }}
+          <SlideFillButton
+            label="Download Resume"
+            variant="primary"
             disabled={!profile?.cvFile}
             onClick={() => {
               if (profile?.cvFile) {
                 window.open(profile.cvFile, '_blank');
               }
             }}
-          >
-            <span className="portfolio-btn-content">
-              <span>Download Resume</span>
-              <Download className="btn-arrow w-[18px] h-[18px]" />
-            </span>
-            <span className="portfolio-btn-bg" />
-          </motion.button>
+          />
           {!profile?.cvFile && (
             <p className="mt-3 text-xs text-muted-text">CV file coming soon</p>
           )}

@@ -2,7 +2,8 @@
 
 import { useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, CheckCircle, AlertCircle } from 'lucide-react';
+import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionHeading } from './section-heading';
 import { useData, useContactSubmit } from '@/lib/data-provider';
@@ -188,17 +189,13 @@ export function ContactSection() {
                   </motion.div>
                 )}
 
-                <motion.button
-                  type="submit" disabled={submitting || status === 'success'}
-                  className="portfolio-btn portfolio-btn-primary w-full"
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span className="portfolio-btn-content">
-                    <span>{submitting ? 'Sending...' : status === 'success' ? 'Sent!' : 'Send Message'}</span>
-                    <Send className="btn-arrow w-[18px] h-[18px]" />
-                  </span>
-                  <span className="portfolio-btn-bg" />
-                </motion.button>
+                <SlideFillButton
+                  label={submitting ? 'Sending...' : status === 'success' ? 'Sent!' : 'Send Message'}
+                  variant="primary"
+                  disabled={submitting || status === 'success'}
+                  type="submit"
+                  className="w-full"
+                />
               </form>
             </ScrollReveal>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { SectionHeading } from './section-heading';
 import { ScrollReveal } from './scroll-reveal';
 import { useData } from '@/lib/data-provider';
@@ -72,17 +72,11 @@ export function AboutPreview() {
             </ScrollReveal>
 
             <ScrollReveal direction="right" delay={0.3}>
-              <motion.button
+              <SlideFillButton
+                label="Learn More"
+                variant="secondary"
                 onClick={scrollToResume}
-                className="mt-8 portfolio-btn portfolio-btn-secondary"
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="portfolio-btn-content">
-                  <span>Learn More</span>
-                  <ArrowRight className="btn-arrow w-[18px] h-[18px]" />
-                </span>
-                <span className="portfolio-btn-bg" />
-              </motion.button>
+              />
             </ScrollReveal>
           </div>
         </div>

@@ -2,7 +2,8 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useSyncExternalStore } from 'react';
-import { ArrowRight, ArrowDown } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
+import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { useData } from '@/lib/data-provider';
 
 function useMounted() {
@@ -120,29 +121,17 @@ export function Hero() {
           animate={mounted ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 1.4 }}
         >
-          <motion.button
+          <SlideFillButton
+            label="View My Work"
+            variant="primary"
             onClick={() => scrollToSection('#projects')}
-            className="portfolio-btn portfolio-btn-primary"
-            whileTap={{ scale: 0.95 }}
-          >
-            <span className="portfolio-btn-content">
-              <span>View My Work</span>
-              <ArrowRight className="btn-arrow w-[18px] h-[18px]" />
-            </span>
-            <span className="portfolio-btn-bg" />
-          </motion.button>
+          />
 
-          <motion.button
+          <SlideFillButton
+            label="Contact Me"
+            variant="secondary"
             onClick={() => scrollToSection('#contact')}
-            className="portfolio-btn portfolio-btn-secondary"
-            whileTap={{ scale: 0.95 }}
-          >
-            <span className="portfolio-btn-content">
-              <span>Contact Me</span>
-              <ArrowRight className="btn-arrow w-[18px] h-[18px]" />
-            </span>
-            <span className="portfolio-btn-bg" />
-          </motion.button>
+          />
         </motion.div>
 
         <motion.div

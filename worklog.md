@@ -260,3 +260,32 @@ Stage Summary:
 - All buttons have pill shape (border-radius: 999px), arrow icon with translateX(5px) on hover, translateY(-2px) lift
 - Hire Me button completely removed from both desktop nav and mobile menu
 - Lint passes cleanly
+
+---
+Task ID: slide-fill-button
+Agent: Main Agent
+Task: Implement Originkit-style SlideFillButton with SVG wave/water fill animation
+
+Work Log:
+- Created reusable SlideFillButton component at src/components/ui/slide-fill-button.tsx
+- Adapted Originkit's SlideFillButton code: getOffset(), wavePath(), BACK_PATH, FRONT_PATH, two-layer SVG wave system
+- Used Framer Motion useAnimate() for imperative animations (waterRef, labelRef, iconRef, backRef, frontRef)
+- Implemented runFill()/runDrain() with spring transition (stiffness:800, damping:60)
+- Implemented continuous wave oscillation with two SVG layers at different speeds
+- Created primary variant: #FF3900 bg → white wave fill → text goes to #030303
+- Created secondary variant: #FFFFFF bg → orange #FF3900 wave fill → text goes to #FFFFFF
+- Applied to hero.tsx: View My Work (primary) + Contact Me (secondary)
+- Applied to about-preview.tsx: Learn More (secondary)
+- Applied to resume-section.tsx: Download Resume (primary, disabled-aware)
+- Applied to contact-section.tsx: Send Message (primary, type=submit, dynamic label)
+- Removed old CSS .portfolio-btn animation classes from globals.css (130+ lines)
+- Removed unused lucide-react imports (ArrowRight, Download, Send) from updated files
+- Lint passes cleanly
+
+Stage Summary:
+- All 5 buttons now use SlideFillButton with SVG wave/water fill animation
+- Water layer starts at translateY(calc(100% + 20px)), rises to translateY(0) on hover
+- Two SVG waves (back: slower/subtle at 0.45 opacity, front: faster/prominent) animate continuously
+- Text and icon colors transition smoothly with the fill via Framer Motion
+- Hire Me button confirmed removed from both desktop and mobile navigation
+- Pill shape (border-radius: 9999), consistent 56px min-height, 28px padding
