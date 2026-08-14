@@ -3,7 +3,7 @@
 import { ScrollReveal } from './scroll-reveal';
 
 interface SectionHeadingProps {
-  label: string;
+  label?: string;
   title: string;
   description?: string;
   align?: 'left' | 'center';
@@ -19,11 +19,13 @@ export function SectionHeading({
     <div
       className={`mb-12 lg:mb-16 ${align === 'center' ? 'text-center' : 'text-left'}`}
     >
-      <ScrollReveal delay={0}>
-        <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest uppercase text-brand bg-brand/10 rounded-full border border-brand/20 mb-4">
-          {label}
-        </span>
-      </ScrollReveal>
+      {label && (
+        <ScrollReveal delay={0}>
+          <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest uppercase text-brand bg-brand/10 rounded-full border border-brand/20 mb-4">
+            {label}
+          </span>
+        </ScrollReveal>
+      )}
       <ScrollReveal delay={0.1}>
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
           {title}
