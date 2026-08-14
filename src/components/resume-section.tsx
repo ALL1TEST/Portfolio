@@ -51,7 +51,7 @@ function SkillCard({ category, skills, index }: {
 }
 
 export function ResumeSection() {
-  const { profile, skills, experiences, languages, softSkills, loading } = useData();
+  const { profile, skills, experiences, loading } = useData();
 
   // Group skills by category
   const groupedSkills = skills.reduce<Record<string, typeof skills>>((acc, skill) => {
@@ -165,65 +165,6 @@ export function ResumeSection() {
                   )}
                 </div>
 
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-
-        {/* Languages & Soft Skills */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          <ScrollReveal direction="left">
-            <div className="p-6 bg-surface/50 border border-stroke/30 rounded-xl">
-              <h3 className="text-xl font-bold text-white mb-6">Languages</h3>
-              <div className="space-y-4">
-                {loading ? (
-                  [1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-8 rounded-lg" />)
-                ) : (
-                  languages.map((lang, index) => (
-                    <motion.div
-                      key={lang.id}
-                      className="flex items-center justify-between"
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <span className="text-sm font-medium text-white">{lang.name}</span>
-                      <span className="text-xs font-medium text-brand bg-brand/10 px-3 py-1 rounded-full">{lang.level}</span>
-                    </motion.div>
-                  ))
-                )}
-              </div>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal direction="right">
-            <div className="p-6 bg-surface/50 border border-stroke/30 rounded-xl">
-              <h3 className="text-xl font-bold text-white mb-6">Soft Skills</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {loading ? (
-                  [1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-14 rounded-lg" />)
-                ) : (
-                  softSkills.map((skill, index) => {
-                    const Icon = iconMap[skill.icon] || Lightbulb;
-                    return (
-                      <motion.div
-                        key={skill.id}
-                        className="group flex items-center gap-3 p-3 bg-dark/50 rounded-lg hover:bg-surface transition-colors"
-                        initial={{ opacity: 0, x: 20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.1 }}
-                        whileHover={{ scale: 1.02 }}
-                      >
-                        <div className="w-8 h-8 bg-brand/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Icon className="w-4 h-4 text-brand" />
-                        </div>
-                        <span className="text-sm text-muted-text group-hover:text-white transition-colors">{skill.name}</span>
-                      </motion.div>
-                    );
-                  })
-                )}
               </div>
             </div>
           </ScrollReveal>
