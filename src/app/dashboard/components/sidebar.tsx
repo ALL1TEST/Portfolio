@@ -11,6 +11,7 @@ import {
   Mail,
   Settings,
   Zap,
+  GraduationCap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -26,6 +27,7 @@ const navItems = [
   { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Projects', href: '/dashboard/projects', icon: FolderOpen },
   { label: 'Certificates', href: '/dashboard/certificates', icon: Award },
+  { label: 'Education', href: '/dashboard/education', icon: GraduationCap },
   { label: 'Skills', href: '/dashboard/skills', icon: Code2 },
   { label: 'Resume', href: '/dashboard/resume', icon: FileText },
   { label: 'Messages', href: '/dashboard/messages', icon: Mail, showBadge: true },

@@ -339,3 +339,65 @@ Stage Summary:
 - Tech items as subtle bordered pills
 - Mobile: single column, relative positioning, reduced padding
 - Reduced motion: animations disabled
+
+---
+Task ID: 5
+Agent: Main Agent
+Task: Redesign Education section with premium editorial timeline/list style
+
+Work Log:
+- Read current project state: no standalone education-section.tsx existed; education was embedded in resume-section.tsx as simple bordered cards
+- Read existing API routes: /api/education (full CRUD), /api/resume (returns education + experience + languages + softSkills + skills)
+- Read Education Prisma model: id, degree, field, institution, location, year, displayOrder
+- Updated prisma/seed.ts with user-specified education entries:
+  1. ISTA NTIC — Full Stack Development / Développement Digital — 2024 – Present
+  2. DEVMINDS — Software Engineering & Artificial Intelligence — 2026
+- Cleaned duplicate education entries from database and re-seeded
+- Created standalone `src/components/education-section.tsx` with:
+  - Full-width dark section with `id="education"`
+  - Section header: "EDUCATION" badge + "My Educational Journey" heading + description on right
+  - Horizontal rows: number (left), institution + degree (center), date (right)
+  - Interactive hover: activeIndex state, orange (#FF3900) active background
+  - Skeleton loading state (3 skeleton rows)
+  - Empty state message
+  - Two-digit number formatting (01, 02, ...)
+- Added ~200 lines of education CSS to globals.css:
+  - .education-section, .education-inner (max-width 1320px)
+  - .education-header (flex row), .education-header-left, .education-header-right
+  - .education-heading (clamp 36-64px), .education-description (17px gray)
+  - .education-list (flex column)
+  - .education-item (3-column grid: 80px | 1fr | auto, border-top/bottom)
+  - .education-item.active (#FF3900 background, white text)
+  - .education-number (clamp 32-56px, faint white, brighter on active)
+  - .education-institution (clamp 20-32px bold), .education-degree (14-18px gray)
+  - .education-date (pill with border, transparent bg → white bg on active)
+  - Hover: translateX(4px) lift, 0.45s cubic-bezier transition
+  - Mobile responsive (768px): 2-column grid, smaller fonts, date flows to column 2
+  - Reduced motion: transform disabled, transition simplified
+- Updated page.tsx: imported EducationSection, placed between CertificatesSection and ResumeSection
+- Removed old education sub-section from resume-section.tsx (lines 173-201)
+- Cleaned unused `education` from useData destructuring in resume-section
+- Created standalone `src/app/dashboard/education/page.tsx`:
+  - Full CRUD table: Order (with up/down reorder), Institution, Degree/Field, Year, Actions
+  - Create/Edit dialog with all 6 fields (Institution, Degree, Field, Year, Location, Display Order)
+  - Delete confirmation AlertDialog
+  - Reorder via PUT with parallel swap requests
+  - Loading skeletons, empty state, toast notifications
+  - Follows existing dashboard patterns (motion.div, Card, Table, Dialog)
+- Added "Education" to dashboard sidebar nav (GraduationCap icon, between Certificates and Skills)
+- Verified via agent-browser:
+  - Section renders with correct HTML structure
+  - Data loads from API (both education entries visible)
+  - First item has .active class with #FF3900 background
+  - Computed styles confirmed: background rgb(255,57,0), color rgb(255,255,255)
+- Lint passes clean
+
+Stage Summary:
+- Education section redesigned as premium editorial timeline/list with horizontal rows
+- Numbers left-aligned, content center/left, dates right-aligned
+- Orange (#FF3900) active/hover background with smooth 0.45s transitions
+- Thin horizontal borders between rows, no cards/glassmorphism
+- First item active by default, hover shifts active state to hovered item
+- Fully responsive: desktop 3-column grid, mobile 2-column compact layout
+- Dashboard management page at /dashboard/education with full CRUD + reorder
+- Sidebar navigation updated with Education entry

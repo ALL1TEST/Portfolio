@@ -162,25 +162,29 @@ async function seed() {
   // Create education
   const education = [
     {
-      degree: 'Diplôme de Technicien Spécialisé',
+      degree: 'Full Stack Development',
       field: 'Développement Digital',
-      institution: 'OFPPT',
-      location: 'Oulad Teima',
-      year: '2024',
+      institution: 'Institut Spécialisé de Technologie Appliquée NTIC',
+      location: 'Oulad Teima, Morocco',
+      year: '2024 – Present',
       displayOrder: 1,
     },
     {
-      degree: 'Baccalauréat',
-      field: 'Sciences de la Vie et de la Terre',
-      institution: 'Lycée Qualifiant Al Araar',
-      location: 'Essaouira',
-      year: '2020 – 2021',
+      degree: 'Software Engineering & Artificial Intelligence',
+      field: '',
+      institution: 'DEVMINDS',
+      location: '',
+      year: '2026',
       displayOrder: 2,
     },
   ];
 
   for (const e of education) {
-    await db.education.create({ data: e });
+    await db.education.upsert({
+      where: { id: `edu-${e.displayOrder}` },
+      update: e,
+      create: { ...e, id: `edu-${e.displayOrder}` },
+    });
   }
   console.log(`✅ ${education.length} education entries created`);
 

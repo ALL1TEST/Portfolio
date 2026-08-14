@@ -51,7 +51,7 @@ function SkillCard({ category, skills, index }: {
 }
 
 export function ResumeSection() {
-  const { profile, skills, education, experiences, languages, softSkills, loading } = useData();
+  const { profile, skills, experiences, languages, softSkills, loading } = useData();
 
   // Group skills by category
   const groupedSkills = skills.reduce<Record<string, typeof skills>>((acc, skill) => {
@@ -168,36 +168,6 @@ export function ResumeSection() {
               </div>
             </div>
           </ScrollReveal>
-        </div>
-
-        {/* Education */}
-        <div className="mb-20">
-          <ScrollReveal>
-            <h3 className="text-2xl font-bold text-white mb-8 text-center">Education</h3>
-          </ScrollReveal>
-          <div className="max-w-3xl mx-auto space-y-6">
-            {loading ? (
-              [1, 2].map((i) => <Skeleton key={i} className="h-28 rounded-xl" />)
-            ) : (
-              education.map((edu, index) => (
-                <ScrollReveal key={edu.id} delay={index * 0.1}>
-                  <motion.div
-                    className="group relative p-6 bg-surface/50 border border-stroke/30 rounded-xl hover:border-brand/30 transition-all duration-300"
-                    whileHover={{ x: 4 }}
-                  >
-                    <div className="flex items-start justify-between flex-wrap gap-2 mb-2">
-                      <div>
-                        <h4 className="text-lg font-bold text-white group-hover:text-brand transition-colors">{edu.degree}</h4>
-                        <p className="text-sm text-muted-text">{edu.field}</p>
-                      </div>
-                      <span className="px-3 py-1 text-xs font-medium text-brand bg-brand/10 border border-brand/20 rounded-full">{edu.year}</span>
-                    </div>
-                    <p className="text-sm text-muted-text">{edu.institution}{edu.location ? `, ${edu.location}` : ''}</p>
-                  </motion.div>
-                </ScrollReveal>
-              ))
-            )}
-          </div>
         </div>
 
         {/* Languages & Soft Skills */}

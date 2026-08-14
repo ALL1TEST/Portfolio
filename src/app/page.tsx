@@ -8,6 +8,7 @@ import { TechMarquee } from '@/components/tech-marquee';
 import { AboutPreview } from '@/components/about-preview';
 import { ProjectsSection } from '@/components/projects-section';
 import { CertificatesSection } from '@/components/certificates-section';
+import { EducationSection } from '@/components/education-section';
 import { ResumeSection } from '@/components/resume-section';
 import { ContactSection } from '@/components/contact-section';
 import { Footer } from '@/components/footer';
@@ -24,6 +25,7 @@ export default function Home() {
           <AboutPreview />
           <ProjectsSection />
           <CertificatesSection />
+          <EducationSection />
           <ResumeSection />
           <ContactSection />
         </main>
