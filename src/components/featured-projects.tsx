@@ -8,7 +8,7 @@ import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Project } from '@/lib/types';
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function FeaturedProjectCard({ project, index }: { project: Project; index: number }) {
   const technologies: string[] = (() => {
     try { return JSON.parse(project.technologies); } catch { return []; }
   })();
@@ -16,7 +16,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   const hasImage = !!project.projectImage;
 
   return (
-    <ScrollReveal delay={index * 0.12} direction="up">
+    <ScrollReveal delay={index * 0.15} direction="up">
       <motion.div
         className="group rounded-xl overflow-hidden bg-surface border border-stroke/40"
         whileHover={{ y: -6 }}
@@ -103,16 +103,21 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   );
 }
 
-export function ProjectsSection() {
+export function FeaturedProjects() {
   const { projects, loading } = useData();
 
+  // Filter featured projects and sort by displayOrder
+  const featuredProjects = projects
+    .filter((p) => p.featured)
+    .sort((a, b) => a.displayOrder - b.displayOrder);
+
   return (
-    <section id="projects" className="relative py-24 lg:py-32">
+    <section id="featured-projects" className="relative py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
-          label="Projects"
-          title="Selected Projects"
-          description="A curated showcase of work spanning full-stack development, automation, and web applications."
+          label="Featured"
+          title="Featured Projects"
+          description="A selection of my best work, showcasing full-stack development and creative problem-solving."
         />
 
         {loading ? (
@@ -128,14 +133,14 @@ export function ProjectsSection() {
               </div>
             ))}
           </div>
-        ) : projects.length === 0 ? (
+        ) : featuredProjects.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-muted-text">No projects yet. Check back soon!</p>
+            <p className="text-muted-text">No featured projects yet. Check back soon!</p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {projects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
+            {featuredProjects.map((project, index) => (
+              <FeaturedProjectCard key={project.id} project={project} index={index} />
             ))}
           </div>
         )}

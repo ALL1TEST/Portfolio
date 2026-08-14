@@ -1,17 +1,37 @@
 'use client';
 
-import { ArrowRight, Award } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
+import { SectionHeading } from './section-heading';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
+
+const FILTER_CATEGORIES = ['All', 'Cybersecurity', 'PHP', 'Python', 'Computer Hardware'];
+
+function parseSkills(skillsJson: string): string {
+  try {
+    const parsed = JSON.parse(skillsJson);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed.join(', ');
+    }
+    return '';
+  } catch {
+    // If not valid JSON, return as-is if non-empty
+    return skillsJson || '';
+  }
+}
 
 function CertificateCard({ cert, index }: { cert: ReturnType<typeof useData>['certificates'][0]; index: number }) {
   const hasImage = !!cert.certificateImage;
   const href = cert.credentialUrl || '#';
 
-  // Extract year from issueDate for the tag pill
+  // Extract year from issueDate
   const yearMatch = cert.issueDate?.match(/\b(19|20)\d{2}\b/);
-  const yearText = yearMatch ? yearMatch[0] : cert.issueDate || '';
+  const year = yearMatch ? yearMatch[0] : '';
+
+  // Parse skills
+  const skillsText = parseSkills(cert.skills);
 
   return (
     <ScrollReveal delay={index * 0.15}>
@@ -25,26 +45,24 @@ function CertificateCard({ cert, index }: { cert: ReturnType<typeof useData>['ce
           />
         ) : (
           <div className="absolute inset-0 bg-surface flex items-center justify-center">
-            <Award className="w-20 h-20 text-stroke/20" />
+            <span className="text-4xl font-bold text-stroke/30">{cert.title?.charAt(0)}</span>
           </div>
         )}
 
-        {/* Content layer — tags top-right, info bottom-left */}
+        {/* Content layer */}
         <div className="certificate-card-content">
-          {/* Top row: tags pushed to the right */}
-          <div className="certificate-tags">
-            <span className="certificate-tag">{cert.issuer}</span>
-            {yearText && <span className="certificate-tag">{yearText}</span>}
-          </div>
-
-          {/* Bottom: title + meta */}
+          {/* Bottom info */}
           <div className="certificate-info">
             <h2 className="certificate-title">{cert.title}</h2>
-            <p className="certificate-meta">{cert.issuer}</p>
+            {(skillsText || year) && (
+              <p className="text-sm text-white/60 mt-1">
+                {skillsText}{skillsText && year && ' • '}<span className="text-white/45">Issued {year}</span>
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Centered View button — hidden until hover (always visible on mobile) */}
+        {/* Centered View Credential pill button */}
         {href !== '#' && (
           <a
             href={href}
@@ -53,8 +71,8 @@ function CertificateCard({ cert, index }: { cert: ReturnType<typeof useData>['ce
             className="certificate-view-button"
             aria-label={`View ${cert.title}`}
           >
-            <span>→</span>
-            <span>View</span>
+            <span>View Credential</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </a>
         )}
       </div>
@@ -64,25 +82,47 @@ function CertificateCard({ cert, index }: { cert: ReturnType<typeof useData>['ce
 
 export function CertificatesSection() {
   const { certificates, loading } = useData();
+  const [activeFilter, setActiveFilter] = useState('All');
+
+  // Get unique categories from certificate skills
+  const filteredCerts = useMemo(() => {
+    if (activeFilter === 'All') return certificates;
+    return certificates.filter((cert) => {
+      const skillsText = parseSkills(cert.skills).toLowerCase();
+      const titleLower = cert.title.toLowerCase();
+      const issuerLower = cert.issuer.toLowerCase();
+      const filterLower = activeFilter.toLowerCase();
+
+      // Match filter against skills, title, or issuer
+      return skillsText.includes(filterLower) || titleLower.includes(filterLower) || issuerLower.includes(filterLower);
+    });
+  }, [certificates, activeFilter]);
 
   return (
     <section id="certificates" className="relative py-24 lg:py-32 bg-gradient-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading
+          label="Certificates"
+          title="Credentials & Learning"
+          description="Professional certifications that validate my expertise and commitment to continuous learning."
+        />
 
-        {/* Section header */}
-        <ScrollReveal delay={0}>
-          <div className="text-center mb-14 lg:mb-20">
-            <span className="inline-block px-5 py-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-muted-text bg-surface border border-stroke rounded-sm mb-5">
-              Certificates
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-              Credentials &amp; Learning
-            </h2>
-            <p className="mt-4 text-muted-text max-w-xl mx-auto text-base leading-relaxed">
-              Professional certifications that validate my expertise and commitment to continuous learning.
-            </p>
-          </div>
-        </ScrollReveal>
+        {/* Centered filter buttons */}
+        <div className="flex flex-wrap justify-center gap-2 mb-12 lg:mb-16">
+          {FILTER_CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveFilter(cat)}
+              className={`px-4 py-2 text-xs font-semibold tracking-wider uppercase rounded-full border transition-all duration-300 ${
+                activeFilter === cat
+                  ? 'bg-brand text-white border-brand shadow-lg shadow-brand/20'
+                  : 'bg-surface/50 text-muted-text border-stroke/40 hover:text-white hover:border-brand/40'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
         {/* Grid */}
         {loading ? (
@@ -93,13 +133,15 @@ export function CertificatesSection() {
               </div>
             ))}
           </div>
-        ) : certificates.length === 0 ? (
+        ) : filteredCerts.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-muted-text">No certificates yet. Check back soon!</p>
+            <p className="text-muted-text">
+              {activeFilter !== 'All' ? `No certificates found for "${activeFilter}".` : 'No certificates yet. Check back soon!'}
+            </p>
           </div>
         ) : (
           <div className="certificates-grid">
-            {certificates.map((cert, index) => (
+            {filteredCerts.map((cert, index) => (
               <CertificateCard key={cert.id} cert={cert} index={index} />
             ))}
           </div>

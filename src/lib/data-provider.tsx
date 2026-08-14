@@ -79,6 +79,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchData();
   }, [fetchData]);
 
+  // Auto-refresh when user switches back to this tab (e.g., after editing in dashboard)
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') fetchData();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [fetchData]);
+
   return (
     <DataContext.Provider value={{ profile, projects, certificates, skills, education, experiences, languages, softSkills, loading }}>
       {children}

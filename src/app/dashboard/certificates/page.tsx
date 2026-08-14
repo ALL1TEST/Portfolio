@@ -93,11 +93,20 @@ export default function CertificatesPage() {
 
   const openEdit = (cert: Certificate) => {
     setEditingId(cert.id);
+    // Parse JSON skills string into comma-separated text for the form
+    const parsedSkills = (() => {
+      try {
+        const parsed = JSON.parse(cert.skills);
+        return Array.isArray(parsed) ? parsed.join(', ') : cert.skills;
+      } catch {
+        return cert.skills;
+      }
+    })();
     setForm({
       title: cert.title,
       issuer: cert.issuer,
       issueDate: cert.issueDate,
-      skills: cert.skills,
+      skills: parsedSkills,
       certificateImage: cert.certificateImage,
       credentialUrl: cert.credentialUrl,
       displayOrder: cert.displayOrder,

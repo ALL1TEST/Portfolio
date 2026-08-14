@@ -128,7 +128,14 @@ export default function ProjectsPage() {
       slug: project.slug,
       shortDescription: project.shortDescription,
       fullDescription: project.fullDescription,
-      technologies: project.technologies,
+      technologies: (() => {
+        try {
+          const parsed = JSON.parse(project.technologies);
+          return Array.isArray(parsed) ? parsed.join(', ') : project.technologies;
+        } catch {
+          return project.technologies;
+        }
+      })(),
       startDate: project.startDate,
       endDate: project.endDate,
       location: project.location,
