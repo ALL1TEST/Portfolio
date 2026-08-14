@@ -485,3 +485,28 @@ Stage Summary:
 - Orange active state on icon, pill-shaped skill tags with hover effects
 - Responsive: grid on desktop, stacked on mobile
 - Database updated: Web→Front-end rename, SEO skill item added
+
+---
+Task ID: ticker-fix
+Agent: Main Agent
+Task: Fix Technologies ticker animation to be a seamless infinite right-to-left loop using pure CSS
+
+Work Log:
+- Inspected current `tech-marquee.tsx` — structure was already correct (two `.tech-ticker-group` divs with `aria-hidden="true"` on the second)
+- Inspected `globals.css` ticker CSS — found two issues:
+  1. Keyframes used `translateX()` instead of `translate3d()` (less performant)
+  2. Missing `!important` on animation declaration (could be overridden)
+- Fixed `globals.css`: Changed keyframes from `translateX(0)/translateX(-50%)` to `translate3d(0,0,0)/translate3d(-50%,0,0)`
+- Fixed `globals.css`: Added `!important` to `.tech-ticker-track` animation property
+- Started dev server and verified with Agent Browser:
+  - Animation state: `running`
+  - Transform progressing from -678px to -1074px over 3 seconds (continuous movement)
+  - 2 groups present with 26 total items (13 tech × 2)
+  - Second group has `aria-hidden="true"` for accessibility
+  - No runtime errors in dev log
+
+Stage Summary:
+- Tech ticker animation is now working as a seamless infinite right-to-left loop
+- Only modified `src/app/globals.css` (2 line changes in the ticker CSS section)
+- No changes to `tech-marquee.tsx` (structure was already correct)
+- No changes to any other component or page
