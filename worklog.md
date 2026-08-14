@@ -453,3 +453,35 @@ Stage Summary:
 - Added deduplication safety net in data-provider.tsx as defense-in-depth
 - Database cleaned: all 148 duplicate records removed, 42 correct records remain
 - Zero design/styling/animation changes — only data logic fixed
+
+---
+Task ID: 8
+Agent: Main Agent
+Task: Redesign Technical Skills section as FAQ/accordion layout
+
+Work Log:
+- Updated database: renamed "Web" category to "Front-end" (5 skills), added "SEO" skill item to SEO category (now has SEO + Web Optimization = 2 items, total 25 skills)
+- Updated prisma/seed.ts: changed Web→Front-end with correct display order, added skill-seo entry
+- Rewrote resume-section.tsx: removed old SkillCard component and card grid, replaced with SkillsAccordion component
+- SkillsAccordion: useState for activeIndex, toggle function that closes previous when opening new
+- Two-column layout: left side with "TECHNICAL SKILLS" badge + large heading, right side with accordion
+- Accordion: 8 categories (Programming, Front-end, Back-end, Databases, AI & Automation, CMS, Tools & Cloud, SEO)
+- Each accordion item: category name + square outlined +/− icon, expandable content with pill tags
+- Icon transforms: rotate(180deg) + orange background on active state
+- Content expands via grid-template-rows: 0fr → 1fr with opacity transition
+- Skill tags: pill shape (border-radius: 999px), dark bg, subtle border, orange hover with translateY(-2px)
+- Added 21 CSS rules to globals.css for accordion (container, header, label, title, accordion, trigger, icon, content, tags, responsive breakpoints, reduced motion)
+- Responsive: 2-column grid at >900px, single column at ≤900px, compact at ≤600px
+- Left header has sticky positioning at top: 120px on desktop
+- Removed unused icon imports (Code2, Globe, Server, Database, Brain, Layout, Cloud, Search, Users, Lightbulb, RefreshCw)
+- Removed SectionHeading import
+- Lint passes clean
+- Verified HTML structure via curl: skills-faq-container, skills-label, skills-faq-title present
+
+Stage Summary:
+- Technical Skills section redesigned from card grid to FAQ/accordion layout
+- Two-column layout: large heading left, expandable accordion right
+- 8 categories with 25 technologies total, each with smooth expand/collapse animation
+- Orange active state on icon, pill-shaped skill tags with hover effects
+- Responsive: grid on desktop, stacked on mobile
+- Database updated: Web→Front-end rename, SEO skill item added

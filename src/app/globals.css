@@ -883,4 +883,169 @@
   .education-item:hover {
     transform: none !important;
   }
+
+  /* Skills Accordion */
+  .skill-accordion-content {
+    transition: none;
+  }
+}
+
+/* ========== Skills FAQ Accordion ========== */
+
+.skills-faq-container {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 100px;
+  align-items: start;
+}
+
+.skills-faq-header {
+  position: sticky;
+  top: 120px;
+}
+
+.skills-label {
+  display: inline-flex;
+  padding: 8px 14px;
+  border: 1px solid #353535;
+  border-radius: 4px;
+  color: #9A9A9A;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-bottom: 28px;
+}
+
+.skills-faq-title {
+  margin: 0;
+  color: #FFFFFF;
+  font-size: clamp(42px, 5vw, 72px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.skills-accordion {
+  width: 100%;
+  border-top: 1px solid #353535;
+}
+
+.skill-accordion-item {
+  border-bottom: 1px solid #353535;
+}
+
+.skill-accordion-trigger {
+  width: 100%;
+  min-height: 72px;
+  padding: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: transparent;
+  border: 0;
+  color: #FFFFFF;
+  font-size: clamp(18px, 1.8vw, 24px);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.skill-accordion-trigger:hover span:first-child {
+  color: #FF3900;
+}
+
+.skill-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #9A9A9A;
+  border-radius: 6px;
+  color: #FFFFFF;
+  font-size: 24px;
+  line-height: 1;
+  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.skill-accordion-item.active .skill-icon {
+  transform: rotate(180deg);
+  background: #FF3900;
+  border-color: #FF3900;
+}
+
+.skill-accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s ease, opacity 0.35s ease;
+  opacity: 0;
+}
+
+.skill-accordion-content > div {
+  overflow: hidden;
+}
+
+.skill-accordion-item.active .skill-accordion-content {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.skill-tags {
+  padding: 0 0 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-tags span {
+  padding: 10px 16px;
+  border: 1px solid #353535;
+  border-radius: 999px;
+  color: #9A9A9A;
+  font-size: 14px;
+  background: #1A1A1A;
+  transition: color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.skill-tags span:hover {
+  color: #FFFFFF;
+  border-color: #FF3900;
+  transform: translateY(-2px);
+}
+
+/* Skills Accordion responsive */
+@media (max-width: 900px) {
+  .skills-faq-container {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+
+  .skills-faq-header {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .skills-faq-container {
+    gap: 40px;
+  }
+
+  .skill-accordion-trigger {
+    min-height: 60px;
+    font-size: 18px;
+    padding: 12px 0;
+  }
+
+  .skill-icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    font-size: 20px;
+  }
+
+  .skill-tags span {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
 }
