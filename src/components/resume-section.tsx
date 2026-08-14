@@ -175,9 +175,6 @@ export function ResumeSection() {
               }
             }}
           />
-          {!profile?.cvFile && (
-            <p className="mt-3 text-xs text-muted-text">CV file coming soon</p>
-          )}
         </ScrollReveal>
       </div>
     </section>
