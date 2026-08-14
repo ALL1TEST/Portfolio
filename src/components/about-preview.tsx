@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { SectionHeading } from './section-heading';
 import { ScrollReveal } from './scroll-reveal';
@@ -8,13 +9,7 @@ import { useData } from '@/lib/data-provider';
 
 export function AboutPreview() {
   const { profile } = useData();
-
-  const scrollToResume = () => {
-    const element = document.getElementById('resume');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const router = useRouter();
 
   const title = profile?.professionalTitle?.split('|')[0]?.trim() || 'Full Stack';
   const specialty = profile?.professionalTitle?.split('|')[1]?.trim() || 'AI & Automation';
@@ -75,7 +70,7 @@ export function AboutPreview() {
               <SlideFillButton
                 label="Learn More"
                 variant="secondary"
-                onClick={scrollToResume}
+                onClick={() => router.push('/resume')}
               />
             </ScrollReveal>
           </div>

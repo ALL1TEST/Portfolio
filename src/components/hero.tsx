@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { useData } from '@/lib/data-provider';
 
@@ -41,19 +42,12 @@ function AnimatedText({ text, delay = 0 }: { text: string; delay?: number }) {
 export function Hero() {
   const mounted = useMounted();
   const { profile, loading } = useData();
+  const router = useRouter();
 
   const fullName = profile?.fullName || 'ABDELLAH AIT-SI';
   const parts = fullName.split(' ');
   const firstName = parts[0] || '';
   const lastName = parts.slice(1).join(' ');
-
-  const scrollToSection = (href: string) => {
-    const id = href.replace('#', '');
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <section
@@ -112,13 +106,13 @@ export function Hero() {
           <SlideFillButton
             label="View My Work"
             variant="primary"
-            onClick={() => scrollToSection('#projects')}
+            onClick={() => router.push('/projects')}
           />
 
           <SlideFillButton
             label="Contact Me"
             variant="secondary"
-            onClick={() => scrollToSection('#contact')}
+            onClick={() => router.push('/contact')}
           />
         </motion.div>
       </div>

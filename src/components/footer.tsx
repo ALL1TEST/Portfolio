@@ -1,28 +1,21 @@
 'use client';
 
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowUp, Github, Linkedin, Instagram } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
 
 const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Certificates', href: '#certificates' },
-  { label: 'Resume', href: '#resume' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Certificates', href: '/certificates' },
+  { label: 'Resume', href: '/resume' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export function Footer() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const scrollToSection = (href: string) => {
-    const id = href.replace('#', '');
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
   return (
@@ -32,18 +25,14 @@ export function Footer() {
           {/* Brand */}
           <ScrollReveal direction="up" delay={0}>
             <div>
-              <a
-                href="#home"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection('#home');
-                }}
+              <Link
+                href="/"
                 className="text-xl font-bold tracking-tight inline-block mb-4"
               >
                 <span className="text-white">Code</span>
                 <span className="text-brand">Virtox</span>
                 <span className="text-brand">.</span>
-              </a>
+              </Link>
               <p className="text-sm text-muted-text leading-relaxed max-w-xs">
                 Full Stack Developer building modern web applications and smart
                 automated solutions.
@@ -88,17 +77,13 @@ export function Footer() {
               </h4>
               <nav className="space-y-2">
                 {navLinks.map((link) => (
-                  <a
+                  <Link
                     key={link.href}
                     href={link.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      scrollToSection(link.href);
-                    }}
                     className="block text-sm text-muted-text hover:text-white transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 ))}
               </nav>
             </div>
