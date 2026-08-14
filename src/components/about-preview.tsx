@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { SectionHeading } from './section-heading';
@@ -23,22 +23,13 @@ export function AboutPreview() {
           <ScrollReveal direction="left">
             <div className="relative aspect-square max-w-md mx-auto">
               <div className="absolute inset-0 bg-surface rounded-2xl border border-stroke/50 overflow-hidden">
-                <div className="absolute inset-0 grid-bg opacity-40" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-32 h-32 rounded-full border border-brand/20 animate-pulse-glow" />
-                  <div className="absolute w-20 h-20 rounded-full border border-brand/40" />
-                  <div className="absolute w-8 h-8 bg-brand/20 rounded-full blur-xl" />
-                </div>
-                <div className="absolute top-4 left-4 w-12 h-[1px] bg-brand/50" />
-                <div className="absolute top-4 left-4 w-[1px] h-12 bg-brand/50" />
-                <div className="absolute bottom-4 right-4 w-12 h-[1px] bg-brand/50" />
-                <div className="absolute bottom-4 right-4 w-[1px] h-12 bg-brand/50" />
-                <div className="absolute bottom-6 left-6 text-brand/60 font-mono text-xs tracking-widest">
-                  {profile?.brandName?.substring(0, 2).toUpperCase() || 'CV'}
-                </div>
-                <div className="absolute top-6 right-6 text-muted-text/40 font-mono text-xs">
-                  &lt;/&gt;
-                </div>
+                <Image
+                  src="/uploads/ABDELLAH.png"
+                  alt="Abdellah Ait-Si"
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </div>
             </div>
           </ScrollReveal>
