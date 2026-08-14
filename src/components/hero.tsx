@@ -2,7 +2,6 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useSyncExternalStore } from 'react';
-import { ArrowDown } from 'lucide-react';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { useData } from '@/lib/data-provider';
 
@@ -132,23 +131,6 @@ export function Hero() {
             variant="secondary"
             onClick={() => scrollToSection('#contact')}
           />
-        </motion.div>
-
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          initial={{ opacity: 0 }}
-          animate={mounted ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 2.0 }}
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="flex flex-col items-center gap-2 text-muted-text/50 cursor-pointer"
-            onClick={() => scrollToSection('#about')}
-          >
-            <span className="text-xs tracking-widest uppercase">Scroll</span>
-            <ArrowDown className="w-4 h-4" />
-          </motion.div>
         </motion.div>
       </div>
     </section>
