@@ -289,3 +289,26 @@ Stage Summary:
 - Text and icon colors transition smoothly with the fill via Framer Motion
 - Hire Me button confirmed removed from both desktop and mobile navigation
 - Pill shape (border-radius: 9999), consistent 56px min-height, 28px padding
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Redesign Certificates section with full-card visual design matching reference layout
+
+Work Log:
+- Read existing certificates-section.tsx (old card design with borders, tags, external links)
+- Checked certificate data from API (2 certs: PHP Essential Training, Foundations of Cybersecurity; no images, no credential URLs)
+- Rewrote certificates-section.tsx with new visual structure: image fills entire card, gradient overlay, tags at top-right, title at bottom, centered View button on hover
+- Added complete certificate card CSS to globals.css (20 rules: grid, card, image, overlay, content, tags, title, meta, view button, hover states, responsive breakpoints)
+- Updated section header to match project section badge + heading style
+- Added reduced motion support for hover animations
+- Verified via curl that all CSS compiles correctly (163KB compiled CSS with all certificate rules)
+- Verified via agent-browser: 2-column grid, 520px min-height, 12px border-radius, overflow hidden, white pill tags, white titles, gray meta text, z-index layering
+- Verified responsive: 1 column on mobile (375px), 1 column on tablet (768px), 2 columns on desktop
+
+Stage Summary:
+- Certificates section fully redesigned with image-as-card visual system
+- CSS verified in compiled output: .certificates-grid (2-col grid), .certificate-card (520px, rounded), .certificate-card::after (gradient overlay), .certificate-tag (white pills), .certificate-view-button (orange pill, opacity+scale on hover)
+- View button conditionally renders only when credentialUrl exists
+- Fallback shows Award icon when no certificate image
+- All existing certificate data preserved
