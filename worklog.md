@@ -421,3 +421,35 @@ Stage Summary:
 - Dashboard duplication fixed: Education management now lives exclusively at /dashboard/education
 - Resume dashboard page cleaned up to only manage Experience, Languages, and Soft Skills
 - Public portfolio page unaffected — no duplication existed on the public-facing site
+
+---
+Task ID: 7
+Agent: Main Agent
+Task: Fix data duplication bug across entire portfolio (certificates, experiences, languages, soft skills, technical skills)
+
+Work Log:
+- Root cause identified: prisma/seed.ts used `db.TABLE.create()` (instead of `upsert()`) for certificates, skills, experiences, languages, and soft skills
+- Each time `bun run seed` was executed during development, duplicate records were created in the SQLite database
+- Verified database state: Certificate (8→2), Experience (12→3), Language (16→4), SoftSkill (16→4), Skill (96→24) — all 4x duplication from 4 seed runs
+- Cleaned all duplicate records: deleted 8 certificates, 96 skills, 12 experiences, 16 languages, 16 soft skills, 4 projects
+- Rewrote prisma/seed.ts: ALL tables now use `upsert()` with stable deterministic IDs (e.g., `cert-php-essential`, `exp-dentclinic`, `lang-arabic`, `skill-js`, `ss-teamwork`)
+- Re-seeded database with clean data: 2 certificates, 3 projects, 24 skills, 2 education, 3 experiences, 4 languages, 4 soft skills
+- Added deduplication safety net in src/lib/data-provider.tsx: `uniqueById()` helper deduplicates all fetched arrays by ID before setting state (prevents future DB duplicates from rendering)
+- Verified all API routes: /api/certificates, /api/experience, /api/languages, /api/soft-skills, /api/skills, /api/resume — all return correct single-copy data
+- Verified dashboard CRUD: create/update/delete operations use correct patterns (no append-style bugs)
+- Browser-verified all sections render with correct counts:
+  - Certificates: 2 (PHP Essential Training, Foundations of Cybersecurity)
+  - Experiences: 3 (DentClinic, CRUD Étudiant, Library Management System)
+  - Languages: 4 (Arabic Native, Amazigh Native, French Intermediate, English Technical)
+  - Soft Skills: 4 (Project Management, Teamwork, Adaptability, Problem Solving)
+  - Technical Skills: 24 across 8 categories (AI & Automation, Back-end, CMS, Databases, Programming, SEO, Tools & Cloud, Web)
+  - Education: 2 (ISTA NTIC, DEVMINDS)
+  - Projects: 3 (DentClinic, CRUD Étudiant, Library Management System)
+- Lint passes clean
+
+Stage Summary:
+- Data duplication bug fully fixed: root cause was `create()` in seed script being run multiple times
+- Fixed seed.ts with `upsert()` + stable IDs for all tables — future seed runs are now idempotent
+- Added deduplication safety net in data-provider.tsx as defense-in-depth
+- Database cleaned: all 148 duplicate records removed, 42 correct records remain
+- Zero design/styling/animation changes — only data logic fixed

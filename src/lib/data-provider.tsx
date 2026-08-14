@@ -56,14 +56,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
         resumeRes.json(),
       ]);
 
+      // Deduplicate by ID before setting state (safety net against DB duplicates)
+      const uniqueById = <T extends { id?: string; title?: string; name?: string }>(items: T[]): T[] =>
+        Array.from(new Map(items.map(item => [item.id || item.title || item.name || JSON.stringify(item), item])).values());
+
       setProfile(profileData);
-      setProjects(projectsData);
-      setCertificates(certsData);
-      setSkills(skillsData);
-      setEducation(resumeData.education || []);
-      setExperiences(resumeData.experience || []);
-      setLanguages(resumeData.languages || []);
-      setSoftSkills(resumeData.softSkills || []);
+      setProjects(uniqueById(projectsData));
+      setCertificates(uniqueById(certsData));
+      setSkills(uniqueById(skillsData));
+      setEducation(uniqueById(resumeData.education || []));
+      setExperiences(uniqueById(resumeData.experience || []));
+      setLanguages(uniqueById(resumeData.languages || []));
+      setSoftSkills(uniqueById(resumeData.softSkills || []));
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
