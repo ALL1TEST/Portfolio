@@ -195,6 +195,7 @@
   flex-shrink: 0;
 }
 
+.tech-item i,
 .tech-item svg {
   color: #9a9a9a;
   fill: currentColor;
