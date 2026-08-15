@@ -77,19 +77,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           <div className="mt-auto" />
 
           {/* Links row */}
-          <div className="flex items-center gap-4 pt-5 border-t border-stroke/40">
-            {project.liveDemoUrl && (
-              <a
-                href={project.liveDemoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-sm font-medium text-white/70 hover:text-brand transition-colors duration-300"
-              >
-                <ArrowUpRight className="w-4 h-4" />
-                View Project
-              </a>
-            )}
-            {project.githubUrl && (
+          <div className="flex items-center gap-3 pt-5 border-t border-stroke/40">
+            <a
+              href={project.liveDemoUrl || project.githubUrl || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand rounded-full hover:bg-brand/80 transition-colors duration-300"
+            >
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              View Project
+            </a>
+            {project.githubUrl && project.liveDemoUrl && project.githubUrl !== project.liveDemoUrl && (
               <a
                 href={project.githubUrl}
                 target="_blank"
