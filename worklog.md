@@ -748,3 +748,30 @@ Stage Summary:
 - Key insight: conditional rendering (placeholder before viewport, animated after) avoids all `initial === animate` bugs
 - Native IntersectionObserver is more reliable than framer-motion's `useInView` in Next.js SSR context
 - All 7 section titles verified working: Who I Am, Featured Projects, Selected Projects, Certificates & Credentials, Technologies I / work with, Experience & Projects, Let's Build Something Great Together.
+---
+Task ID: 10
+Agent: Main Agent
+Task: Fix FocusReveal — use whileInView viewport detection per user specifications
+
+Work Log:
+- Verified all 7 title texts are intact and correct (none deleted/replaced)
+- Rewrote FocusReveal component using framer-motion `whileInView="visible"` + `viewport={{ once: true, amount: 0.3 }}` on parent element
+- Architecture: parent `<MotionTag>` with `initial="hidden"` + `whileInView="visible"` handles viewport detection; children inherit via variant label propagation with per-character delays
+- This avoids the `initial === animate` bug entirely — `whileInView` is a separate trigger that doesn't conflict with `initial`
+- Component includes all specified internals: START_SCALE (1.2), MAX_BLUR (20), EASE_OUT, buildStaggerDelays, resolveEase
+- Word wrapping: each word wrapped in `inline-block whitespace-nowrap`, regular space between words allows natural line breaks
+- Reduced motion support via useReducedMotion — renders plain text immediately
+- Updated all consuming components with `blur={20}` and `staggerFrom="start"` while preserving exact existing className values
+- Verified via agent-browser:
+  - All 7 titles (8 FocusReveal instances) animate correctly
+  - Titles below fold remain blurred until scrolled into view
+  - All characters end at opacity:1, blur(0px) — fully sharp, no residual blur
+  - Once-only behavior: titles stay sharp when scrolling back
+  - Mobile (375px): word wrapping works, animation triggers correctly
+  - No console errors, no hydration errors, lint clean
+
+Stage Summary:
+- FocusReveal now uses whileInView + viewport for reliable viewport-triggered animation
+- Parent-level whileInView propagates to children via shared variant labels
+- Per-character delays handle stagger without needing staggerChildren
+- All original titles preserved with exact existing styling

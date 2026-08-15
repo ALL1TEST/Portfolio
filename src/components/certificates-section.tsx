@@ -114,6 +114,8 @@ export function CertificatesSection() {
             text="Certificates & Credentials"
             as="h2"
             className={CERT_TITLE_CLASSES}
+            blur={20}
+            staggerFrom="start"
           />
           <ScrollReveal delay={0.3}>
             <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base leading-relaxed">
