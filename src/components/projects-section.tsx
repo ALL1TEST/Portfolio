@@ -122,6 +122,7 @@ export function ProjectsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           label="Projects"
+          labelStyle="skills"
           title="Selected Projects"
           description="A curated showcase of work spanning full-stack development, automation, and web applications."
         />

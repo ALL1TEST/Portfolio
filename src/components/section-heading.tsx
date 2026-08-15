@@ -5,6 +5,7 @@ import FocusReveal from './focus-reveal';
 
 interface SectionHeadingProps {
   label?: string;
+  labelStyle?: 'default' | 'skills';
   title: string;
   description?: string;
   align?: 'left' | 'center';
@@ -14,6 +15,7 @@ const TITLE_CLASSES = 'text-3xl sm:text-4xl lg:text-5xl font-bold text-white lea
 
 export function SectionHeading({
   label,
+  labelStyle = 'default',
   title,
   description,
   align = 'center',
@@ -24,7 +26,7 @@ export function SectionHeading({
     >
       {label && (
         <ScrollReveal delay={0}>
-          <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest uppercase text-brand bg-brand/10 rounded-full border border-brand/20 mb-4">
+          <span className={labelStyle === 'skills' ? 'skills-label' : 'inline-block px-4 py-1.5 text-xs font-semibold tracking-widest uppercase text-brand bg-brand/10 rounded-full border border-brand/20 mb-4'}>
             {label}
           </span>
         </ScrollReveal>
