@@ -38,6 +38,12 @@ export const PUT = withAuth(async (req: Request) => {
         ...(body.aboutCard3Description !== undefined && { aboutCard3Description: body.aboutCard3Description }),
         ...(body.profileImage !== undefined && { profileImage: body.profileImage }),
         ...(body.cvFile !== undefined && { cvFile: body.cvFile }),
+        ...(body.stat1Value !== undefined && { stat1Value: body.stat1Value }),
+        ...(body.stat1Label !== undefined && { stat1Label: body.stat1Label }),
+        ...(body.stat2Value !== undefined && { stat2Value: body.stat2Value }),
+        ...(body.stat2Label !== undefined && { stat2Label: body.stat2Label }),
+        ...(body.stat3Value !== undefined && { stat3Value: body.stat3Value }),
+        ...(body.stat3Label !== undefined && { stat3Label: body.stat3Label }),
       },
     });
   } else {

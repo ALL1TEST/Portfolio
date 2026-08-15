@@ -36,6 +36,12 @@ interface Profile {
   aboutCard3Description: string;
   profileImage: string;
   cvFile: string;
+  stat1Value: string;
+  stat1Label: string;
+  stat2Value: string;
+  stat2Label: string;
+  stat3Value: string;
+  stat3Label: string;
 }
 
 const emptyProfile: Profile = {
@@ -62,6 +68,12 @@ const emptyProfile: Profile = {
   aboutCard3Description: '',
   profileImage: '',
   cvFile: '',
+  stat1Value: '',
+  stat1Label: '',
+  stat2Value: '',
+  stat2Label: '',
+  stat3Value: '',
+  stat3Label: '',
 };
 
 export default function SettingsPage() {
@@ -384,6 +396,43 @@ export default function SettingsPage() {
             <Label className="text-sm text-white">Location</Label>
             <Input value={profile.location} onChange={(e) => updateField('location', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="Oulad Teima, Morocco" />
           </div>
+        </div>
+      </Card>
+
+      {/* Achievement Stats */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Achievement Stats</h3>
+        <p className="text-xs text-muted-text mb-4">Edit the 3 stats displayed in the stats section of your site.</p>
+        <div className="space-y-6">
+          {(['1', '2', '3'] as const).map((num) => (
+            <div key={num} className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-md bg-brand/10 text-brand font-bold text-xs flex items-center justify-center flex-shrink-0">#{num}</span>
+                <span className="text-xs font-medium text-muted-text">Stat {num}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">Value</Label>
+                  <Input
+                    value={profile[`stat${num}Value` as keyof Profile] as string}
+                    onChange={(e) => updateField(`stat${num}Value` as keyof Profile, e.target.value)}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="e.g. 6+"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">Label</Label>
+                  <Input
+                    value={profile[`stat${num}Label` as keyof Profile] as string}
+                    onChange={(e) => updateField(`stat${num}Label` as keyof Profile, e.target.value)}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="e.g. Certificates"
+                  />
+                </div>
+              </div>
+              {num !== '3' && <div className="border-b border-stroke/20" />}
+            </div>
+          ))}
         </div>
       </Card>
 
