@@ -2,7 +2,7 @@
 // Originkit preset `custom-style` — defaults rewritten to match preview.
 "use client";
 
-// Focus Reveal — Originkit (framer-motion)
+// Focus Reveal — Originkit (motion/react)
 // Props set in the preview:
 //   text: "FOCUS REVEAL"
 //   blur: 20
@@ -131,9 +131,7 @@ const FocusReveal = ({
   const reduceMotion = useReducedMotion();
   const completedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
-  useEffect(() => {
-    onCompleteRef.current = onComplete;
-  });
+  onCompleteRef.current = onComplete;
 
   const duration = transition.duration ?? DEFAULT_TRANSITION.duration!;
   const baseDelay = transition.delay ?? DEFAULT_TRANSITION.delay!;
@@ -201,25 +199,16 @@ const FocusReveal = ({
     ...(font ?? null),
   };
 
-  // Memoised variant objects so framer-motion can compare by reference.
-  // Must be before the early return (rules-of-hooks).
   const hidden = useMemo(
-    () =>
-      skipMotion
-        ? { opacity: 0 }
-        : { opacity: 0, scale: START_SCALE, filter: `blur(${safeBlur}px)` },
-    [safeBlur, skipMotion],
+    () => skipMotion ? { opacity: 0 } : { opacity: 0, scale: START_SCALE, filter: `blur(${safeBlur}px)` },
+    [safeBlur, skipMotion]
   );
   const visible = useMemo(
-    () => (skipMotion ? { opacity: 1 } : { opacity: 1, scale: 1, filter: "blur(0px)" }),
-    [skipMotion],
+    () => skipMotion ? { opacity: 1 } : { opacity: 1, scale: 1, filter: "blur(0px)" },
+    [skipMotion]
   );
-  const characterVariants = useMemo(
-    () => ({ hidden, visible }),
-    [hidden, visible],
-  );
+  const characterVariants = useMemo(() => ({ hidden, visible }), [hidden, visible]);
 
-  // Reduced motion: render immediately as plain, visible text.
   if (skipMotion) {
     return (
       <MotionTag aria-label={text} className={className} style={rootStyle}>
@@ -229,9 +218,9 @@ const FocusReveal = ({
   }
 
   return (
-    <MotionTag
-      aria-label={text}
-      className={className}
+    <MotionTag 
+      aria-label={text} 
+      className={className} 
       style={rootStyle}
       initial="hidden"
       whileInView="visible"
@@ -260,7 +249,7 @@ const FocusReveal = ({
                   variants={characterVariants}
                   transition={{
                     type: "tween",
-                    duration,
+                    duration: duration,
                     delay: delays[index] ?? 0,
                     ease: resolveEase(ease),
                   }}

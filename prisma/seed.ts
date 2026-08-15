@@ -28,7 +28,7 @@ async function seed() {
       fullName: 'ABDELLAH AIT-SI',
       brandName: 'CodeVirtox',
       professionalTitle: 'Full Stack Developer | AI & Automation',
-      shortBio: 'Building modern web applications and smart automated solutions. Specialized in React, Laravel, and crafting full-stack experiences that drive real impact.',
+      shortBio: 'I build modern web applications, scalable backend systems, and automation solutions that help turn ideas into reliable digital products.',
       aboutText: 'Développeur Full Stack spécialisé en React, Laravel et MySQL, passionné par la création d\'applications web modernes. Intéressé par l\'intelligence artificielle, l\'automatisation et le développement de solutions innovantes.',
       email: 'contact@codevirtox.com',
       phone: '+212 600-000-000',

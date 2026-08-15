@@ -73,7 +73,7 @@ export function ContactSection() {
           label="Contact"
           labelStyle="skills"
           title="Let's Build Something Great Together."
-          description="Have a project in mind or just want to connect? I'd love to hear from you."
+          description="Have a project, a role,or just want to connect? I usually reply within 24 hours."
         />
 
         <div className="max-w-2xl mx-auto">

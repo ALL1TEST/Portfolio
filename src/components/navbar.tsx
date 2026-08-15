@@ -121,13 +121,14 @@ export function Navbar() {
               <motion.div
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center min-w-0"
+                className="flex items-center gap-2.5 min-w-0"
               >
                 <img
-                  src="/uploads/codevirtox-logo.png"
-                  alt="CodeVirtox"
-                  className="site-logo"
+                  src="/logo.png"
+                  alt="Logo"
+                  className="object-contain h-10 w-auto lg:h-12"
                 />
+                <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">CodeVirtox</span>
               </motion.div>
               <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-gradient-to-r from-brand via-brand/60 to-transparent group-hover/logo:w-full transition-all duration-500 ease-out" />
             </Link>

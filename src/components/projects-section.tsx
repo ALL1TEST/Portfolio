@@ -124,7 +124,7 @@ export function ProjectsSection() {
           label="Projects"
           labelStyle="skills"
           title="Selected Projects"
-          description="A curated showcase of work spanning full-stack development, automation, and web applications."
+          description="A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving."
         />
 
         {loading ? (

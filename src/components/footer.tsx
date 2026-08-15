@@ -27,16 +27,15 @@ export function Footer() {
             <div>
               <Link
                 href="/"
-                className="inline-flex items-baseline mb-4 group/flogo"
+                className="flex items-center gap-2.5 mb-4 group/flogo min-w-0"
               >
-                <span className="text-xl font-bold text-white tracking-[-0.02em]">
-                  Code
-                </span>
-                <span className="text-xl font-bold tracking-[-0.02em] text-brand drop-shadow-[0_0_8px_rgba(255,57,0,0.35)] transition-all duration-300 group-hover/flogo:drop-shadow-[0_0_14px_rgba(255,57,0,0.55)]">
-                  Virtox
-                </span>
-                <span className="text-xl font-bold tracking-[-0.02em] text-brand/80 drop-shadow-[0_0_8px_rgba(255,57,0,0.35)] transition-all duration-300 group-hover/flogo:drop-shadow-[0_0_14px_rgba(255,57,0,0.55)]">
-                  .
+                <img
+                  src="/logo.png"
+                  alt="Logo"
+                  className="object-contain h-10 w-auto lg:h-12 transition-transform duration-300 group-hover/flogo:scale-105"
+                />
+                <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">
+                  CodeVirtox
                 </span>
               </Link>
               <p className="text-sm text-muted-text leading-relaxed max-w-xs">
