@@ -961,3 +961,39 @@ Stage Summary:
 - About Text changes now reflect in the About section on the homepage
 - Social Links (GitHub/LinkedIn) now reflect in navbar mobile menu and footer
 - All components have fallback defaults for when profile data is empty
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Add Profile Image upload, Instagram/Twitter links, Footer Bio to Settings; conditionally hide social icons on frontend
+
+Work Log:
+- Read all relevant files: settings page, profile API, data-provider, frontend page, footer, navbar, types, upload API, prisma schema
+- Updated Prisma schema: added `instagramUrl`, `twitterUrl`, `footerBio` fields to Profile model
+- Ran `bun run db:push` to sync database schema
+- Updated `/src/app/api/profile/route.ts`: added new fields to PUT handler
+- Updated `/src/app/api/upload/route.ts`: added `category=profile` subdirectory support
+- Updated `/src/lib/types.ts`: added new fields to Profile interface
+- Rewrote `/src/app/dashboard/settings/page.tsx`: 
+  - Added Profile Image upload with preview, upload button, remove button
+  - Added Instagram URL input
+  - Added Twitter URL input
+  - Added Footer Bio textarea
+  - Removed old Profile Image URL input (replaced with upload)
+- Rewrote `/src/components/footer.tsx`:
+  - Social links now dynamically built from profile data (only non-empty URLs)
+  - Added Instagram and Twitter icons
+  - Footer bio uses `footerBio` field, falls back to `shortBio`
+- Rewrote `/src/components/navbar.tsx`:
+  - Social links now dynamically built from profile data
+  - Removed hardcoded default social links fallback
+  - Only shows social icons when URLs are configured
+- Ran lint: all passed
+- Verified in browser: homepage renders, footer hides social icons when URLs empty, settings page shows all new fields
+
+Stage Summary:
+- All new fields working end-to-end
+- Social icons conditionally hidden when no URL is set (both footer and navbar)
+- Profile image upload saves to `/uploads/profile/` directory
+- Footer bio displayed in footer with fallback to shortBio
+- No application errors

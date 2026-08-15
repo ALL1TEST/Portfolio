@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Save, Loader2, User } from 'lucide-react';
+import { Save, Loader2, User, Upload, Trash2, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,11 +19,14 @@ interface Profile {
   professionalTitle: string;
   shortBio: string;
   aboutText: string;
+  footerBio: string;
   email: string;
   phone: string;
   location: string;
   githubUrl: string;
   linkedinUrl: string;
+  instagramUrl: string;
+  twitterUrl: string;
   profileImage: string;
   cvFile: string;
 }
@@ -34,11 +37,14 @@ const emptyProfile: Profile = {
   professionalTitle: '',
   shortBio: '',
   aboutText: '',
+  footerBio: '',
   email: '',
   phone: '',
   location: '',
   githubUrl: '',
   linkedinUrl: '',
+  instagramUrl: '',
+  twitterUrl: '',
   profileImage: '',
   cvFile: '',
 };
@@ -48,6 +54,8 @@ export default function SettingsPage() {
   const [original, setOriginal] = useState<Profile>(emptyProfile);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -69,6 +77,50 @@ export default function SettingsPage() {
 
   const updateField = (field: keyof Profile, value: string) => {
     setProfile((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Only image files are allowed');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('category', 'profile');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        updateField('profileImage', data.url);
+        toast.success('Image uploaded successfully');
+      } else {
+        toast.error('Failed to upload image');
+      }
+    } catch {
+      toast.error('Failed to upload image');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = () => {
+    updateField('profileImage', '');
   };
 
   const handleSave = async () => {
@@ -138,6 +190,70 @@ export default function SettingsPage() {
         </Button>
       </div>
 
+      {/* Profile Image */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Profile Image</h3>
+        <div className="flex items-center gap-6">
+          {/* Preview */}
+          <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-stroke/50 bg-dark flex-shrink-0">
+            {profile.profileImage ? (
+              <img
+                src={profile.profileImage}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-text">
+                <User className="w-8 h-8" />
+              </div>
+            )}
+          </div>
+
+          {/* Upload controls */}
+          <div className="flex-1 space-y-3">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="border-stroke text-white hover:bg-dark gap-2"
+              >
+                {uploading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
+                {uploading ? 'Uploading...' : 'Upload Image'}
+              </Button>
+              {profile.profileImage && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={removeImage}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Remove
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-text">
+              Recommended: Square image, min 300×300px. Max 5MB.
+            </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </div>
+        </div>
+      </Card>
+
       {/* Personal Information */}
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Personal Information</h3>
@@ -197,6 +313,21 @@ export default function SettingsPage() {
             placeholder="Tell visitors about yourself, your background, experience, and what drives you..."
           />
           <p className="text-xs text-muted-text">This appears on the About section of your portfolio.</p>
+        </div>
+      </Card>
+
+      {/* Footer Bio */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Footer</h3>
+        <div className="space-y-2">
+          <Label className="text-sm text-white">Footer Bio</Label>
+          <Textarea
+            value={profile.footerBio}
+            onChange={(e) => updateField('footerBio', e.target.value)}
+            className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+            placeholder="A short bio or tagline that appears in the footer of your site..."
+          />
+          <p className="text-xs text-muted-text">This appears in the footer section of your website.</p>
         </div>
       </Card>
 
@@ -265,14 +396,26 @@ export default function SettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-sm text-white">Profile Image URL</Label>
+              <Label className="text-sm text-white">Instagram URL</Label>
               <Input
-                value={profile.profileImage}
-                onChange={(e) => updateField('profileImage', e.target.value)}
+                value={profile.instagramUrl}
+                onChange={(e) => updateField('instagramUrl', e.target.value)}
                 className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                placeholder="/images/profile.jpg"
+                placeholder="https://instagram.com/username"
               />
             </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-white">Twitter URL</Label>
+              <Input
+                value={profile.twitterUrl}
+                onChange={(e) => updateField('twitterUrl', e.target.value)}
+                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                placeholder="https://twitter.com/username"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-sm text-white">CV File URL</Label>
               <Input
@@ -283,6 +426,10 @@ export default function SettingsPage() {
               />
             </div>
           </div>
+
+          <p className="text-xs text-muted-text">
+            Leave a social link empty to hide its icon from the frontend.
+          </p>
         </div>
       </Card>
 

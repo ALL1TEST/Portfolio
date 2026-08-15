@@ -35,8 +35,16 @@ export const POST = withAuth(async (req: Request) => {
     const ext = path.extname(file.name) || (file.type === 'application/pdf' ? '.pdf' : '.png');
     const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
 
-    // Determine subdirectory based on file type
-    const subDir = file.type === 'application/pdf' ? 'certificates' : 'projects';
+    // Determine subdirectory based on file type or category
+    const category = (formData.get('category') as string) || '';
+    let subDir: string;
+    if (category === 'profile') {
+      subDir = 'profile';
+    } else if (file.type === 'application/pdf') {
+      subDir = 'certificates';
+    } else {
+      subDir = 'projects';
+    }
     const uploadDir = path.join(process.cwd(), 'public', 'uploads', subDir);
     await mkdir(uploadDir, { recursive: true });
 

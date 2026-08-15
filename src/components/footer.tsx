@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowUp, Github, Linkedin, Instagram } from 'lucide-react';
+import { ArrowUp, Github, Linkedin, Instagram, Twitter } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
 import { useData } from '@/lib/data-provider';
 
@@ -19,6 +19,13 @@ export function Footer() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Build social links array from profile — only include non-empty URLs
+  const socialLinks: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [];
+  if (profile?.githubUrl) socialLinks.push({ href: profile.githubUrl, label: 'GitHub', icon: Github });
+  if (profile?.linkedinUrl) socialLinks.push({ href: profile.linkedinUrl, label: 'LinkedIn', icon: Linkedin });
+  if (profile?.instagramUrl) socialLinks.push({ href: profile.instagramUrl, label: 'Instagram', icon: Instagram });
+  if (profile?.twitterUrl) socialLinks.push({ href: profile.twitterUrl, label: 'Twitter', icon: Twitter });
 
   return (
     <footer className="relative border-t border-stroke/30 bg-dark">
@@ -41,49 +48,24 @@ export function Footer() {
                 </span>
               </Link>
               <p className="text-sm text-muted-text leading-relaxed max-w-xs">
-                {profile?.shortBio || 'Full Stack Developer building modern web applications and smart automated solutions.'}
+                {profile?.footerBio || profile?.shortBio || 'Full Stack Developer building modern web applications and smart automated solutions.'}
               </p>
-              <div className="flex items-center gap-3 mt-4">
-                {profile?.githubUrl ? (
-                  <a
-                    href={profile.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all"
-                    aria-label="GitHub"
-                  >
-                    <Github className="w-4 h-4" />
-                  </a>
-                ) : (
-                  <a href="https://github.com/CodeVirtox" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all" aria-label="GitHub">
-                    <Github className="w-4 h-4" />
-                  </a>
-                )}
-                {profile?.linkedinUrl ? (
-                  <a
-                    href={profile.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all"
-                    aria-label="LinkedIn"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                ) : (
-                  <a href="https://www.linkedin.com/in/abdellahaitsi-dev/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all" aria-label="LinkedIn">
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                )}
-                <a
-                  href="https://www.instagram.com/dev.abdellah/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all"
-                  aria-label="Instagram"
-                >
-                  <Instagram className="w-4 h-4" />
-                </a>
-              </div>
+              {socialLinks.length > 0 && (
+                <div className="flex items-center gap-3 mt-4">
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all"
+                      aria-label={social.label}
+                    >
+                      <social.icon className="w-4 h-4" />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </ScrollReveal>
 

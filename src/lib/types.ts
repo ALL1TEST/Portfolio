@@ -5,11 +5,14 @@ export interface Profile {
   professionalTitle: string;
   shortBio: string;
   aboutText: string;
+  footerBio: string;
   email: string;
   phone: string;
   location: string;
   githubUrl: string;
   linkedinUrl: string;
+  instagramUrl: string;
+  twitterUrl: string;
   profileImage: string;
   cvFile: string;
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Github, Linkedin, Instagram } from 'lucide-react';
+import { Menu, X, Github, Linkedin, Instagram, Twitter } from 'lucide-react';
 import { useData } from '@/lib/data-provider';
 
 const navLinks = [
@@ -15,18 +15,19 @@ const navLinks = [
   { label: 'Contact', href: '/contact' },
 ];
 
-const defaultSocialLinks = [
-  { label: 'GitHub', href: 'https://github.com/CodeVirtox', icon: Github },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/abdellahaitsi-dev/', icon: Linkedin },
-  { label: 'Instagram', href: 'https://www.instagram.com/dev.abdellah/', icon: Instagram },
-];
-
 export function Navbar() {
   const { profile } = useData();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Build social links array from profile — only include non-empty URLs
+  const socialLinks: { href: string; label: string; icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }> }[] = [];
+  if (profile?.githubUrl) socialLinks.push({ href: profile.githubUrl, label: 'GitHub', icon: Github });
+  if (profile?.linkedinUrl) socialLinks.push({ href: profile.linkedinUrl, label: 'LinkedIn', icon: Linkedin });
+  if (profile?.instagramUrl) socialLinks.push({ href: profile.instagramUrl, label: 'Instagram', icon: Instagram });
+  if (profile?.twitterUrl) socialLinks.push({ href: profile.twitterUrl, label: 'Twitter', icon: Twitter });
 
   const handleScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 50);
@@ -255,25 +256,16 @@ export function Navbar() {
                 className="mt-12 mb-6 h-px bg-gradient-to-r from-transparent via-stroke/40 to-transparent"
               />
 
-              {/* Social links */}
-              <motion.div variants={itemVariants} className="flex items-center gap-2.5">
-                {/* Social links from profile data */}
-                {profile?.githubUrl && (
-                  <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300" aria-label="GitHub">
-                    <Github size={16} strokeWidth={1.5} />
-                  </a>
-                )}
-                {profile?.linkedinUrl && (
-                  <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300" aria-label="LinkedIn">
-                    <Linkedin size={16} strokeWidth={1.5} />
-                  </a>
-                )}
-                {!profile?.githubUrl && !profile?.linkedinUrl && defaultSocialLinks.map((social) => (
-                  <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300" aria-label={social.label}>
-                    <social.icon size={16} strokeWidth={1.5} />
-                  </a>
-                ))}
-              </motion.div>
+              {/* Social links — only show if profile has any social links */}
+              {socialLinks.length > 0 && (
+                <motion.div variants={itemVariants} className="flex items-center gap-2.5">
+                  {socialLinks.map((social) => (
+                    <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300" aria-label={social.label}>
+                      <social.icon size={16} strokeWidth={1.5} />
+                    </a>
+                  ))}
+                </motion.div>
+              )}
 
               {/* Bottom branding */}
               <motion.div variants={itemVariants} className="mt-auto pb-8">
