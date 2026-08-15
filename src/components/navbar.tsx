@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Github, Linkedin, Instagram } from 'lucide-react';
+import Image from 'next/image';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -118,21 +119,20 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Brand */}
             <Link href="/" className="relative z-10 group/logo" onClick={closeMobileMenu}>
-              <motion.span
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex items-baseline"
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center"
               >
-                <span className="text-[1.35rem] lg:text-[1.6rem] font-bold text-white tracking-[-0.02em]">
-                  Code
-                </span>
-                <span className="text-[1.35rem] lg:text-[1.6rem] font-bold tracking-[-0.02em] text-brand drop-shadow-[0_0_8px_rgba(255,57,0,0.35)] transition-all duration-300 group-hover/logo:drop-shadow-[0_0_14px_rgba(255,57,0,0.55)]">
-                  Virtox
-                </span>
-                <span className="text-[1.35rem] lg:text-[1.6rem] font-bold tracking-[-0.02em] text-brand/80 drop-shadow-[0_0_8px_rgba(255,57,0,0.35)] transition-all duration-300 group-hover/logo:drop-shadow-[0_0_14px_rgba(255,57,0,0.55)]">
-                  .
-                </span>
-              </motion.span>
+                <Image
+                  src="/uploads/pasted_image_1786815626986.png"
+                  alt="CodeVirtox"
+                  width={140}
+                  height={40}
+                  className="h-8 lg:h-9 w-auto object-contain"
+                  priority
+                />
+              </motion.div>
               <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-gradient-to-r from-brand via-brand/60 to-transparent group-hover/logo:w-full transition-all duration-500 ease-out" />
             </Link>
 
