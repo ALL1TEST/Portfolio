@@ -583,3 +583,31 @@ Stage Summary:
 - Dynamic filter system: categories auto-derived from certificates in DB, new categories appear automatically
 - Dashboard allows full CRUD with category management
 - Card design: split layout (image top, content below) consistent with project cards
+
+---
+Task ID: Cert-Redesign
+Agent: Main Agent
+Task: Redesign Certificates section cards to match project-card visual style (full-bleed image, gradient overlay, centered View button)
+
+Work Log:
+- Read existing certificates-section.tsx (used cert-v2-* classes with split image+content layout)
+- Read globals.css (both old cert-v2-* and new certificate-card* styles existed)
+- Read types.ts and data-provider.tsx to understand data structure
+- Rewrote certificates-section.tsx CertificateCard component to use project-card visual system:
+  - Full-bleed certificate image filling entire card (certificate-card-image class)
+  - Dark gradient overlay via ::after pseudo-element (transparent → black)
+  - White pill-shaped tags at top-right showing Issuer + Year
+  - Certificate title at bottom-left with meta text below
+  - Centered orange #FF3900 pill "→ View" button hidden by default, appears on hover with opacity+scale animation
+  - Hover zoom effect on image (scale 1.06)
+  - Award icon placeholder when no image is set
+- Removed old cert-v2-* CSS styles from globals.css (~180 lines of unused styles)
+- Preserved all existing functionality: dynamic filters, stats counter, AnimatePresence transitions, loading skeletons, empty states
+- Verified with browser: confirmed 2-column grid, white pills, titles at bottom, gradient overlay, hover View button, zoom effect
+- Lint passes cleanly, no errors in dev log
+
+Stage Summary:
+- certificates-section.tsx now uses certificate-card/certificate-card-image/certificate-card-content/certificate-tags/certificate-tag/certificate-info/certificate-title/certificate-meta/certificate-view-button classes
+- Old cert-v2-* CSS removed from globals.css
+- All certificate data, filtering, and section structure preserved unchanged
+- Visual design matches the reference HTML: full-card visual background, category labels at top, title at bottom, centered View button on hover

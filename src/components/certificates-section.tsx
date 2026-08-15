@@ -2,22 +2,11 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Award } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Certificate } from '@/lib/types';
-
-function parseSkills(skillsJson: string): string[] {
-  try {
-    const parsed = JSON.parse(skillsJson);
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    return [];
-  } catch {
-    if (skillsJson && skillsJson.trim()) return skillsJson.split(',').map(s => s.trim()).filter(Boolean);
-    return [];
-  }
-}
 
 function formatIssueDate(dateStr: string): string {
   if (!dateStr) return '';
@@ -33,8 +22,15 @@ function formatIssueDate(dateStr: string): string {
 function CertificateCard({ cert, index }: { cert: Certificate; index: number }) {
   const hasImage = !!cert.certificateImage;
   const href = cert.credentialUrl || '#';
-  const skills = parseSkills(cert.skills);
   const formattedDate = formatIssueDate(cert.issueDate);
+
+  // Build tag pills: issuer + year
+  const tags: string[] = [];
+  if (cert.issuer) tags.push(cert.issuer);
+  if (formattedDate) {
+    const yearMatch = formattedDate.match(/\d{4}/);
+    if (yearMatch) tags.push(yearMatch[0]);
+  }
 
   return (
     <motion.div
@@ -47,64 +43,67 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
         delay: index * 0.08,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="cert-v2-card group"
+      className="certificate-card"
     >
-      {/* Image / Thumbnail area */}
-      <div className="cert-v2-image-area">
-        {hasImage ? (
-          <img src={cert.certificateImage} alt={cert.title} className="cert-v2-image" />
-        ) : (
-          <div className="cert-v2-image-placeholder">
-            <Award className="w-10 h-10 text-stroke/30" />
-            <span className="text-xs text-stroke/40 mt-2 uppercase tracking-wider">No Image</span>
-          </div>
-        )}
-      </div>
+      {/* Full-bleed image */}
+      {hasImage ? (
+        <img
+          src={cert.certificateImage}
+          alt={cert.title}
+          className="certificate-card-image"
+        />
+      ) : (
+        <div
+          className="certificate-card-image"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+          }}
+        >
+          <Award className="w-12 h-12 text-white/10" />
+        </div>
+      )}
 
-      {/* Content area */}
-      <div className="cert-v2-content">
-        {/* Category badge */}
-        {cert.category && (
-          <span className="cert-v2-category-badge">{cert.category}</span>
-        )}
-
-        {/* Title */}
-        <h3 className="cert-v2-title">{cert.title}</h3>
-
-        {/* Issuer */}
-        <p className="cert-v2-issuer">{cert.issuer}</p>
-
-        {/* Issue date */}
-        {formattedDate && (
-          <p className="cert-v2-date">
-            Issued {formattedDate}
-          </p>
-        )}
-
-        {/* Skills */}
-        {skills.length > 0 && (
-          <div className="cert-v2-skills">
-            <span className="cert-v2-skills-label">Skills:</span>
-            <span className="cert-v2-skills-text">
-              {skills.join(' • ')}
+      {/* Content overlay — tags top, title bottom */}
+      <div className="certificate-card-content">
+        {/* Tags at top-right */}
+        <div className="certificate-tags">
+          {tags.map((tag) => (
+            <span key={tag} className="certificate-tag">
+              {tag}
             </span>
-          </div>
-        )}
+          ))}
+        </div>
 
-        {/* View Credential button */}
-        {href !== '#' && (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cert-v2-view-btn"
-            aria-label={`View credential for ${cert.title}`}
-          >
-            <span>View Credential</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </a>
-        )}
+        {/* Title + meta at bottom-left */}
+        <div className="certificate-info">
+          <h3 className="certificate-title">{cert.title}</h3>
+          <p className="certificate-meta">
+            {[cert.issuer, formattedDate].filter(Boolean).join(' — ')}
+          </p>
+        </div>
       </div>
+
+      {/* Centered View button — appears on hover */}
+      {href !== '#' ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="certificate-view-button"
+          aria-label={`View credential for ${cert.title}`}
+        >
+          <span>→</span>
+          <span>View</span>
+        </a>
+      ) : (
+        <div className="certificate-view-button" style={{ cursor: 'default' }}>
+          <span>→</span>
+          <span>View</span>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -183,19 +182,10 @@ export function CertificatesSection() {
 
         {/* Certificate grid */}
         {loading ? (
-          <div className="cert-v2-grid">
+          <div className="certificates-grid">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="cert-v2-card">
-                <div className="cert-v2-image-area">
-                  <Skeleton className="w-full h-full" />
-                </div>
-                <div className="cert-v2-content">
-                  <Skeleton className="h-4 w-20 mb-3" />
-                  <Skeleton className="h-6 w-48 mb-2" />
-                  <Skeleton className="h-4 w-32 mb-1" />
-                  <Skeleton className="h-4 w-24 mb-4" />
-                  <Skeleton className="h-4 w-full" />
-                </div>
+              <div key={i} className="certificate-card">
+                <Skeleton className="w-full h-full" />
               </div>
             ))}
           </div>
@@ -208,7 +198,7 @@ export function CertificatesSection() {
             </p>
           </div>
         ) : (
-          <motion.div layout className="cert-v2-grid">
+          <motion.div layout className="certificates-grid">
             <AnimatePresence mode="popLayout">
               {filteredCerts.map((cert, index) => (
                 <CertificateCard key={cert.id} cert={cert} index={index} />

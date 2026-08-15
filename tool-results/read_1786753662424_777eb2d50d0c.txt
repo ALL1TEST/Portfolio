@@ -1,0 +1,1230 @@
+     1→@import "tailwindcss";
+     2→@import "tw-animate-css";
+     3→
+     4→@custom-variant dark (&:is(.dark *));
+     5→
+     6→@theme inline {
+     7→  --color-background: var(--background);
+     8→  --color-foreground: var(--foreground);
+     9→  --font-sans: var(--font-geist-sans);
+    10→  --font-mono: var(--font-geist-mono);
+    11→  --color-sidebar-ring: var(--sidebar-ring);
+    12→  --color-sidebar-border: var(--sidebar-border);
+    13→  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    14→  --color-sidebar-accent: var(--sidebar-accent);
+    15→  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    16→  --color-sidebar-primary: var(--sidebar-primary);
+    17→  --color-sidebar-foreground: var(--sidebar-foreground);
+    18→  --color-sidebar: var(--sidebar);
+    19→  --color-chart-5: var(--chart-5);
+    20→  --color-chart-4: var(--chart-4);
+    21→  --color-chart-3: var(--chart-3);
+    22→  --color-chart-2: var(--chart-2);
+    23→  --color-chart-1: var(--chart-1);
+    24→  --color-ring: var(--ring);
+    25→  --color-input: var(--input);
+    26→  --color-border: var(--border);
+    27→  --color-destructive: var(--destructive);
+    28→  --color-accent-foreground: var(--accent-foreground);
+    29→  --color-accent: var(--accent);
+    30→  --color-muted-foreground: var(--muted-foreground);
+    31→  --color-muted: var(--muted);
+    32→  --color-secondary-foreground: var(--secondary-foreground);
+    33→  --color-secondary: var(--secondary);
+    34→  --color-primary-foreground: var(--primary-foreground);
+    35→  --color-primary: var(--primary);
+    36→  --color-popover-foreground: var(--popover-foreground);
+    37→  --color-popover: var(--popover);
+    38→  --color-card-foreground: var(--card-foreground);
+    39→  --color-card: var(--card);
+    40→  --radius-sm: calc(var(--radius) - 4px);
+    41→  --radius-md: calc(var(--radius) - 2px);
+    42→  --radius-lg: var(--radius);
+    43→  --radius-xl: calc(var(--radius) + 4px);
+    44→  --color-brand: #FF3900;
+    45→  --color-brand-light: #FF5A2B;
+    46→  --color-dark: #030303;
+    47→  --color-surface: #1A1A1A;
+    48→  --color-stroke: #353535;
+    49→  --color-gradient-dark: #151517;
+    50→  --color-muted-text: #9A9A9A;
+    51→}
+    52→
+    53→:root {
+    54→  --radius: 0.625rem;
+    55→  --background: #030303;
+    56→  --foreground: #FFFFFF;
+    57→  --card: #1A1A1A;
+    58→  --card-foreground: #FFFFFF;
+    59→  --popover: #1A1A1A;
+    60→  --popover-foreground: #FFFFFF;
+    61→  --primary: #FF3900;
+    62→  --primary-foreground: #FFFFFF;
+    63→  --secondary: #151517;
+    64→  --secondary-foreground: #FFFFFF;
+    65→  --muted: #1A1A1A;
+    66→  --muted-foreground: #9A9A9A;
+    67→  --accent: #1A1A1A;
+    68→  --accent-foreground: #FFFFFF;
+    69→  --destructive: #FF3900;
+    70→  --border: #353535;
+    71→  --input: #353535;
+    72→  --ring: #FF3900;
+    73→  --chart-1: #FF3900;
+    74→  --chart-2: #FF5A2B;
+    75→  --chart-3: #9A9A9A;
+    76→  --chart-4: #1A1A1A;
+    77→  --chart-5: #353535;
+    78→  --sidebar: #151517;
+    79→  --sidebar-foreground: #FFFFFF;
+    80→  --sidebar-primary: #FF3900;
+    81→  --sidebar-primary-foreground: #FFFFFF;
+    82→  --sidebar-accent: #1A1A1A;
+    83→  --sidebar-accent-foreground: #FFFFFF;
+    84→  --sidebar-border: #353535;
+    85→  --sidebar-ring: #FF3900;
+    86→}
+    87→
+    88→@layer base {
+    89→  * {
+    90→    @apply border-border outline-ring/50;
+    91→  }
+    92→  body {
+    93→    @apply bg-background text-foreground;
+    94→  }
+    95→  html {
+    96→    scroll-behavior: smooth;
+    97→    scrollbar-width: thin;
+    98→    scrollbar-color: #353535 #030303;
+    99→  }
+   100→  ::-webkit-scrollbar {
+   101→    width: 6px;
+   102→  }
+   103→  ::-webkit-scrollbar-track {
+   104→    background: #030303;
+   105→  }
+   106→  ::-webkit-scrollbar-thumb {
+   107→    background: #353535;
+   108→    border-radius: 3px;
+   109→  }
+   110→  ::-webkit-scrollbar-thumb:hover {
+   111→    background: #FF3900;
+   112→  }
+   113→  ::selection {
+   114→    background: #FF3900;
+   115→    color: #FFFFFF;
+   116→  }
+   117→}
+   118→
+   119→/* Noise texture overlay */
+   120→.noise-bg::before {
+   121→  content: '';
+   122→  position: fixed;
+   123→  top: 0;
+   124→  left: 0;
+   125→  width: 100%;
+   126→  height: 100%;
+   127→  opacity: 0.03;
+   128→  z-index: 0;
+   129→  pointer-events: none;
+   130→  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+   131→}
+   132→
+   133→/* Gradient text */
+   134→.gradient-text {
+   135→  background: linear-gradient(135deg, #FFFFFF 0%, #9A9A9A 100%);
+   136→  -webkit-background-clip: text;
+   137→  -webkit-text-fill-color: transparent;
+   138→  background-clip: text;
+   139→}
+   140→
+   141→/* Animated gradient border */
+   142→@property --angle {
+   143→  syntax: '<angle>';
+   144→  initial-value: 0deg;
+   145→  inherits: false;
+   146→}
+   147→
+   148→.animated-border {
+   149→  --angle: 0deg;
+   150→  border-image: conic-gradient(from var(--angle), #FF3900, #353535, #FF3900) 1;
+   151→  animation: rotate-border 4s linear infinite;
+   152→}
+   153→
+   154→@keyframes rotate-border {
+   155→  to { --angle: 360deg; }
+   156→}
+   157→
+   158→/* Glow effect */
+   159→.glow-brand {
+   160→  box-shadow: 0 0 20px rgba(255, 57, 0, 0.15), 0 0 60px rgba(255, 57, 0, 0.05);
+   161→}
+   162→
+   163→.glow-brand-strong {
+   164→  box-shadow: 0 0 30px rgba(255, 57, 0, 0.3), 0 0 80px rgba(255, 57, 0, 0.1);
+   165→}
+   166→
+   167→/* Tech ticker animation */
+   168→.tech-ticker {
+   169→  width: 100%;
+   170→  overflow: hidden;
+   171→  white-space: nowrap;
+   172→}
+   173→
+   174→.tech-ticker-track {
+   175→  display: flex;
+   176→  width: max-content;
+   177→  will-change: transform;
+   178→  animation: technologyTicker 25s linear infinite !important;
+   179→}
+   180→
+   181→.tech-ticker-group {
+   182→  display: flex;
+   183→  align-items: center;
+   184→  flex-shrink: 0;
+   185→}
+   186→
+   187→.tech-item {
+   188→  display: flex;
+   189→  align-items: center;
+   190→  gap: 12px;
+   191→  padding-right: 28px;
+   192→  color: #9a9a9a;
+   193→  font-size: 16px;
+   194→  font-weight: 500;
+   195→  flex-shrink: 0;
+   196→}
+   197→
+   198→.tech-item i,
+   199→.tech-item svg {
+   200→  color: #9a9a9a;
+   201→  fill: currentColor;
+   202→}
+   203→
+   204→.tech-item b {
+   205→  color: #555;
+   206→  margin-left: 8px;
+   207→  font-weight: normal;
+   208→}
+   209→
+   210→@keyframes technologyTicker {
+   211→  from {
+   212→    transform: translate3d(0, 0, 0);
+   213→  }
+   214→  to {
+   215→    transform: translate3d(-50%, 0, 0);
+   216→  }
+   217→}
+   218→
+   219→/* Pulse glow */
+   220→@keyframes pulse-glow {
+   221→  0%, 100% { opacity: 0.4; }
+   222→  50% { opacity: 0.8; }
+   223→}
+   224→
+   225→.animate-pulse-glow {
+   226→  animation: pulse-glow 3s ease-in-out infinite;
+   227→}
+   228→
+   229→/* Grid background */
+   230→.grid-bg {
+   231→  background-image: 
+   232→    linear-gradient(rgba(53, 53, 53, 0.3) 1px, transparent 1px),
+   233→    linear-gradient(90deg, rgba(53, 53, 53, 0.3) 1px, transparent 1px);
+   234→  background-size: 60px 60px;
+   235→}
+   236→
+   237→/* Reduced motion */
+   238→@media (prefers-reduced-motion: reduce) {
+   239→  .tech-ticker-track {
+   240→    animation: none;
+   241→  }
+   242→  .animate-pulse-glow {
+   243→    animation: none;
+   244→  }
+   245→  .animated-border {
+   246→    animation: none;
+   247→  }
+   248→  html {
+   249→    scroll-behavior: auto;
+   250→  }
+   251→  .certificate-card:hover .certificate-card-image {
+   252→    transform: none;
+   253→  }
+   254→  .certificate-view-button {
+   255→    opacity: 1;
+   256→    transform: translate(-50%, -50%) scale(1);
+   257→  }
+   258→}
+   259→
+   260→/* ─── Certificate Cards ─── */
+   261→.certificates-grid {
+   262→  display: grid;
+   263→  grid-template-columns: repeat(2, minmax(0, 1fr));
+   264→  gap: 24px;
+   265→}
+   266→
+   267→.certificate-card {
+   268→  position: relative;
+   269→  min-height: 520px;
+   270→  overflow: hidden;
+   271→  border-radius: 12px;
+   272→  background: #1a1a1a;
+   273→  cursor: pointer;
+   274→}
+   275→
+   276→.certificate-card-image {
+   277→  position: absolute;
+   278→  inset: 0;
+   279→  width: 100%;
+   280→  height: 100%;
+   281→  object-fit: cover;
+   282→  transition: transform 0.7s cubic-bezier(.2,.8,.2,1);
+   283→}
+   284→
+   285→/* Dark gradient overlay: transparent top → near-black bottom */
+   286→.certificate-card::after {
+   287→  content: "";
+   288→  position: absolute;
+   289→  inset: 0;
+   290→  background: linear-gradient(
+   291→    to bottom,
+   292→    rgba(0, 0, 0, 0.05) 25%,
+   293→    rgba(0, 0, 0, 0.2) 50%,
+   294→    rgba(0, 0, 0, 0.95) 100%
+   295→  );
+   296→  pointer-events: none;
+   297→  z-index: 1;
+   298→}
+   299→
+   300→.certificate-card:hover .certificate-card-image {
+   301→  transform: scale(1.06);
+   302→}
+   303→
+   304→.certificate-card-content {
+   305→  position: absolute;
+   306→  inset: 0;
+   307→  z-index: 2;
+   308→  display: flex;
+   309→  flex-direction: column;
+   310→  justify-content: space-between;
+   311→  padding: 28px;
+   312→}
+   313→
+   314→.certificate-tags {
+   315→  display: flex;
+   316→  justify-content: flex-end;
+   317→  gap: 10px;
+   318→  flex-wrap: wrap;
+   319→}
+   320→
+   321→.certificate-tag {
+   322→  padding: 10px 20px;
+   323→  border-radius: 999px;
+   324→  background: rgba(255, 255, 255, 0.95);
+   325→  color: #1a1a1a;
+   326→  font-size: 14px;
+   327→  font-weight: 600;
+   328→}
+   329→
+   330→.certificate-info {
+   331→  color: #ffffff;
+   332→}
+   333→
+   334→.certificate-title {
+   335→  margin: 0;
+   336→  font-size: clamp(28px, 3vw, 48px);
+   337→  line-height: 1.1;
+   338→  font-weight: 600;
+   339→}
+   340→
+   341→.certificate-meta {
+   342→  margin-top: 12px;
+   343→  color: #9a9a9a;
+   344→  font-size: 15px;
+   345→}
+   346→
+   347→/* Centered View button — hidden by default, shown on hover */
+   348→.certificate-view-button {
+   349→  position: absolute;
+   350→  top: 50%;
+   351→  left: 50%;
+   352→  z-index: 3;
+   353→  transform: translate(-50%, -50%) scale(0.7);
+   354→  opacity: 0;
+   355→
+   356→  display: inline-flex;
+   357→  align-items: center;
+   358→  gap: 10px;
+   359→
+   360→  padding: 16px 26px;
+   361→  border-radius: 999px;
+   362→
+   363→  background: #ff3900;
+   364→  color: #ffffff;
+   365→
+   366→  font-size: 16px;
+   367→  font-weight: 600;
+   368→  text-decoration: none;
+   369→
+   370→  transition:
+   371→    opacity 0.35s ease,
+   372→    transform 0.35s cubic-bezier(.2,.8,.2,1),
+   373→    background 0.3s ease;
+   374→}
+   375→
+   376→.certificate-card:hover .certificate-view-button {
+   377→  opacity: 1;
+   378→  transform: translate(-50%, -50%) scale(1);
+   379→}
+   380→
+   381→.certificate-view-button:hover {
+   382→  background: #ff4a16;
+   383→}
+   384→
+   385→.certificate-view-button span:first-child {
+   386→  transition: transform 0.3s ease;
+   387→}
+   388→
+   389→.certificate-view-button:hover span:first-child {
+   390→  transform: translateX(4px);
+   391→}
+   392→
+   393→/* Responsive */
+   394→@media (max-width: 768px) {
+   395→  .certificates-grid {
+   396→    grid-template-columns: 1fr;
+   397→  }
+   398→
+   399→  .certificate-card {
+   400→    min-height: 420px;
+   401→  }
+   402→
+   403→  .certificate-card-content {
+   404→    padding: 20px;
+   405→  }
+   406→
+   407→  .certificate-view-button {
+   408→    opacity: 1;
+   409→    transform: translate(-50%, -50%) scale(1);
+   410→  }
+   411→}
+   412→
+   413→/* ─── Certificate Cards v2 — Modern Grid Layout ─── */
+   414→.cert-v2-grid {
+   415→  display: grid;
+   416→  grid-template-columns: repeat(2, minmax(0, 1fr));
+   417→  gap: 24px;
+   418→}
+   419→
+   420→.cert-v2-card {
+   421→  display: flex;
+   422→  flex-direction: column;
+   423→  overflow: hidden;
+   424→  border-radius: 12px;
+   425→  background: #1a1a1a;
+   426→  border: 1px solid rgba(53, 53, 53, 0.4);
+   427→  transition:
+   428→    transform 0.4s cubic-bezier(.2,.8,.2,1),
+   429→    box-shadow 0.4s ease,
+   430→    border-color 0.4s ease;
+   431→}
+   432→
+   433→.cert-v2-card:hover {
+   434→  transform: translateY(-4px);
+   435→  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 57, 0, 0.1);
+   436→  border-color: rgba(53, 53, 53, 0.7);
+   437→}
+   438→
+   439→/* Image area */
+   440→.cert-v2-image-area {
+   441→  position: relative;
+   442→  aspect-ratio: 16 / 10;
+   443→  overflow: hidden;
+   444→  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+   445→}
+   446→
+   447→.cert-v2-image {
+   448→  position: absolute;
+   449→  inset: 0;
+   450→  width: 100%;
+   451→  height: 100%;
+   452→  object-fit: cover;
+   453→  transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+   454→}
+   455→
+   456→.cert-v2-card:hover .cert-v2-image {
+   457→  transform: scale(1.05);
+   458→}
+   459→
+   460→.cert-v2-image-placeholder {
+   461→  position: absolute;
+   462→  inset: 0;
+   463→  display: flex;
+   464→  flex-direction: column;
+   465→  align-items: center;
+   466→  justify-content: center;
+   467→}
+   468→
+   469→/* Content area */
+   470→.cert-v2-content {
+   471→  padding: 20px 22px 22px;
+   472→  display: flex;
+   473→  flex-direction: column;
+   474→  flex: 1;
+   475→}
+   476→
+   477→.cert-v2-category-badge {
+   478→  display: inline-block;
+   479→  align-self: flex-start;
+   480→  padding: 4px 12px;
+   481→  font-size: 11px;
+   482→  font-weight: 600;
+   483→  letter-spacing: 0.04em;
+   484→  color: #ff3900;
+   485→  background: rgba(255, 57, 0, 0.1);
+   486→  border: 1px solid rgba(255, 57, 0, 0.2);
+   487→  border-radius: 9999px;
+   488→  margin-bottom: 12px;
+   489→}
+   490→
+   491→.cert-v2-title {
+   492→  margin: 0;
+   493→  font-size: 17px;
+   494→  font-weight: 600;
+   495→  color: #ffffff;
+   496→  line-height: 1.3;
+   497→  transition: color 0.3s ease;
+   498→}
+   499→
+   500→.cert-v2-card:hover .cert-v2-title {
+   501→  color: #ff5a2b;
+   502→}
+   503→
+   504→.cert-v2-issuer {
+   505→  margin: 6px 0 0;
+   506→  font-size: 14px;
+   507→  color: #9a9a9a;
+   508→  font-weight: 400;
+   509→}
+   510→
+   511→.cert-v2-date {
+   512→  margin: 4px 0 0;
+   513→  font-size: 13px;
+   514→  color: rgba(255, 255, 255, 0.4);
+   515→  font-weight: 400;
+   516→}
+   517→
+   518→.cert-v2-skills {
+   519→  margin-top: 12px;
+   520→  padding-top: 12px;
+   521→  border-top: 1px solid rgba(53, 53, 53, 0.5);
+   522→  font-size: 13px;
+   523→  line-height: 1.5;
+   524→}
+   525→
+   526→.cert-v2-skills-label {
+   527→  font-weight: 500;
+   528→  color: #9a9a9a;
+   529→  margin-right: 6px;
+   530→}
+   531→
+   532→.cert-v2-skills-text {
+   533→  color: rgba(255, 255, 255, 0.6);
+   534→}
+   535→
+   536→/* View Credential button */
+   537→.cert-v2-view-btn {
+   538→  display: inline-flex;
+   539→  align-items: center;
+   540→  gap: 8px;
+   541→  align-self: flex-start;
+   542→  margin-top: 16px;
+   543→  padding: 10px 20px;
+   544→  font-size: 13px;
+   545→  font-weight: 600;
+   546→  color: #ffffff;
+   547→  background: #ff3900;
+   548→  border-radius: 9999px;
+   549→  text-decoration: none;
+   550→  transition:
+   551→    background 0.3s ease,
+   552→    transform 0.3s ease,
+   553→    box-shadow 0.3s ease;
+   554→}
+   555→
+   556→.cert-v2-view-btn:hover {
+   557→  background: #ff4a16;
+   558→  transform: translateY(-1px);
+   559→  box-shadow: 0 4px 16px rgba(255, 57, 0, 0.3);
+   560→}
+   561→
+   562→.cert-v2-view-btn svg {
+   563→  transition: transform 0.3s ease;
+   564→}
+   565→
+   566→.cert-v2-view-btn:hover svg {
+   567→  transform: translate(2px, -2px);
+   568→}
+   569→
+   570→/* Responsive */
+   571→@media (max-width: 768px) {
+   572→  .cert-v2-grid {
+   573→    grid-template-columns: 1fr;
+   574→  }
+   575→
+   576→  .cert-v2-content {
+   577→    padding: 16px 18px 18px;
+   578→  }
+   579→
+   580→  .cert-v2-title {
+   581→    font-size: 16px;
+   582→  }
+   583→}
+   584→
+   585→@media (max-width: 480px) {
+   586→  .cert-v2-grid {
+   587→    gap: 16px;
+   588→  }
+   589→}
+   590→
+   591→/* ─── Experience & Projects — Journey Style ─── */
+   592→.experience-projects {
+   593→  position: relative;
+   594→  background: #030303;
+   595→  padding: 80px 0;
+   596→}
+   597→
+   598→.experience-projects-inner {
+   599→  max-width: 1320px;
+   600→  margin: 0 auto;
+   601→  display: grid;
+   602→  grid-template-columns: minmax(280px, 0.9fr) minmax(500px, 1.1fr);
+   603→  gap: 80px;
+   604→  align-items: start;
+   605→}
+   606→
+   607→/* LEFT SIDE — Sticky heading */
+   608→.journey-intro {
+   609→  position: sticky;
+   610→  top: 140px;
+   611→  align-self: start;
+   612→}
+   613→
+   614→.journey-label {
+   615→  display: inline-flex;
+   616→  align-items: center;
+   617→  padding: 9px 14px;
+   618→  margin-bottom: 28px;
+   619→  border-radius: 4px;
+   620→  background: linear-gradient(180deg, #252525, #171717);
+   621→  color: #d7d7d7;
+   622→  font-size: 11px;
+   623→  font-weight: 700;
+   624→  letter-spacing: 0.08em;
+   625→  text-transform: uppercase;
+   626→}
+   627→
+   628→.journey-title {
+   629→  margin: 0;
+   630→  max-width: 480px;
+   631→  color: #ffffff;
+   632→  font-size: clamp(42px, 4.5vw, 76px);
+   633→  font-weight: 600;
+   634→  line-height: 1.05;
+   635→  letter-spacing: -0.045em;
+   636→}
+   637→
+   638→/* RIGHT SIDE — Stacked cards */
+   639→.journey-cards {
+   640→  position: relative;
+   641→  display: flex;
+   642→  flex-direction: column;
+   643→}
+   644→
+   645→.journey-card {
+   646→  position: sticky;
+   647→  top: 120px;
+   648→  min-height: 430px;
+   649→  padding: 48px 40px;
+   650→  border-radius: 22px 22px 18px 18px;
+   651→  overflow: hidden;
+   652→  display: flex;
+   653→  flex-direction: column;
+   654→  justify-content: flex-start;
+   655→  opacity: 0;
+   656→  transform: translateY(50px);
+   657→  animation: journeyReveal 0.8s ease forwards;
+   658→  transition:
+   659→    transform 0.5s ease,
+   660→    box-shadow 0.5s ease;
+   661→}
+   662→
+   663→.journey-card:nth-child(1) { background: #ff3900; z-index: 1; }
+   664→.journey-card:nth-child(2) { background: #3d3d3d; z-index: 2; top: 150px; }
+   665→.journey-card:nth-child(3) { background: #1a1a1a; z-index: 3; top: 180px; }
+   666→.journey-card:nth-child(4) { background: #353535; z-index: 4; top: 210px; }
+   667→.journey-card:nth-child(5) { background: #1a1a1a; z-index: 5; top: 240px; }
+   668→
+   669→.journey-card:nth-child(n+6) {
+   670→  background: #1a1a1a;
+   671→}
+   672→
+   673→.journey-card + .journey-card {
+   674→  margin-top: 24px;
+   675→}
+   676→
+   677→.journey-card:hover {
+   678→  transform: translateY(-6px);
+   679→  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+   680→}
+   681→
+   682→/* DATE pill */
+   683→.journey-date {
+   684→  width: fit-content;
+   685→  display: inline-flex;
+   686→  align-items: center;
+   687→  gap: 8px;
+   688→  padding: 9px 15px;
+   689→  border-radius: 999px;
+   690→  background: rgba(255, 255, 255, 0.92);
+   691→  color: #161616;
+   692→  font-size: 14px;
+   693→  font-weight: 600;
+   694→}
+   695→
+   696→.journey-date::before {
+   697→  content: "";
+   698→  width: 6px;
+   699→  height: 6px;
+   700→  border-radius: 50%;
+   701→  background: currentColor;
+   702→}
+   703→
+   704→/* Card content */
+   705→.journey-card-content {
+   706→  margin-top: auto;
+   707→  padding-top: 100px;
+   708→}
+   709→
+   710→.journey-card-title {
+   711→  margin: 0 0 18px;
+   712→  color: #ffffff;
+   713→  font-size: clamp(28px, 3vw, 46px);
+   714→  font-weight: 600;
+   715→  line-height: 1.1;
+   716→  letter-spacing: -0.035em;
+   717→}
+   718→
+   719→.journey-card-description {
+   720→  max-width: 680px;
+   721→  margin: 0;
+   722→  color: #c5c5c5;
+   723→  font-size: 17px;
+   724→  line-height: 1.7;
+   725→}
+   726→
+   727→.journey-card-location {
+   728→  color: #9a9a9a;
+   729→}
+   730→
+   731→.journey-card-tech {
+   732→  display: flex;
+   733→  flex-wrap: wrap;
+   734→  gap: 8px;
+   735→  margin-top: 28px;
+   736→}
+   737→
+   738→.journey-tech-item {
+   739→  padding: 8px 13px;
+   740→  border: 1px solid rgba(255, 255, 255, 0.15);
+   741→  border-radius: 999px;
+   742→  color: #b5b5b5;
+   743→  font-size: 13px;
+   744→  background: rgba(0, 0, 0, 0.12);
+   745→}
+   746→
+   747→/* Skeleton variant */
+   748→.journey-card-skeleton {
+   749→  opacity: 1;
+   750→  transform: none;
+   751→  animation: none;
+   752→}
+   753→
+   754→/* Scroll reveal animation */
+   755→@keyframes journeyReveal {
+   756→  to {
+   757→    opacity: 1;
+   758→    transform: translateY(0);
+   759→  }
+   760→}
+   761→
+   762→/* MOBILE */
+   763→@media (max-width: 900px) {
+   764→  .experience-projects {
+   765→    padding: 40px 0;
+   766→  }
+   767→
+   768→  .experience-projects-inner {
+   769→    grid-template-columns: 1fr;
+   770→    gap: 40px;
+   771→  }
+   772→
+   773→  .journey-intro {
+   774→    position: relative;
+   775→    top: auto;
+   776→  }
+   777→
+   778→  .journey-card,
+   779→  .journey-card:nth-child(n) {
+   780→    position: relative;
+   781→    top: auto;
+   782→    min-height: auto;
+   783→    margin-top: 0;
+   784→    padding: 32px 24px;
+   785→  }
+   786→
+   787→  .journey-card + .journey-card {
+   788→    margin-top: 16px;
+   789→  }
+   790→
+   791→  .journey-card-content {
+   792→    margin-top: 0;
+   793→    padding-top: 70px;
+   794→  }
+   795→
+   796→  .journey-title {
+   797→    font-size: 48px;
+   798→  }
+   799→}
+   800→
+   801→/* Reduced motion */
+   802→@media (prefers-reduced-motion: reduce) {
+   803→  .journey-card {
+   804→    animation: none;
+   805→    opacity: 1;
+   806→    transform: none;
+   807→  }
+   808→}
+   809→
+   810→/* ─── Education Section — Editorial Timeline ─── */
+   811→.education-section {
+   812→  position: relative;
+   813→  background: #030303;
+   814→  padding: 100px 0 80px;
+   815→  overflow: hidden;
+   816→}
+   817→
+   818→.education-inner {
+   819→  max-width: 1320px;
+   820→  margin: 0 auto;
+   821→  padding: 0 24px;
+   822→}
+   823→
+   824→/* Header */
+   825→.education-header {
+   826→  display: flex;
+   827→  align-items: flex-start;
+   828→  justify-content: space-between;
+   829→  gap: 60px;
+   830→  margin-bottom: 64px;
+   831→  flex-wrap: wrap;
+   832→}
+   833→
+   834→.education-header-left {
+   835→  flex: 1;
+   836→  min-width: 280px;
+   837→}
+   838→
+   839→.education-header-right {
+   840→  flex: 1;
+   841→  min-width: 280px;
+   842→  max-width: 480px;
+   843→  padding-top: 12px;
+   844→}
+   845→
+   846→.section-badge {
+   847→  display: inline-flex;
+   848→  align-items: center;
+   849→  padding: 9px 14px;
+   850→  margin-bottom: 28px;
+   851→  border-radius: 4px;
+   852→  background: linear-gradient(180deg, #252525, #171717);
+   853→  color: #d7d7d7;
+   854→  font-size: 11px;
+   855→  font-weight: 700;
+   856→  letter-spacing: 0.08em;
+   857→  text-transform: uppercase;
+   858→}
+   859→
+   860→.education-heading {
+   861→  margin: 0;
+   862→  color: #ffffff;
+   863→  font-size: clamp(36px, 4vw, 64px);
+   864→  font-weight: 600;
+   865→  line-height: 1.08;
+   866→  letter-spacing: -0.04em;
+   867→}
+   868→
+   869→.education-description {
+   870→  margin: 0;
+   871→  color: #9a9a9a;
+   872→  font-size: 17px;
+   873→  line-height: 1.7;
+   874→}
+   875→
+   876→/* Education List */
+   877→.education-list {
+   878→  display: flex;
+   879→  flex-direction: column;
+   880→}
+   881→
+   882→/* Education Item — each row */
+   883→.education-item {
+   884→  display: grid;
+   885→  grid-template-columns: 80px 1fr auto;
+   886→  align-items: center;
+   887→  gap: 40px;
+   888→  padding: 36px 40px;
+   889→  border-top: 1px solid rgba(255, 255, 255, 0.06);
+   890→  cursor: pointer;
+   891→  transition:
+   892→    background-color 0.45s cubic-bezier(.25,.46,.45,.94),
+   893→    transform 0.35s ease;
+   894→  position: relative;
+   895→}
+   896→
+   897→.education-item:last-child {
+   898→  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+   899→}
+   900→
+   901→/* Active / Hovered state — orange background */
+   902→.education-item.active {
+   903→  background: #FF3900;
+   904→  color: #ffffff;
+   905→}
+   906→
+   907→.education-item:not(.active) {
+   908→  background: transparent;
+   909→}
+   910→
+   911→/* Hover lift effect */
+   912→.education-item:hover {
+   913→  transform: translateX(4px);
+   914→}
+   915→
+   916→/* Number */
+   917→.education-number {
+   918→  font-size: clamp(32px, 4vw, 56px);
+   919→  font-weight: 700;
+   920→  line-height: 1;
+   921→  letter-spacing: -0.04em;
+   922→  color: rgba(255, 255, 255, 0.08);
+   923→  transition: color 0.45s ease;
+   924→}
+   925→
+   926→.education-item.active .education-number {
+   927→  color: rgba(255, 255, 255, 0.3);
+   928→}
+   929→
+   930→/* Content */
+   931→.education-content {
+   932→  min-width: 0;
+   933→}
+   934→
+   935→.education-institution {
+   936→  margin: 0 0 8px;
+   937→  color: #ffffff;
+   938→  font-size: clamp(20px, 2.2vw, 32px);
+   939→  font-weight: 600;
+   940→  line-height: 1.2;
+   941→  letter-spacing: -0.02em;
+   942→  transition: color 0.45s ease;
+   943→}
+   944→
+   945→.education-item:not(.active) .education-institution {
+   946→  color: #e0e0e0;
+   947→}
+   948→
+   949→.education-degree {
+   950→  margin: 0;
+   951→  color: #9a9a9a;
+   952→  font-size: clamp(14px, 1.4vw, 18px);
+   953→  font-weight: 400;
+   954→  line-height: 1.5;
+   955→  transition: color 0.45s ease;
+   956→}
+   957→
+   958→.education-item.active .education-degree {
+   959→  color: rgba(255, 255, 255, 0.75);
+   960→}
+   961→
+   962→/* Date */
+   963→.education-date {
+   964→  font-size: clamp(14px, 1.3vw, 17px);
+   965→  font-weight: 500;
+   966→  color: #9a9a9a;
+   967→  white-space: nowrap;
+   968→  padding: 10px 20px;
+   969→  border-radius: 999px;
+   970→  border: 1px solid rgba(255, 255, 255, 0.08);
+   971→  background: rgba(255, 255, 255, 0.03);
+   972→  transition:
+   973→    color 0.45s ease,
+   974→    background 0.45s ease,
+   975→    border-color 0.45s ease;
+   976→}
+   977→
+   978→.education-item.active .education-date {
+   979→  color: #ffffff;
+   980→  background: rgba(255, 255, 255, 0.18);
+   981→  border-color: rgba(255, 255, 255, 0.25);
+   982→}
+   983→
+   984→/* Skeleton state */
+   985→.education-item-skeleton {
+   986→  opacity: 1 !important;
+   987→  transform: none !important;
+   988→  animation: none !important;
+   989→}
+   990→
+   991→.education-number-skeleton,
+   992→.education-content-skeleton,
+   993→.education-date-skeleton {
+   994→  display: flex;
+   995→  flex-direction: column;
+   996→}
+   997→
+   998→/* Empty state */
+   999→.education-empty {
+  1000→  padding: 60px 0;
+  1001→  text-align: center;
+  1002→}
+  1003→
+  1004→.education-empty p {
+  1005→  color: #9a9a9a;
+  1006→  font-size: 16px;
+  1007→}
+  1008→
+  1009→/* MOBILE */
+  1010→@media (max-width: 768px) {
+  1011→  .education-section {
+  1012→    padding: 60px 0 40px;
+  1013→  }
+  1014→
+  1015→  .education-inner {
+  1016→    padding: 0 16px;
+  1017→  }
+  1018→
+  1019→  .education-header {
+  1020→    flex-direction: column;
+  1021→    gap: 20px;
+  1022→    margin-bottom: 40px;
+  1023→  }
+  1024→
+  1025→  .education-header-right {
+  1026→    max-width: 100%;
+  1027→    padding-top: 0;
+  1028→  }
+  1029→
+  1030→  .education-item {
+  1031→    grid-template-columns: 48px 1fr;
+  1032→    gap: 16px 20px;
+  1033→    padding: 24px 20px;
+  1034→  }
+  1035→
+  1036→  .education-number {
+  1037→    font-size: 28px;
+  1038→  }
+  1039→
+  1040→  .education-date {
+  1041→    grid-column: 2;
+  1042→    justify-self: start;
+  1043→  }
+  1044→
+  1045→  .education-institution {
+  1046→    font-size: 20px;
+  1047→  }
+  1048→
+  1049→  .education-degree {
+  1050→    font-size: 14px;
+  1051→  }
+  1052→}
+  1053→
+  1054→/* Reduced motion */
+  1055→@media (prefers-reduced-motion: reduce) {
+  1056→  .education-item {
+  1057→    transition: background-color 0.2s ease;
+  1058→    transform: none !important;
+  1059→  }
+  1060→
+  1061→  .education-item:hover {
+  1062→    transform: none !important;
+  1063→  }
+  1064→
+  1065→  /* Skills Accordion */
+  1066→  .skill-accordion-content {
+  1067→    transition: none;
+  1068→  }
+  1069→}
+  1070→
+  1071→/* ========== Skills FAQ Accordion ========== */
+  1072→
+  1073→.skills-faq-container {
+  1074→  display: grid;
+  1075→  grid-template-columns: 1fr 1.1fr;
+  1076→  gap: 100px;
+  1077→  align-items: start;
+  1078→}
+  1079→
+  1080→.skills-faq-header {
+  1081→  position: sticky;
+  1082→  top: 120px;
+  1083→}
+  1084→
+  1085→.skills-label {
+  1086→  display: inline-flex;
+  1087→  padding: 8px 14px;
+  1088→  border: 1px solid #353535;
+  1089→  border-radius: 4px;
+  1090→  color: #9A9A9A;
+  1091→  font-size: 11px;
+  1092→  font-weight: 600;
+  1093→  letter-spacing: 0.08em;
+  1094→  margin-bottom: 28px;
+  1095→}
+  1096→
+  1097→.skills-faq-title {
+  1098→  margin: 0;
+  1099→  color: #FFFFFF;
+  1100→  font-size: clamp(42px, 5vw, 72px);
+  1101→  line-height: 1.05;
+  1102→  letter-spacing: -0.04em;
+  1103→}
+  1104→
+  1105→.skills-accordion {
+  1106→  width: 100%;
+  1107→  border-top: 1px solid #353535;
+  1108→}
+  1109→
+  1110→.skill-accordion-item {
+  1111→  border-bottom: 1px solid #353535;
+  1112→}
+  1113→
+  1114→.skill-accordion-trigger {
+  1115→  width: 100%;
+  1116→  min-height: 72px;
+  1117→  padding: 16px 0;
+  1118→  display: flex;
+  1119→  align-items: center;
+  1120→  justify-content: space-between;
+  1121→  gap: 24px;
+  1122→  background: transparent;
+  1123→  border: 0;
+  1124→  color: #FFFFFF;
+  1125→  font-size: clamp(18px, 1.8vw, 24px);
+  1126→  font-weight: 600;
+  1127→  text-align: left;
+  1128→  cursor: pointer;
+  1129→  font-family: inherit;
+  1130→}
+  1131→
+  1132→.skill-accordion-trigger:hover span:first-child {
+  1133→  color: #FF3900;
+  1134→}
+  1135→
+  1136→.skill-icon {
+  1137→  width: 34px;
+  1138→  height: 34px;
+  1139→  flex: 0 0 34px;
+  1140→  display: grid;
+  1141→  place-items: center;
+  1142→  border: 1px solid #9A9A9A;
+  1143→  border-radius: 6px;
+  1144→  color: #FFFFFF;
+  1145→  font-size: 24px;
+  1146→  line-height: 1;
+  1147→  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  1148→}
+  1149→
+  1150→.skill-accordion-item.active .skill-icon {
+  1151→  transform: rotate(180deg);
+  1152→  background: #FF3900;
+  1153→  border-color: #FF3900;
+  1154→}
+  1155→
+  1156→.skill-accordion-content {
+  1157→  display: grid;
+  1158→  grid-template-rows: 0fr;
+  1159→  transition: grid-template-rows 0.45s ease, opacity 0.35s ease;
+  1160→  opacity: 0;
+  1161→}
+  1162→
+  1163→.skill-accordion-content > div {
+  1164→  overflow: hidden;
+  1165→}
+  1166→
+  1167→.skill-accordion-item.active .skill-accordion-content {
+  1168→  grid-template-rows: 1fr;
+  1169→  opacity: 1;
+  1170→}
+  1171→
+  1172→.skill-tags {
+  1173→  padding: 0 0 24px;
+  1174→  display: flex;
+  1175→  flex-wrap: wrap;
+  1176→  gap: 10px;
+  1177→}
+  1178→
+  1179→.skill-tags span {
+  1180→  padding: 10px 16px;
+  1181→  border: 1px solid #353535;
+  1182→  border-radius: 999px;
+  1183→  color: #9A9A9A;
+  1184→  font-size: 14px;
+  1185→  background: #1A1A1A;
+  1186→  transition: color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  1187→}
+  1188→
+  1189→.skill-tags span:hover {
+  1190→  color: #FFFFFF;
+  1191→  border-color: #FF3900;
+  1192→  transform: translateY(-2px);
+  1193→}
+  1194→
+  1195→/* Skills Accordion responsive */
+  1196→@media (max-width: 900px) {
+  1197→  .skills-faq-container {
+  1198→    grid-template-columns: 1fr;
+  1199→    gap: 60px;
+  1200→  }
+  1201→
+  1202→  .skills-faq-header {
+  1203→    position: static;
+  1204→  }
+  1205→}
+  1206→
+  1207→@media (max-width: 600px) {
+  1208→  .skills-faq-container {
+  1209→    gap: 40px;
+  1210→  }
+  1211→
+  1212→  .skill-accordion-trigger {
+  1213→    min-height: 60px;
+  1214→    font-size: 18px;
+  1215→    padding: 12px 0;
+  1216→  }
+  1217→
+  1218→  .skill-icon {
+  1219→    width: 28px;
+  1220→    height: 28px;
+  1221→    flex: 0 0 28px;
+  1222→    font-size: 20px;
+  1223→  }
+  1224→
+  1225→  .skill-tags span {
+  1226→    padding: 8px 14px;
+  1227→    font-size: 13px;
+  1228→  }
+  1229→}
+  1230→
