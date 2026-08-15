@@ -815,3 +815,30 @@ Stage Summary:
 - Fixed white shadow issue by switching from `animate={object}` to `whileInView="visible"` + variants pattern
 - Root cause: non-memoised plain objects in animate prop caused framer-motion to restart animation on re-render
 - Fix: variant labels (stable strings) + whileInView viewport trigger = reliable, once-only animation
+---
+Task ID: about-content-redesign
+Agent: Main Agent
+Task: Redesign "Who I Am" section content from generic dashboard cards to professional portfolio presentation
+
+Work Log:
+- Read current about-preview.tsx to understand existing layout (2-col grid: image left, content right)
+- Read focus-reveal.tsx, section-heading.tsx, scroll-reveal.tsx, glow-card.tsx, and theme globals for styling context
+- Removed the 4 generic info cards (Focus, Specialty, Experience, Location) that looked like dashboard stats
+- Added "A BIT ABOUT ME" uppercase label in brand color (#FF3900)
+- Added professional intro paragraph about Full-Stack Developer focused on modern web apps & AI automation
+- Created 3 professional value cards with numbered design (01, 02, 03):
+  - 01 — Build & Develop (Code2 icon)
+  - 02 — AI & Automation (Bot icon)
+  - 03 — Learn & Improve (BookOpen icon)
+- Each card features: left accent bar (brand color on hover), number badge, icon, title, and description
+- Cards use hover transitions (border brightens, accent bar expands, number badge background shifts)
+- Preserved all existing elements: profile image, "Who I Am" heading, "Learn More" button, dark theme, responsive layout
+- Staggered scroll reveal animations (delays: 0.1, 0.15, 0.2/0.3/0.4, 0.5)
+- Verified with agent-browser: all content renders correctly, "Learn More" navigates to /resume, no console errors
+- Mobile responsive verified at 375x812 viewport
+
+Stage Summary:
+- Replaced 4 generic dashboard-style cards with 3 professional value proposition cards
+- Added "A bit about me" intro section with professional description
+- All existing layout, styling, buttons, and responsive behavior preserved
+- File modified: src/components/about-preview.tsx
