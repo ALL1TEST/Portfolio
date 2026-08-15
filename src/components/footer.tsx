@@ -122,8 +122,7 @@ export function Footer() {
             © {new Date().getFullYear()} Abdellah Ait-Si. All rights reserved.
           </p>
           <p className="text-xs text-muted-text">
-            Designed & Built with{' '}
-            <span className="text-brand">♥</span>
+            Designed & Built by CodeVirtox
           </p>
         </div>
       </div>
