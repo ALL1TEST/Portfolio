@@ -1,7 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { ArrowUpRight, Github } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowUpRight, Github, ChevronUp, ChevronDown } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionHeading } from './section-heading';
 import { useData } from '@/lib/data-provider';
@@ -106,8 +107,14 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   );
 }
 
+const INITIAL_SHOW = 3;
+
 export function ProjectsSection() {
   const { projects, loading } = useData();
+  const [showAll, setShowAll] = useState(false);
+
+  const hasMore = projects.length > INITIAL_SHOW;
+  const visibleProjects = showAll ? projects : projects.slice(0, INITIAL_SHOW);
 
   return (
     <section id="projects" className="relative py-24 lg:py-32">
@@ -141,11 +148,36 @@ export function ProjectsSection() {
             <p className="text-muted-text">No projects yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-            {projects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
-            ))}
-          </div>
+          <>
+            <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+              <AnimatePresence mode="popLayout">
+                {visibleProjects.map((project, index) => (
+                  <ProjectCard key={project.id} project={project} index={index} />
+                ))}
+              </AnimatePresence>
+            </motion.div>
+
+            {hasMore && (
+              <div className="mt-12 lg:mt-16 text-center">
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white/80 bg-surface border border-stroke/50 rounded-full hover:text-white hover:border-brand/40 transition-all duration-300"
+                >
+                  {showAll ? (
+                    <>
+                      <ChevronUp className="w-4 h-4" />
+                      <span>Show Less</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      <span>Show More</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>
