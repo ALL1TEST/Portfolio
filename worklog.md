@@ -550,3 +550,36 @@ Stage Summary:
 - All 7 homepage sections restored and working: Hero, TechMarquee, Who I Am, Featured Projects, Certificates (with filters), Resume (Skills + Experience), Contact
 - Dashboard JSON corruption fix applied for both projects and certificates
 - Auto-refresh on tab switch implemented
+
+---
+Task ID: certificates-rebuild
+Agent: Main Agent
+Task: Rebuild Certificates page with dynamic category filters, modern card layout, and full dashboard integration
+
+Work Log:
+- Added `category` and `credentialId` fields to Certificate model in Prisma schema
+- Pushed schema to SQLite database with `bun run db:push`
+- Updated TypeScript Certificate interface with new fields
+- Updated certificates API route (GET/POST/PUT/DELETE) to handle category and credentialId
+- Rebuilt `certificates-section.tsx` with:
+  - New title "Certificates & Credentials" and subtitle
+  - Dynamic certificate count stat (e.g. "2+ Certificates")
+  - Dynamic category filters derived from DB (no hardcoding) — only categories with ≥1 certificate shown
+  - Smooth AnimatePresence transitions when filtering
+  - Modern v2 card layout: image area (16:10), content below with category badge, title, issuer, issue date, skills list, View Credential button
+  - Formatted date display (e.g. "May 2025")
+- Rebuilt dashboard certificates page with:
+  - Category input with datalist suggestions (existing categories + defaults)
+  - Credential ID field
+  - Image URL input with upload button
+  - Category badges shown in table
+  - Category overview in header
+- Added full CSS for cert-v2 card styles (grid, hover effects, responsive breakpoints)
+- Verified both /certificates page and homepage section render correctly with no errors
+- Pushed to GitHub
+
+Stage Summary:
+- Certificate model now supports: title, issuer, issueDate, skills, certificateImage, credentialUrl, credentialId, category, displayOrder
+- Dynamic filter system: categories auto-derived from certificates in DB, new categories appear automatically
+- Dashboard allows full CRUD with category management
+- Card design: split layout (image top, content below) consistent with project cards
