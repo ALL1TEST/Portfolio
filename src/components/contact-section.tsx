@@ -71,6 +71,7 @@ export function ContactSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           label="Contact"
+          labelStyle="skills"
           title="Let's Build Something Great Together."
           description="Have a project in mind or just want to connect? I'd love to hear from you."
         />
