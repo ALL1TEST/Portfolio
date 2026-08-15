@@ -84,7 +84,7 @@ export function ResumeSection() {
                 <FocusReveal
                   text="Technologies I work with"
                   as="h2"
-                  className="skills-faq-title"
+                  className="journey-title"
                   blur={20}
                   staggerFrom="start"
                   transition={{
