@@ -175,10 +175,10 @@ export function ResumeSection() {
 
                             <p className="journey-card-description">
                               {exp.description}
-                              {exp.location && (
-                                <span className="journey-card-location"> · {exp.location}</span>
-                              )}
                             </p>
+                            {exp.location && (
+                              <p className="journey-card-location">{exp.location}</p>
+                            )}
 
                             {techs.length > 0 && (
                               <div className="journey-card-tech">
