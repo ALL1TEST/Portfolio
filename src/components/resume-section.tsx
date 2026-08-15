@@ -62,41 +62,15 @@ export function ResumeSection() {
   return (
     <section id="resume" className="relative py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main Description & Professional Summary */}
-        <div className="mb-20 max-w-3xl">
+        {/* Resume Intro */}
+        <div className="mb-20 text-center max-w-3xl mx-auto">
           <ScrollReveal>
-            <p className="text-base lg:text-lg text-muted-text leading-relaxed">
-              Full-stack developer focused on building modern web applications, backend systems, and automation solutions. I enjoy transforming ideas into clean, scalable, and practical digital products.
-            </p>
+            <div className="skills-label mb-4">RESUME</div>
           </ScrollReveal>
           <ScrollReveal delay={0.1}>
-            <p className="mt-4 text-sm text-muted-text/70 leading-relaxed">
+            <p className="text-base lg:text-lg text-muted-text leading-relaxed">
               Full-stack developer with hands-on experience building web applications, backend systems, and database-driven solutions. Focused on clean architecture, practical problem-solving, and continuous learning.
             </p>
-          </ScrollReveal>
-        </div>
-
-        {/* Core Skills */}
-        <div className="mb-20">
-          <ScrollReveal>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                'Frontend development with React and modern JavaScript',
-                'Backend development with Laravel and PHP',
-                'Database design with MySQL',
-                'REST APIs and application integration',
-                'Automation workflows and AI-powered solutions',
-                'Git, Docker, and modern development tools',
-              ].map((skill, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 p-4 bg-surface/50 border border-stroke/30 rounded-xl"
-                >
-                  <span className="flex-shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-brand" />
-                  <span className="text-sm text-muted-text leading-relaxed">{skill}</span>
-                </div>
-              ))}
-            </div>
           </ScrollReveal>
         </div>
 
