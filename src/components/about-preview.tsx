@@ -22,7 +22,7 @@ export function AboutPreview() {
         <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
           <ScrollReveal direction="left">
             <div className="relative aspect-square max-w-md mx-auto">
-              <div className="absolute inset-0 bg-surface rounded-2xl border border-stroke/50 overflow-hidden">
+              <div className="absolute inset-0 bg-surface rounded-2xl border border-stroke/50 overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.5),inset_0_0_20px_rgba(0,0,0,0.3)]">
                 <Image
                   src="/uploads/ABDELLAH.png"
                   alt="Abdellah Ait-Si"
@@ -30,6 +30,7 @@ export function AboutPreview() {
                   className="object-cover"
                   priority
                 />
+                <div className="absolute inset-0 rounded-2xl shadow-[inset_0_0_80px_rgba(0,0,0,0.6),inset_0_0_30px_rgba(0,0,0,0.4),inset_0_-20px_40px_rgba(255,57,0,0.08)] pointer-events-none" />
               </div>
             </div>
           </ScrollReveal>
