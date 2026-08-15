@@ -122,14 +122,15 @@ export function Navbar() {
               <motion.div
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center"
+                className="flex items-center min-w-0"
               >
                 <Image
-                  src="/uploads/pasted_image_1786815626986.png"
+                  src="/uploads/pasted_image_1786815895412.png"
                   alt="CodeVirtox"
-                  width={140}
-                  height={40}
-                  className="h-8 lg:h-9 w-auto object-contain"
+                  width={320}
+                  height={80}
+                  className="h-10 lg:h-12 w-auto object-contain block"
+                  style={{ maxWidth: '100%' }}
                   priority
                 />
               </motion.div>
