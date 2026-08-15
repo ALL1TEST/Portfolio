@@ -90,8 +90,14 @@ export function CertificatesSection() {
   const { certificates, loading } = useData();
   const [activeFilter, setActiveFilter] = useState('All');
 
-  // Hardcoded filter categories
-  const categories = ['All', 'Cybersecurity', 'PHP', 'Python', 'Computer Hardware'];
+  // Dynamically derive filter categories from actual certificate data
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    certificates.forEach((cert) => {
+      if (cert.category && cert.category.trim()) cats.add(cert.category.trim());
+    });
+    return ['All', ...Array.from(cats).sort()];
+  }, [certificates]);
 
   // Filter certificates by selected category
   const filteredCerts = useMemo(() => {

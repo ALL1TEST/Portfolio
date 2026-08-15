@@ -195,11 +195,29 @@ export default function CertificatesPage() {
         category: form.category.trim(),
       };
 
+      // Save the certificate data
       const res = await fetch('/api/certificates', {
         method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingId ? { ...payload, id: editingId } : payload),
       });
+
+      // Auto-reorder when editing (shift others to fill gap)
+      if (editingId && res.ok) {
+        const otherItems = certificates.filter((c) => c.id !== editingId);
+        const sortedOthers = [...otherItems].sort((a, b) => a.displayOrder - b.displayOrder);
+        const newPos = Math.max(1, Math.min(form.displayOrder, certificates.length));
+        const reordered = [
+          ...sortedOthers.slice(0, newPos - 1),
+          { id: editingId, displayOrder: newPos },
+          ...sortedOthers.slice(newPos - 1),
+        ].map((item, idx) => ({ id: item.id, displayOrder: idx + 1 }));
+        await fetch('/api/certificates', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reorder: reordered }),
+        });
+      }
 
       if (res.ok) {
         toast.success(editingId ? 'Certificate updated' : 'Certificate created');
@@ -222,7 +240,19 @@ export default function CertificatesPage() {
       const res = await fetch(`/api/certificates?id=${deleteId}`, { method: 'DELETE' });
       if (res.ok) {
         toast.success('Certificate deleted');
-        setCertificates((prev) => prev.filter((c) => c.id !== deleteId));
+        // Re-sequence remaining items from 1
+        const remaining = certificates
+          .filter((c) => c.id !== deleteId)
+          .sort((a, b) => a.displayOrder - b.displayOrder)
+          .map((item, idx) => ({ id: item.id, displayOrder: idx + 1 }));
+        if (remaining.length > 0) {
+          await fetch('/api/certificates', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reorder: remaining }),
+          });
+        }
+        fetchCertificates();
       } else {
         toast.error('Failed to delete certificate');
       }
@@ -523,9 +553,11 @@ export default function CertificatesPage() {
               <Label className="text-sm text-white">Display Order</Label>
               <Input
                 type="number"
-                value={form.displayOrder}
-                onChange={(e) => setForm((p) => ({ ...p, displayOrder: parseInt(e.target.value) || 0 }))}
+                min={0}
+                value={form.displayOrder || ''}
+                onChange={(e) => setForm((p) => ({ ...p, displayOrder: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
                 className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                placeholder="0"
               />
             </div>
 

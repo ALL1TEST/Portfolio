@@ -922,3 +922,21 @@ Stage Summary:
 - PDF upload button added next to Credential URL field
 - Certificate Image upload also improved with preview and remove
 - Upload API now supports both images and PDFs
+
+---
+Task ID: 5
+Agent: Main Agent
+Task: Fix Certificate Display Order not reflecting on frontend
+
+Work Log:
+- Added batch reorder support to `/api/certificates` PUT endpoint
+- Added auto-reorder in dashboard `handleSubmit` when editing certificates
+- Added auto-reorder in dashboard `handleDelete` to re-sequence remaining items
+- Fixed Display Order input to allow clearing and re-typing (same fix as Resume)
+- Fixed frontend filter categories: changed from hardcoded array to dynamic derivation from actual certificate data
+
+Stage Summary:
+- Certificate auto-reorder now works on edit and delete
+- Frontend filter categories are now dynamic (All + whatever categories exist in DB)
+- Display Order changes in dashboard immediately reflect on public frontend
+- No more hardcoded category filters

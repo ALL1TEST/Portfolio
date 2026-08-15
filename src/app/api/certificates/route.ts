@@ -27,6 +27,17 @@ export const POST = withAuth(async (req: Request) => {
 
 export const PUT = withAuth(async (req: Request) => {
   const body = await req.json();
+
+  // Batch reorder: expects { reorder: [{ id, displayOrder }] }
+  if (body.reorder && Array.isArray(body.reorder)) {
+    await Promise.all(
+      body.reorder.map((item: { id: string; displayOrder: number }) =>
+        db.certificate.update({ where: { id: item.id }, data: { displayOrder: item.displayOrder } })
+      )
+    );
+    return NextResponse.json({ success: true });
+  }
+
   if (!body.id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
   const cert = await db.certificate.update({
     where: { id: body.id },
