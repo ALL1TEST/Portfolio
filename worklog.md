@@ -687,3 +687,37 @@ Stage Summary:
 - Respects reduced-motion preferences (skipMotion from useReducedMotion)
 - Desktop nav, cards, images, buttons, mobile menu, layout all unchanged
 - Lint clean, no compilation errors
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Fix FocusReveal animation — viewport-triggered with proper whileInView/useInView detection
+
+Work Log:
+- Diagnosed root cause: previous implementation used `initial={hidden} animate={trigger ? visible : hidden}` which never applied hidden styles when trigger was false (framer-motion optimizes away identical initial/animate states). The conditional rendering workaround (useOnceInView + visibility:hidden placeholder) caused layout shifts and wasn't reliable.
+- Completely rewrote `src/components/focus-reveal.tsx`:
+  - Uses framer-motion `useInView` hook for reliable viewport detection with `once: true, amount: 0.3`
+  - Character spans use variant-based animation (`variants={{ hidden: charHidden, visible: charVisible }}`) with per-character stagger delays via `transition.delay`
+  - Parent MotionTag uses `initial="hidden" animate={isInView ? 'visible' : 'hidden'}` — on first render, `initial` styles are applied before `animate` evaluation, ensuring characters start in hidden state
+  - When `useInView` flips to true, `animate` changes to "visible" and variant propagation triggers the stagger animation
+- Simplified `src/components/section-heading.tsx` — removed useOnceInView hook and conditional rendering, now directly uses `<FocusReveal>` with exact existing Tailwind classes
+- Simplified `src/components/certificates-section.tsx` — removed CertificatesTitle wrapper component, replaced with direct `<FocusReveal>` call
+- Simplified `src/components/resume-section.tsx` — removed useOnceInView hooks and conditional rendering, all three FocusReveal titles now drop in directly
+- Deleted `src/components/use-once-in-view.ts` (no longer needed)
+- Browser-verified every title on every page:
+  - Home: "Who I Am" (hidden→visible on scroll), "Featured Projects" (animated correctly)
+  - /projects: "Selected Projects" (animated)
+  - /certificates: "Certificates & Credentials" (animated)
+  - /resume: "Technologies I" + "work with" (both animated), "Experience & Projects" (hidden→visible on scroll)
+  - /contact: "Let's Build Something Great Together." (animated)
+- Verified once-only: scrolling away and back does NOT replay animation
+- Verified mobile responsiveness: heading visible, no wrapping issues
+- Verified no console errors, no hydration errors
+
+Stage Summary:
+- FocusReveal now works correctly with viewport-triggered animation
+- Characters start at opacity:0, scale:1.3, blur(14px) and animate to opacity:1, scale:1, blur(0px)
+- Stagger: 0.03s per character, duration: 0.35s, ease: easeOut-cubic
+- Triggers ONLY when section enters viewport, plays ONCE, never replays
+- Reduced motion supported via useReducedMotion
+- All 7 titles verified working across all 5 pages

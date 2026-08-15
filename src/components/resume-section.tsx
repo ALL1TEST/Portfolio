@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { ScrollReveal } from './scroll-reveal';
 import FocusReveal from './focus-reveal';
-import { useOnceInView } from './use-once-in-view';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -59,10 +58,6 @@ function SkillsAccordion({ skills }: { skills: { name: string; category: string 
 
 export function ResumeSection() {
   const { profile, skills, experiences, loading } = useData();
-  const skillsRef = useRef(null);
-  const skillsInView = useOnceInView(skillsRef, '-60px');
-  const expRef = useRef(null);
-  const expInView = useOnceInView(expRef, '-60px');
 
   return (
     <section id="resume" className="relative py-24 lg:py-32">
@@ -72,44 +67,28 @@ export function ResumeSection() {
           <ScrollReveal>
             <div className="skills-faq-container">
               {/* Left side */}
-              <div className="skills-faq-header" ref={skillsRef}>
+              <div className="skills-faq-header">
                 <div className="skills-label">TECHNICAL SKILLS</div>
-                {skillsInView ? (
-                  <div>
-                    <FocusReveal
-                      text="Technologies I"
-                      as="h2"
-                      className="skills-faq-title"
-                      blur={15}
-                      trigger={true}
-                      transition={{
-                        type: 'tween',
-                        duration: 0.35,
-                        staggerChildren: 0.03,
-                        ease: 'easeOut',
-                      }}
-                    />
-                    <FocusReveal
-                      text="work with"
-                      as="h2"
-                      className="skills-faq-title"
-                      blur={15}
-                      trigger={true}
-                      transition={{
-                        type: 'tween',
-                        duration: 0.35,
-                        delay: 0.25,
-                        staggerChildren: 0.03,
-                        ease: 'easeOut',
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <h2 className="skills-faq-title" aria-label="Technologies I work with" style={{ visibility: 'hidden' }}>
-                    Technologies I<br />
-                    work with
-                  </h2>
-                )}
+                <FocusReveal
+                  text="Technologies I"
+                  as="h2"
+                  className="skills-faq-title"
+                  blur={14}
+                  scaleStart={1.3}
+                  duration={0.35}
+                  staggerChildren={0.03}
+                  staggerFrom="start"
+                />
+                <FocusReveal
+                  text="work with"
+                  as="h2"
+                  className="skills-faq-title"
+                  blur={14}
+                  scaleStart={1.3}
+                  duration={0.35}
+                  staggerChildren={0.03}
+                  staggerFrom="start"
+                />
               </div>
 
               {/* Right side */}
@@ -136,27 +115,18 @@ export function ResumeSection() {
               <div className="experience-projects-inner">
 
                 {/* LEFT SIDE — Sticky heading */}
-                <div className="journey-intro" ref={expRef}>
+                <div className="journey-intro">
                   <div className="journey-label">MY JOURNEY</div>
-                  {expInView ? (
-                    <FocusReveal
-                      text="Experience & Projects"
-                      as="h2"
-                      className="journey-title"
-                      blur={15}
-                      trigger={true}
-                      transition={{
-                        type: 'tween',
-                        duration: 0.35,
-                        staggerChildren: 0.03,
-                        ease: 'easeOut',
-                      }}
-                    />
-                  ) : (
-                    <h2 className="journey-title" aria-label="Experience & Projects" style={{ visibility: 'hidden' }}>
-                      Experience &amp; Projects
-                    </h2>
-                  )}
+                  <FocusReveal
+                    text="Experience & Projects"
+                    as="h2"
+                    className="journey-title"
+                    blur={14}
+                    scaleStart={1.3}
+                    duration={0.35}
+                    staggerChildren={0.03}
+                    staggerFrom="start"
+                  />
                 </div>
 
                 {/* RIGHT SIDE — Stacked cards */}

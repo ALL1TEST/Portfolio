@@ -1,9 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
 import { ScrollReveal } from './scroll-reveal';
 import FocusReveal from './focus-reveal';
-import { useOnceInView } from './use-once-in-view';
 
 interface SectionHeadingProps {
   label?: string;
@@ -12,17 +10,14 @@ interface SectionHeadingProps {
   align?: 'left' | 'center';
 }
 
+const TITLE_CLASSES = 'text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight';
+
 export function SectionHeading({
   label,
   title,
   description,
   align = 'center',
 }: SectionHeadingProps) {
-  const titleRef = useRef(null);
-  const titleInView = useOnceInView(titleRef, '-60px');
-
-  const titleClasses = 'text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight';
-
   return (
     <div
       className={`mb-12 lg:mb-16 ${align === 'center' ? 'text-center' : 'text-left'}`}
@@ -34,27 +29,16 @@ export function SectionHeading({
           </span>
         </ScrollReveal>
       )}
-      <div ref={titleRef}>
-        {titleInView ? (
-          <FocusReveal
-            text={title}
-            as="h2"
-            className={titleClasses}
-            blur={15}
-            trigger={true}
-            transition={{
-              type: 'tween',
-              duration: 0.35,
-              staggerChildren: 0.03,
-              ease: 'easeOut',
-            }}
-          />
-        ) : (
-          <h2 className={titleClasses} aria-label={title} style={{ visibility: 'hidden' }}>
-            {title}
-          </h2>
-        )}
-      </div>
+      <FocusReveal
+        text={title}
+        as="h2"
+        className={TITLE_CLASSES}
+        blur={14}
+        scaleStart={1.3}
+        duration={0.35}
+        staggerChildren={0.03}
+        staggerFrom="start"
+      />
       {description && (
         <ScrollReveal delay={0.3}>
           <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base lg:text-lg leading-relaxed">
