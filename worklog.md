@@ -866,3 +866,20 @@ Stage Summary:
 - Display Order input can be cleared and retyped without resetting to 0
 - Frontend shows correct experience order and clean technology badges
 - No more double-encoding risk from API
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Add auto-reorder for Resume experience display order
+
+Work Log:
+- Added batch reorder support to `/api/experience` PUT endpoint (same pattern as skills API)
+- Modified `handleSubmit` in dashboard resume to calculate reordered list when displayOrder changes
+- Modified `handleDelete` to re-sequence remaining items from 1 after deletion
+- Display Order is clamped between 1 and total items count
+- Browser verified: changing DentClinic from #1 to #2 automatically shifted CRUD Étudiant from #2 to #1
+
+Stage Summary:
+- Auto-reorder works on edit and delete
+- Items always stay numbered 1, 2, 3... with no gaps
+- Database and UI stay in sync

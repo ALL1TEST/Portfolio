@@ -87,14 +87,65 @@ function ExperienceTab() {
     try {
       const techs = form.technologies.split(',').map((t) => t.trim()).filter(Boolean);
       const payload = { ...form, technologies: techs };
-      const res = await fetch('/api/experience', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editingId ? { ...payload, id: editingId } : payload) });
-      if (res.ok) { toast.success(editingId ? 'Updated' : 'Created'); setFormOpen(false); fetchItems(); } else toast.error('Failed');
+
+      // Calculate new order: insert/move item at its displayOrder position
+      const otherItems = items.filter((i) => i.id !== editingId);
+      const sortedOthers = [...otherItems].sort((a, b) => a.displayOrder - b.displayOrder);
+      // Clamp new position between 1 and total items
+      const newPos = Math.max(1, Math.min(form.displayOrder, items.length));
+      // Insert the edited item at the new position (1-based)
+      const reordered = [
+        ...sortedOthers.slice(0, newPos - 1),
+        { id: editingId, displayOrder: newPos },
+        ...sortedOthers.slice(newPos - 1),
+      ].map((item, idx) => ({ id: item.id, displayOrder: idx + 1 }));
+
+      // Save the item data + batch reorder in parallel
+      const [saveRes, reorderRes] = await Promise.all([
+        fetch('/api/experience', {
+          method: editingId ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(editingId ? { ...payload, id: editingId } : payload),
+        }),
+        // Only reorder when editing (not creating — new item has no position yet)
+        editingId
+          ? fetch('/api/experience', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ reorder: reordered }),
+            })
+          : Promise.resolve({ ok: true }),
+      ]);
+
+      if (saveRes.ok) {
+        toast.success(editingId ? 'Updated' : 'Created');
+        setFormOpen(false);
+        fetchItems();
+      } else toast.error('Failed');
     } catch { toast.error('Failed'); } finally { setSaving(false); }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    try { const res = await fetch(`/api/experience?id=${deleteId}`, { method: 'DELETE' }); if (res.ok) { toast.success('Deleted'); setItems((p) => p.filter((i) => i.id !== deleteId)); } else toast.error('Failed'); } catch { toast.error('Failed'); } finally { setDeleteOpen(false); setDeleteId(null); }
+    try {
+      const res = await fetch(`/api/experience?id=${deleteId}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('Deleted');
+        // Re-sequence remaining items from 1
+        const remaining = items
+          .filter((i) => i.id !== deleteId)
+          .sort((a, b) => a.displayOrder - b.displayOrder)
+          .map((item, idx) => ({ id: item.id, displayOrder: idx + 1 }));
+        if (remaining.length > 0) {
+          await fetch('/api/experience', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reorder: remaining }),
+          });
+        }
+        fetchItems();
+      } else toast.error('Failed');
+    } catch { toast.error('Failed'); } finally { setDeleteOpen(false); setDeleteId(null); }
   };
 
   return (
