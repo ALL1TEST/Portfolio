@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Github, Linkedin, Instagram } from 'lucide-react';
-import Image from 'next/image';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -124,14 +123,10 @@ export function Navbar() {
                 whileTap={{ scale: 0.97 }}
                 className="flex items-center min-w-0"
               >
-                <Image
+                <img
                   src="/uploads/codevirtox-logo.png"
                   alt="CodeVirtox"
-                  width={320}
-                  height={80}
-                  className="h-10 lg:h-12 w-auto object-contain block"
-                  style={{ maxWidth: '100%' }}
-                  priority
+                  className="site-logo"
                 />
               </motion.div>
               <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-gradient-to-r from-brand via-brand/60 to-transparent group-hover/logo:w-full transition-all duration-500 ease-out" />
