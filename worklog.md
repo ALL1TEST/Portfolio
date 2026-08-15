@@ -662,3 +662,28 @@ Stage Summary:
 - No heavy backgrounds, borders, or glowing effects on any nav state
 - Clean text links with subtle hover/active indicators
 - Desktop nav untouched, verified via agent browser
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Apply FocusReveal character-by-character animation to all portfolio section titles
+
+Work Log:
+- Created `src/components/focus-reveal.tsx` — adapted from user-provided Originkit code, converted `motion/react` imports to `framer-motion`, added `trigger` boolean prop for viewport-controlled animation
+- Created `src/components/use-once-in-view.ts` — custom hook using native IntersectionObserver with `once: true` behavior. Returns `false` initially, flips to `true` once element enters viewport, then disconnects observer
+- Modified `src/components/section-heading.tsx` — replaced static `<h2>` with conditional rendering: invisible placeholder `<h2>` when out of view, FocusReveal component when entering view. Uses `useOnceInView` hook for trigger detection
+- Modified `src/components/certificates-section.tsx` — replaced static `<h2>Certificates & Credentials</h2>` with CertificatesTitle component using same conditional FocusReveal pattern
+- Modified `src/components/resume-section.tsx` — replaced static "Technologies I / work with" (two-line) and "Experience & Projects" titles with conditional FocusReveal. Two-line title uses two separate FocusReveal instances with staggered delay
+- Fixed framer-motion bug where `initial === animate` (same hidden state) caused styles not to be applied. Solved by using conditional rendering (mount FocusReveal only when in view, invisible placeholder before)
+- Removed debug data attributes and console.log statements after verification
+- All pages verified: Home (Who I Am, Featured Projects), Projects (Selected Projects), Certificates (Certificates & Credentials), Resume (Technologies I work with, Experience & Projects), Contact (Let's Build Something Great Together.)
+
+Stage Summary:
+- FocusReveal animation applied to all 7 section titles across 5 pages
+- Animation triggers only when section enters viewport (once-only)
+- Before viewport: invisible placeholder preserves layout (no layout shift)
+- On viewport entry: character-by-character blur(15px) + scale(1.45→1) reveal with 0.03s stagger
+- After animation: clean, crisp text with no blur
+- Respects reduced-motion preferences (skipMotion from useReducedMotion)
+- Desktop nav, cards, images, buttons, mobile menu, layout all unchanged
+- Lint clean, no compilation errors

@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollReveal } from './scroll-reveal';
+import FocusReveal from './focus-reveal';
+import { useOnceInView } from './use-once-in-view';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Certificate } from '@/lib/types';
@@ -22,6 +24,38 @@ function formatIssueYear(dateStr: string): string {
   if (!dateStr) return '';
   const yearMatch = dateStr.match(/\d{4}/);
   return yearMatch ? yearMatch[0] : dateStr;
+}
+
+function CertificatesTitle() {
+  const ref = useRef(null);
+  const inView = useOnceInView(ref, '-60px');
+
+  const titleClasses = 'text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight';
+  const title = 'Certificates & Credentials';
+
+  return (
+    <div ref={ref}>
+      {inView ? (
+        <FocusReveal
+          text={title}
+          as="h2"
+          className={titleClasses}
+          blur={15}
+          trigger={true}
+          transition={{
+            type: 'tween',
+            duration: 0.35,
+            staggerChildren: 0.03,
+            ease: 'easeOut',
+          }}
+        />
+      ) : (
+        <h2 className={titleClasses} aria-label={title} style={{ visibility: 'hidden' }}>
+          {title}
+        </h2>
+      )}
+    </div>
+  );
 }
 
 function CertificateCard({ cert, index }: { cert: Certificate; index: number }) {
@@ -101,19 +135,19 @@ export function CertificatesSection() {
     <section id="certificates" className="relative py-24 lg:py-32 bg-gradient-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <ScrollReveal>
-          <div className="text-center mb-10 lg:mb-12">
+        <div className="text-center mb-10 lg:mb-12">
+          <ScrollReveal delay={0}>
             <span className="inline-block px-5 py-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-muted-text bg-surface border border-stroke rounded-sm mb-5">
               Certificates
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-              Certificates &amp; Credentials
-            </h2>
+          </ScrollReveal>
+          <CertificatesTitle />
+          <ScrollReveal delay={0.3}>
             <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base leading-relaxed">
               A collection of certifications and professional training I&apos;ve completed throughout my learning journey.
             </p>
-          </div>
-        </ScrollReveal>
+          </ScrollReveal>
+        </div>
 
         {/* Filter buttons — centered */}
         <ScrollReveal delay={0.1}>
