@@ -27,11 +27,17 @@ export function Footer() {
             <div>
               <Link
                 href="/"
-                className="text-xl font-bold tracking-tight inline-block mb-4"
+                className="inline-flex items-baseline mb-4 group/flogo"
               >
-                <span className="text-white">Code</span>
-                <span className="text-brand">Virtox</span>
-                <span className="text-brand">.</span>
+                <span className="text-xl font-bold text-white tracking-[-0.02em]">
+                  Code
+                </span>
+                <span className="text-xl font-bold tracking-[-0.02em] text-brand drop-shadow-[0_0_8px_rgba(255,57,0,0.35)] transition-all duration-300 group-hover/flogo:drop-shadow-[0_0_14px_rgba(255,57,0,0.55)]">
+                  Virtox
+                </span>
+                <span className="text-xl font-bold tracking-[-0.02em] text-brand/80 drop-shadow-[0_0_8px_rgba(255,57,0,0.35)] transition-all duration-300 group-hover/flogo:drop-shadow-[0_0_14px_rgba(255,57,0,0.55)]">
+                  .
+                </span>
               </Link>
               <p className="text-sm text-muted-text leading-relaxed max-w-xs">
                 Full Stack Developer building modern web applications and smart
