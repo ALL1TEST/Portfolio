@@ -2,34 +2,45 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Award } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Certificate } from '@/lib/types';
 
-function formatIssueDate(dateStr: string): string {
-  if (!dateStr) return '';
-  const match = dateStr.match(/^(\d{4})-(\d{2})$/);
-  if (match) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthIndex = parseInt(match[2], 10) - 1;
-    if (monthIndex >= 0 && monthIndex <= 11) return `${months[monthIndex]} ${match[1]}`;
+function parseSkills(skillsJson: string): string[] {
+  try {
+    const parsed = JSON.parse(skillsJson);
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    return [];
+  } catch {
+    if (skillsJson && skillsJson.trim()) return skillsJson.split(',').map(s => s.trim()).filter(Boolean);
+    return [];
   }
-  return dateStr;
+}
+
+function formatIssueYear(dateStr: string): string {
+  if (!dateStr) return '';
+  // Extract year from various formats
+  const yearMatch = dateStr.match(/\d{4}/);
+  return yearMatch ? yearMatch[0] : dateStr;
 }
 
 function CertificateCard({ cert, index }: { cert: Certificate; index: number }) {
   const hasImage = !!cert.certificateImage;
   const href = cert.credentialUrl || '#';
-  const formattedDate = formatIssueDate(cert.issueDate);
+  const skills = parseSkills(cert.skills);
+  const year = formatIssueYear(cert.issueDate);
 
-  // Build tag pills: issuer + year
-  const tags: string[] = [];
-  if (cert.issuer) tags.push(cert.issuer);
-  if (formattedDate) {
-    const yearMatch = formattedDate.match(/\d{4}/);
-    if (yearMatch) tags.push(yearMatch[0]);
+  // Build the subtitle line: "Skill / Category • Issued Year"
+  const subtitleParts: string[] = [];
+  if (cert.category) {
+    subtitleParts.push(cert.category);
+  }
+  if (skills.length > 0) {
+    subtitleParts.push(skills[0]);
+  }
+  if (year) {
+    subtitleParts.push(`Issued ${year}`);
   }
 
   return (
@@ -61,28 +72,22 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
             justifyContent: 'center',
             background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
           }}
-        >
-          <Award className="w-12 h-12 text-white/10" />
-        </div>
+        />
       )}
 
-      {/* Content overlay — tags top, title bottom */}
+      {/* Content overlay — title + meta at bottom */}
       <div className="certificate-card-content">
-        {/* Tags at top-right */}
-        <div className="certificate-tags">
-          {tags.map((tag) => (
-            <span key={tag} className="certificate-tag">
-              {tag}
-            </span>
-          ))}
-        </div>
+        {/* Spacer for top (no tags) */}
+        <div />
 
-        {/* Title + meta at bottom-left */}
+        {/* Title + subtitle at bottom-left */}
         <div className="certificate-info">
           <h3 className="certificate-title">{cert.title}</h3>
-          <p className="certificate-meta">
-            {[cert.issuer, formattedDate].filter(Boolean).join(' — ')}
-          </p>
+          {subtitleParts.length > 0 && (
+            <p className="certificate-meta">
+              {subtitleParts.join(' • ')}
+            </p>
+          )}
         </div>
       </div>
 

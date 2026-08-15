@@ -18,11 +18,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <ScrollReveal delay={index * 0.12} direction="up">
       <motion.div
-        className="group rounded-xl overflow-hidden bg-surface border border-stroke/40"
+        className="group rounded-xl overflow-hidden bg-surface border border-stroke/40 flex flex-col"
         whileHover={{ y: -6 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* Image area — 16:10 landscape */}
+        {/* Image area — dedicated space with taller aspect ratio */}
         {hasImage ? (
           <a
             href={project.liveDemoUrl || project.githubUrl || '#'}
@@ -41,20 +41,30 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </div>
           </a>
         ) : (
-          <div className="relative aspect-[16/10] bg-gradient-to-br from-surface to-dark flex items-center justify-center">
-            <span className="text-5xl font-bold text-stroke/20">{project.title?.charAt(0)}</span>
+          <div className="relative aspect-[16/10] bg-gradient-to-br from-surface to-dark flex items-center justify-center overflow-hidden">
+            <span className="text-6xl font-bold text-stroke/15 select-none">{project.title?.charAt(0)}</span>
           </div>
         )}
 
-        {/* Content area below image */}
-        <div className="p-5 lg:p-6">
+        {/* Content area — clearly separated from image with generous padding */}
+        <div className="p-6 lg:p-8 flex flex-col flex-1">
+          {/* Title */}
+          <h3 className="text-xl lg:text-2xl font-bold text-white leading-snug mb-3 group-hover:text-brand transition-colors duration-300">
+            {project.title}
+          </h3>
+
+          {/* Description */}
+          <p className="text-sm lg:text-base text-muted-text leading-relaxed line-clamp-3 mb-5">
+            {project.shortDescription}
+          </p>
+
           {/* Tech pills */}
           {technologies.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {technologies.slice(0, 5).map((tech) => (
+            <div className="flex flex-wrap gap-2 mb-5">
+              {technologies.map((tech) => (
                 <span
                   key={tech}
-                  className="px-2 py-0.5 text-[11px] font-medium tracking-wide text-brand/80 border border-brand/20 rounded bg-brand/5"
+                  className="px-3 py-1 text-[11px] font-medium tracking-wide text-brand/80 border border-brand/20 rounded-full bg-brand/5"
                 >
                   {tech}
                 </span>
@@ -62,27 +72,20 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </div>
           )}
 
-          {/* Title */}
-          <h3 className="text-lg lg:text-xl font-bold text-white leading-snug mb-2 group-hover:text-brand transition-colors duration-300">
-            {project.title}
-          </h3>
-
-          {/* Description */}
-          <p className="text-sm text-muted-text leading-relaxed line-clamp-3">
-            {project.shortDescription}
-          </p>
+          {/* Spacer to push links to bottom */}
+          <div className="mt-auto" />
 
           {/* Links row */}
-          <div className="flex items-center gap-3 mt-4 pt-4 border-t border-stroke/40">
+          <div className="flex items-center gap-4 pt-5 border-t border-stroke/40">
             {project.liveDemoUrl && (
               <a
                 href={project.liveDemoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs font-medium text-white/70 hover:text-brand transition-colors duration-300"
+                className="flex items-center gap-1.5 text-sm font-medium text-white/70 hover:text-brand transition-colors duration-300"
               >
-                <ArrowUpRight className="w-3.5 h-3.5" />
-                Live Demo
+                <ArrowUpRight className="w-4 h-4" />
+                View Project
               </a>
             )}
             {project.githubUrl && (
@@ -90,9 +93,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs font-medium text-white/40 hover:text-white/70 transition-colors duration-300"
+                className="flex items-center gap-1.5 text-sm font-medium text-white/40 hover:text-white/70 transition-colors duration-300"
               >
-                <Github className="w-3.5 h-3.5" />
+                <Github className="w-4 h-4" />
                 Source Code
               </a>
             )}
@@ -116,14 +119,19 @@ export function ProjectsSection() {
         />
 
         {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-xl overflow-hidden bg-surface border border-stroke/40">
+              <div key={i} className="rounded-xl overflow-hidden bg-surface border border-stroke/40 flex flex-col">
                 <Skeleton className="aspect-[16/10] w-full" />
-                <div className="p-5 space-y-3">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-6 w-48" />
+                <div className="p-6 lg:p-8 space-y-3 flex-1">
+                  <Skeleton className="h-7 w-56" />
                   <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <div className="flex gap-2 mt-4">
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                    <Skeleton className="h-6 w-14 rounded-full" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -133,7 +141,7 @@ export function ProjectsSection() {
             <p className="text-muted-text">No projects yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {projects.map((project, index) => (
               <ProjectCard key={project.id} project={project} index={index} />
             ))}

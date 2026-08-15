@@ -611,3 +611,28 @@ Stage Summary:
 - Old cert-v2-* CSS removed from globals.css
 - All certificate data, filtering, and section structure preserved unchanged
 - Visual design matches the reference HTML: full-card visual background, category labels at top, title at bottom, centered View button on hover
+
+---
+Task ID: Home-Page-Update
+Agent: Main Agent
+Task: Comprehensive home page update - stats, featured projects, education, certificates redesign, project cards
+
+Work Log:
+- Updated education DB entries: edu-1 → OFPPT/Specialized Technician Diploma/Digital Development/2024-Present, edu-2 → Qualifying High School Al Araar/Bachelor's Degree/Life and Earth Sciences/2020-2021
+- Created AI Tools project in DB with technologies [React, Next.js, AI APIs, Automation], set featured=true
+- Updated DentClinic description and technologies to [Laravel, Filament, PHP, MySQL]
+- Updated Library Management System: set featured=true, updated description
+- Created achievement-stats.tsx component: 6+ Certificates, 14+ Projects, 8+ Technologies in 3-column grid with subtle dividers
+- Updated featured-projects.tsx: changed label to "FEATURED WORK", title to "Featured Projects", description to "A selection of projects I'm proud of", added View All Projects CTA button with router.push('/projects'), reordered card content (title→description→tech tags→links)
+- Updated page.tsx layout order: Hero → TechMarquee → AchievementStats → AboutPreview → FeaturedProjects → CertificatesSection → ResumeSection → ContactSection
+- Updated certificates-section.tsx: removed issuer/year tags at top-right, removed Award icon import, added category/skill parsing, subtitle shows "Skill • Issued Year" format (e.g. "PHP • Issued 2025", "Cybersecurity • Issued 2025"), clean minimal overlay without icons
+- Updated projects-section.tsx: increased card padding (p-6 lg:p-8), larger title (text-xl lg:text-2xl), larger description, larger tech pills (px-3 py-1), added flex-col with mt-auto for link separation, increased grid gap to 8/10, all content clearly separated from image area
+- Browser verified: desktop + mobile layouts, all sections render correctly, education data updated, certificate overlay text clean, project cards spacious
+
+Stage Summary:
+- New achievement-stats.tsx component created
+- DB: 2 education entries updated, 1 new project created, 2 projects updated
+- Featured Projects section now shows 3 cards with CTA button
+- Certificates show clean "Skill • Issued Year" overlay without icons
+- Project cards have increased height with clear image/content separation
+- Home page layout: Hero → Marquee → Stats → Who I Am → Featured Projects → Certificates → Resume → Contact

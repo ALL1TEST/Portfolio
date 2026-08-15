@@ -2,8 +2,10 @@
 
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Github } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionHeading } from './section-heading';
+import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Project } from '@/lib/types';
@@ -41,20 +43,30 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
             </div>
           </a>
         ) : (
-          <div className="relative aspect-[16/10] bg-gradient-to-br from-surface to-dark flex items-center justify-center">
-            <span className="text-5xl font-bold text-stroke/20">{project.title?.charAt(0)}</span>
+          <div className="relative aspect-[16/10] bg-gradient-to-br from-surface to-dark flex items-center justify-center overflow-hidden">
+            <span className="text-5xl font-bold text-stroke/20 select-none">{project.title?.charAt(0)}</span>
           </div>
         )}
 
-        {/* Content area below image */}
+        {/* Content area below image — clean separation */}
         <div className="p-5 lg:p-6">
+          {/* Title */}
+          <h3 className="text-lg lg:text-xl font-bold text-white leading-snug mb-2 group-hover:text-brand transition-colors duration-300">
+            {project.title}
+          </h3>
+
+          {/* Description */}
+          <p className="text-sm text-muted-text leading-relaxed line-clamp-3 mb-4">
+            {project.shortDescription}
+          </p>
+
           {/* Tech pills */}
           {technologies.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {technologies.slice(0, 5).map((tech) => (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {technologies.map((tech) => (
                 <span
                   key={tech}
-                  className="px-2 py-0.5 text-[11px] font-medium tracking-wide text-brand/80 border border-brand/20 rounded bg-brand/5"
+                  className="px-2.5 py-1 text-[11px] font-medium tracking-wide text-brand/80 border border-brand/20 rounded-full bg-brand/5"
                 >
                   {tech}
                 </span>
@@ -62,19 +74,9 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
             </div>
           )}
 
-          {/* Title */}
-          <h3 className="text-lg lg:text-xl font-bold text-white leading-snug mb-2 group-hover:text-brand transition-colors duration-300">
-            {project.title}
-          </h3>
-
-          {/* Description */}
-          <p className="text-sm text-muted-text leading-relaxed line-clamp-3">
-            {project.shortDescription}
-          </p>
-
           {/* Links row */}
-          <div className="flex items-center gap-3 mt-4 pt-4 border-t border-stroke/40">
-            {project.liveDemoUrl && (
+          <div className="flex items-center gap-3 pt-4 border-t border-stroke/40">
+            {project.liveDemoUrl ? (
               <a
                 href={project.liveDemoUrl}
                 target="_blank"
@@ -82,20 +84,19 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
                 className="flex items-center gap-1.5 text-xs font-medium text-white/70 hover:text-brand transition-colors duration-300"
               >
                 <ArrowUpRight className="w-3.5 h-3.5" />
-                Live Demo
+                View Project
               </a>
-            )}
-            {project.githubUrl && (
+            ) : project.githubUrl ? (
               <a
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs font-medium text-white/40 hover:text-white/70 transition-colors duration-300"
+                className="flex items-center gap-1.5 text-xs font-medium text-white/70 hover:text-brand transition-colors duration-300"
               >
                 <Github className="w-3.5 h-3.5" />
-                Source Code
+                View Project
               </a>
-            )}
+            ) : null}
           </div>
         </div>
       </motion.div>
@@ -105,6 +106,7 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
 export function FeaturedProjects() {
   const { projects, loading } = useData();
+  const router = useRouter();
 
   // Filter featured projects and sort by displayOrder
   const featuredProjects = projects
@@ -115,9 +117,9 @@ export function FeaturedProjects() {
     <section id="featured-projects" className="relative py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
-          label="Featured"
+          label="Featured Work"
           title="Featured Projects"
-          description="A selection of my best work, showcasing full-stack development and creative problem-solving."
+          description="A selection of projects I'm proud of."
         />
 
         {loading ? (
@@ -126,9 +128,14 @@ export function FeaturedProjects() {
               <div key={i} className="rounded-xl overflow-hidden bg-surface border border-stroke/40">
                 <Skeleton className="aspect-[16/10] w-full" />
                 <div className="p-5 space-y-3">
-                  <Skeleton className="h-4 w-20" />
                   <Skeleton className="h-6 w-48" />
                   <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                    <Skeleton className="h-6 w-14 rounded-full" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -138,11 +145,24 @@ export function FeaturedProjects() {
             <p className="text-muted-text">No featured projects yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {featuredProjects.map((project, index) => (
-              <FeaturedProjectCard key={project.id} project={project} index={index} />
-            ))}
-          </div>
+          <>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {featuredProjects.map((project, index) => (
+                <FeaturedProjectCard key={project.id} project={project} index={index} />
+              ))}
+            </div>
+
+            {/* View All Projects CTA */}
+            <ScrollReveal delay={0.3}>
+              <div className="mt-12 lg:mt-16 text-center">
+                <SlideFillButton
+                  label="View All Projects"
+                  variant="secondary"
+                  onClick={() => router.push('/projects')}
+                />
+              </div>
+            </ScrollReveal>
+          </>
         )}
       </div>
     </section>
