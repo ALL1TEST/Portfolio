@@ -264,17 +264,11 @@ export default function SkillsPage() {
             <div className="space-y-2">
               <Label className="text-sm text-white">Category</Label>
               <Select
-                value={form.category === 'Other' ? '__other__' : form.category}
-                onValueChange={(v) => {
-                  if (v === '__other__') {
-                    setForm((p) => ({ ...p, category: '' }));
-                  } else {
-                    setForm((p) => ({ ...p, category: v }));
-                  }
-                }}
+                value={form.category}
+                onValueChange={(v) => setForm((p) => ({ ...p, category: v }))}
               >
                 <SelectTrigger className="bg-dark border-stroke text-white">
-                  <SelectValue placeholder="Select or type a category" />
+                  <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent className="bg-surface border-stroke">
                   {CATEGORIES.map((cat) => (
@@ -282,18 +276,16 @@ export default function SkillsPage() {
                       {cat}
                     </SelectItem>
                   ))}
-                  <SelectItem value="__other__" className="text-muted-text focus:bg-dark focus:text-white">
-                    + New Category
-                  </SelectItem>
                 </SelectContent>
               </Select>
-              {(!DEFAULT_CATEGORIES.includes(form.category) && form.category) && (
+              {form.category === 'Other' && (
                 <Input
-                  value={form.category}
+                  value={''}
                   onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
                   required
+                  autoFocus
                   className="bg-dark border-stroke text-white placeholder:text-muted-text mt-2"
-                  placeholder="Enter custom category name"
+                  placeholder="Enter category name"
                 />
               )}
             </div>
