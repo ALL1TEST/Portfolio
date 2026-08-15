@@ -116,6 +116,13 @@ export function CertificatesSection() {
             className={CERT_TITLE_CLASSES}
             blur={20}
             staggerFrom="start"
+            transition={{
+              type: "tween",
+              duration: 0.3,
+              delay: 0,
+              ease: "easeOut",
+              staggerChildren: 0.035,
+            }}
           />
           <ScrollReveal delay={0.3}>
             <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base leading-relaxed">

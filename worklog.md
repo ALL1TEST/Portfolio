@@ -775,3 +775,22 @@ Stage Summary:
 - Parent-level whileInView propagates to children via shared variant labels
 - Per-character delays handle stagger without needing staggerChildren
 - All original titles preserved with exact existing styling
+---
+Task ID: 11
+Agent: Main Agent
+Task: Apply user-provided FocusReveal (Originkit) component to all 7 section titles
+
+Work Log:
+- Wrote exact user-provided FocusReveal component to `src/components/focus-reveal.tsx`
+- Only change from user code: import from `"framer-motion"` instead of `"motion/react"` (motion/react not installed in project)
+- Fixed lint error: wrapped `onCompleteRef.current = onComplete` in useEffect (react-hooks/refs rule)
+- Updated `section-heading.tsx` — passes explicit transition config and `as="h2"`
+- Updated `certificates-section.tsx` — passes explicit transition config
+- Updated `resume-section.tsx` — combined "Technologies I" + "work with" into single title "Technologies I work with" per user spec; passes explicit transition config
+- Lint clean, no console errors
+- Verified all 7 titles via agent-browser: all chars at opacity:1, blur(0px) — fully sharp
+
+Stage Summary:
+- FocusReveal (Originkit) component applied exactly as user provided
+- Titles: Who I Am, Featured Projects, Selected Projects, Certificates & Credentials, Technologies I work with, Experience & Projects, Let's Build Something Great Together.
+- All using START_SCALE=1.45, blur=20, staggerFrom="start", duration=0.3, staggerChildren=0.035

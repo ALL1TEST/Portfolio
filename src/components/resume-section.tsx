@@ -70,18 +70,18 @@ export function ResumeSection() {
               <div className="skills-faq-header">
                 <div className="skills-label">TECHNICAL SKILLS</div>
                 <FocusReveal
-                  text="Technologies I"
+                  text="Technologies I work with"
                   as="h2"
                   className="skills-faq-title"
                   blur={20}
                   staggerFrom="start"
-                />
-                <FocusReveal
-                  text="work with"
-                  as="h2"
-                  className="skills-faq-title"
-                  blur={20}
-                  staggerFrom="start"
+                  transition={{
+                    type: "tween",
+                    duration: 0.3,
+                    delay: 0,
+                    ease: "easeOut",
+                    staggerChildren: 0.035,
+                  }}
                 />
               </div>
 
@@ -117,6 +117,13 @@ export function ResumeSection() {
                     className="journey-title"
                     blur={20}
                     staggerFrom="start"
+                    transition={{
+                      type: "tween",
+                      duration: 0.3,
+                      delay: 0,
+                      ease: "easeOut",
+                      staggerChildren: 0.035,
+                    }}
                   />
                 </div>
 
