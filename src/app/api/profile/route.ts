@@ -36,6 +36,7 @@ export const PUT = withAuth(async (req: Request) => {
         ...(body.aboutCard2Description !== undefined && { aboutCard2Description: body.aboutCard2Description }),
         ...(body.aboutCard3Title !== undefined && { aboutCard3Title: body.aboutCard3Title }),
         ...(body.aboutCard3Description !== undefined && { aboutCard3Description: body.aboutCard3Description }),
+        ...(body.logoUrl !== undefined && { logoUrl: body.logoUrl }),
         ...(body.profileImage !== undefined && { profileImage: body.profileImage }),
         ...(body.cvFile !== undefined && { cvFile: body.cvFile }),
         ...(body.stat1Value !== undefined && { stat1Value: body.stat1Value }),

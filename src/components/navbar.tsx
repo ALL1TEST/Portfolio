@@ -127,7 +127,7 @@ export function Navbar() {
                 className="flex items-center gap-2.5 min-w-0"
               >
                 <img
-                  src="/logo.png"
+                  src={profile?.logoUrl || '/logo.png'}
                   alt="Logo"
                   className="object-contain h-10 w-auto lg:h-12"
                 />

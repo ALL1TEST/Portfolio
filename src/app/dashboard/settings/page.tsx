@@ -34,6 +34,7 @@ interface Profile {
   aboutCard2Description: string;
   aboutCard3Title: string;
   aboutCard3Description: string;
+  logoUrl: string;
   profileImage: string;
   cvFile: string;
   stat1Value: string;
@@ -66,6 +67,7 @@ const emptyProfile: Profile = {
   aboutCard2Description: '',
   aboutCard3Title: '',
   aboutCard3Description: '',
+  logoUrl: '',
   profileImage: '',
   cvFile: '',
   stat1Value: '',
@@ -81,9 +83,10 @@ export default function SettingsPage() {
   const [original, setOriginal] = useState<Profile>(emptyProfile);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState<'profile' | 'cv' | null>(null);
+  const [uploading, setUploading] = useState<'profile' | 'cv' | 'logo' | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const cvInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -147,6 +150,27 @@ export default function SettingsPage() {
       } else { toast.error('Failed to upload CV'); }
     } catch { toast.error('Failed to upload CV'); }
     finally { setUploading(null); if (cvInputRef.current) cvInputRef.current.value = ''; }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return; }
+
+    setUploading('logo');
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('category', 'profile');
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        updateField('logoUrl', data.url);
+        toast.success('Logo uploaded successfully');
+      } else { toast.error('Failed to upload logo'); }
+    } catch { toast.error('Failed to upload logo'); }
+    finally { setUploading(null); if (logoInputRef.current) logoInputRef.current.value = ''; }
   };
 
   const handleSave = async () => {
@@ -270,6 +294,37 @@ export default function SettingsPage() {
         </div>
       </Card>
 
+      {/* Logo */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Logo</h3>
+        <div className="flex items-center gap-6">
+          <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-stroke/50 bg-dark flex-shrink-0">
+            {profile.logoUrl ? (
+              <img src={profile.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted-text/40">
+                <img src="/logo.png" alt="Current logo" className="w-12 h-12 object-contain opacity-50" />
+              </div>
+            )}
+          </div>
+          <div className="flex-1 space-y-3">
+            <div className="flex items-center gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploading === 'logo'} className="border-stroke text-white hover:bg-dark gap-2">
+                {uploading === 'logo' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                {uploading === 'logo' ? 'Uploading...' : 'Upload Logo'}
+              </Button>
+              {profile.logoUrl && (
+                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('logoUrl', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+                  <Trash2 className="w-3.5 h-3.5" /> Remove
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-text">Recommended: Square PNG with transparent background, min 200×200px. Max 5MB.</p>
+            <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+          </div>
+        </div>
+      </Card>
+
       {/* Personal Information */}
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Personal Information</h3>
@@ -375,27 +430,6 @@ export default function SettingsPage() {
           <Label className="text-sm text-white">Footer Bio</Label>
           <Textarea value={profile.footerBio} onChange={(e) => updateField('footerBio', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]" placeholder="A short bio or tagline that appears in the footer..." />
           <p className="text-xs text-muted-text">This appears in the footer section of your website.</p>
-        </div>
-      </Card>
-
-      {/* Contact Information */}
-      <Card className="bg-surface border-stroke p-6">
-        <h3 className="text-sm font-semibold text-white mb-4">Contact Information</h3>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-sm text-white">Email</Label>
-              <Input value={profile.email} onChange={(e) => updateField('email', e.target.value)} type="email" className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="contact@codevirtox.com" />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm text-white">Phone</Label>
-              <Input value={profile.phone} onChange={(e) => updateField('phone', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="+212 600-000-000" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm text-white">Location</Label>
-            <Input value={profile.location} onChange={(e) => updateField('location', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="Oulad Teima, Morocco" />
-          </div>
         </div>
       </Card>
 

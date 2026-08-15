@@ -45,6 +45,7 @@ model Profile {
   stat2Label        String   @default("Projects")
   stat3Value        String   @default("8+")
   stat3Label        String   @default("Technologies")
+  logoUrl           String   @default("")
   profileImage     String   @default("")
   cvFile           String   @default("")
   createdAt        DateTime @default(now())

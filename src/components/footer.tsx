@@ -39,7 +39,7 @@ export function Footer() {
                 className="flex items-center gap-2.5 mb-4 group/flogo min-w-0"
               >
                 <img
-                  src="/logo.png"
+                  src={profile?.logoUrl || '/logo.png'}
                   alt="Logo"
                   className="object-contain h-10 w-auto lg:h-12 transition-transform duration-300 group-hover/flogo:scale-105"
                 />

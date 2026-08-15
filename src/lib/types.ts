@@ -27,6 +27,7 @@ export interface Profile {
   stat2Label: string;
   stat3Value: string;
   stat3Label: string;
+  logoUrl: string;
   profileImage: string;
   cvFile: string;
 }
