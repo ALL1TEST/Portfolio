@@ -3,13 +3,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Loader2, Briefcase, Languages, Heart } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -47,20 +46,6 @@ interface Experience {
   startDate: string;
   endDate: string;
   location: string;
-  displayOrder: number;
-}
-
-interface Language {
-  id: string;
-  name: string;
-  level: string;
-  displayOrder: number;
-}
-
-interface SoftSkill {
-  id: string;
-  name: string;
-  icon: string;
   displayOrder: number;
 }
 
@@ -179,202 +164,6 @@ function ExperienceTab() {
   );
 }
 
-// ----- Languages Tab -----
-const emptyLanguage = { name: '', level: '', displayOrder: 0 };
-
-function LanguagesTab() {
-  const [items, setItems] = useState<Language[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState(emptyLanguage);
-
-  const fetchItems = useCallback(async () => {
-    try { const res = await fetch('/api/languages'); if (res.ok) setItems(await res.json()); } catch { /* ignore */ } finally { setLoading(false); }
-  }, []);
-  useEffect(() => { fetchItems(); }, [fetchItems]);
-
-  const openCreate = () => { setEditingId(null); setForm(emptyLanguage); setFormOpen(true); };
-  const openEdit = (item: Language) => { setEditingId(item.id); setForm({ name: item.name, level: item.level, displayOrder: item.displayOrder }); setFormOpen(true); };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(true);
-    try {
-      const res = await fetch('/api/languages', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editingId ? { ...form, id: editingId } : form) });
-      if (res.ok) { toast.success(editingId ? 'Updated' : 'Created'); setFormOpen(false); fetchItems(); } else toast.error('Failed');
-    } catch { toast.error('Failed'); } finally { setSaving(false); }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteId) return;
-    try { const res = await fetch(`/api/languages?id=${deleteId}`, { method: 'DELETE' }); if (res.ok) { toast.success('Deleted'); setItems((p) => p.filter((i) => i.id !== deleteId)); } else toast.error('Failed'); } catch { toast.error('Failed'); } finally { setDeleteOpen(false); setDeleteId(null); }
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="flex justify-end">
-        <Button onClick={openCreate} size="sm" className="bg-brand hover:bg-brand-light text-white gap-1.5"><Plus className="w-3.5 h-3.5" /> Add Language</Button>
-      </div>
-      <Card className="bg-surface border-stroke overflow-hidden">
-        {loading ? (
-          <div className="p-6 space-y-3">{[1, 2].map((i) => <Skeleton key={i} className="h-12 w-full bg-dark" />)}</div>
-        ) : items.length === 0 ? (
-          <div className="p-8 text-center"><p className="text-sm text-muted-text">No languages added yet.</p></div>
-        ) : (
-          <ScrollArea className="max-h-96">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-stroke hover:bg-transparent">
-                  <TableHead className="text-muted-text font-medium">Language</TableHead>
-                  <TableHead className="text-muted-text font-medium">Level</TableHead>
-                  <TableHead className="text-muted-text font-medium text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.id} className="border-stroke hover:bg-dark/50">
-                    <TableCell className="font-medium text-white">{item.name}</TableCell>
-                    <TableCell className="text-muted-text">{item.level}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-text hover:text-white hover:bg-surface" onClick={() => openEdit(item)}><Pencil className="w-3.5 h-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-text hover:text-red-500 hover:bg-surface" onClick={() => { setDeleteId(item.id); setDeleteOpen(true); }}><Trash2 className="w-3.5 h-3.5" /></Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        )}
-      </Card>
-
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="bg-surface border-stroke max-w-md">
-          <DialogHeader><DialogTitle className="text-white">{editingId ? 'Edit Language' : 'Add Language'}</DialogTitle><DialogDescription className="text-muted-text">Language details.</DialogDescription></DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2"><Label className="text-sm text-white">Language</Label><Input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="Arabic" /></div>
-            <div className="space-y-2"><Label className="text-sm text-white">Level</Label><Input value={form.level} onChange={(e) => setForm((p) => ({ ...p, level: e.target.value }))} required className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="Native / Fluent / ..." /></div>
-            <div className="space-y-2"><Label className="text-sm text-white">Display Order</Label><Input type="number" value={form.displayOrder} onChange={(e) => setForm((p) => ({ ...p, displayOrder: parseInt(e.target.value) || 0 }))} className="bg-dark border-stroke text-white placeholder:text-muted-text" /></div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setFormOpen(false)} className="border-stroke text-white hover:bg-surface">Cancel</Button>
-              <Button type="submit" disabled={saving} className="bg-brand hover:bg-brand-light text-white">{saving && <Loader2 className="w-4 h-4 animate-spin mr-2" />}{editingId ? 'Update' : 'Create'}</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="bg-surface border-stroke">
-          <AlertDialogHeader><AlertDialogTitle className="text-white">Delete Entry</AlertDialogTitle><AlertDialogDescription className="text-muted-text">This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel className="border-stroke text-white hover:bg-surface">Cancel</AlertDialogCancel><AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">Delete</AlertDialogAction></AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-}
-
-// ----- Soft Skills Tab -----
-const emptySoftSkill = { name: '', icon: '', displayOrder: 0 };
-
-function SoftSkillsTab() {
-  const [items, setItems] = useState<SoftSkill[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState(emptySoftSkill);
-
-  const fetchItems = useCallback(async () => {
-    try { const res = await fetch('/api/soft-skills'); if (res.ok) setItems(await res.json()); } catch { /* ignore */ } finally { setLoading(false); }
-  }, []);
-  useEffect(() => { fetchItems(); }, [fetchItems]);
-
-  const openCreate = () => { setEditingId(null); setForm(emptySoftSkill); setFormOpen(true); };
-  const openEdit = (item: SoftSkill) => { setEditingId(item.id); setForm({ name: item.name, icon: item.icon, displayOrder: item.displayOrder }); setFormOpen(true); };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(true);
-    try {
-      const res = await fetch('/api/soft-skills', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editingId ? { ...form, id: editingId } : form) });
-      if (res.ok) { toast.success(editingId ? 'Updated' : 'Created'); setFormOpen(false); fetchItems(); } else toast.error('Failed');
-    } catch { toast.error('Failed'); } finally { setSaving(false); }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteId) return;
-    try { const res = await fetch(`/api/soft-skills?id=${deleteId}`, { method: 'DELETE' }); if (res.ok) { toast.success('Deleted'); setItems((p) => p.filter((i) => i.id !== deleteId)); } else toast.error('Failed'); } catch { toast.error('Failed'); } finally { setDeleteOpen(false); setDeleteId(null); }
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="flex justify-end">
-        <Button onClick={openCreate} size="sm" className="bg-brand hover:bg-brand-light text-white gap-1.5"><Plus className="w-3.5 h-3.5" /> Add Soft Skill</Button>
-      </div>
-      <Card className="bg-surface border-stroke overflow-hidden">
-        {loading ? (
-          <div className="p-6 space-y-3">{[1, 2].map((i) => <Skeleton key={i} className="h-12 w-full bg-dark" />)}</div>
-        ) : items.length === 0 ? (
-          <div className="p-8 text-center"><p className="text-sm text-muted-text">No soft skills added yet.</p></div>
-        ) : (
-          <ScrollArea className="max-h-96">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-stroke hover:bg-transparent">
-                  <TableHead className="text-muted-text font-medium">Skill</TableHead>
-                  <TableHead className="text-muted-text font-medium">Icon</TableHead>
-                  <TableHead className="text-muted-text font-medium text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.id} className="border-stroke hover:bg-dark/50">
-                    <TableCell className="font-medium text-white">{item.name}</TableCell>
-                    <TableCell className="text-muted-text">{item.icon || '—'}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-text hover:text-white hover:bg-surface" onClick={() => openEdit(item)}><Pencil className="w-3.5 h-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-text hover:text-red-500 hover:bg-surface" onClick={() => { setDeleteId(item.id); setDeleteOpen(true); }}><Trash2 className="w-3.5 h-3.5" /></Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        )}
-      </Card>
-
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="bg-surface border-stroke max-w-md">
-          <DialogHeader><DialogTitle className="text-white">{editingId ? 'Edit Soft Skill' : 'Add Soft Skill'}</DialogTitle><DialogDescription className="text-muted-text">Soft skill details.</DialogDescription></DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2"><Label className="text-sm text-white">Name</Label><Input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="Problem Solving" /></div>
-            <div className="space-y-2"><Label className="text-sm text-white">Icon (emoji)</Label><Input value={form.icon} onChange={(e) => setForm((p) => ({ ...p, icon: e.target.value }))} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="🧠" /></div>
-            <div className="space-y-2"><Label className="text-sm text-white">Display Order</Label><Input type="number" value={form.displayOrder} onChange={(e) => setForm((p) => ({ ...p, displayOrder: parseInt(e.target.value) || 0 }))} className="bg-dark border-stroke text-white placeholder:text-muted-text" /></div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setFormOpen(false)} className="border-stroke text-white hover:bg-surface">Cancel</Button>
-              <Button type="submit" disabled={saving} className="bg-brand hover:bg-brand-light text-white">{saving && <Loader2 className="w-4 h-4 animate-spin mr-2" />}{editingId ? 'Update' : 'Create'}</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="bg-surface border-stroke">
-          <AlertDialogHeader><AlertDialogTitle className="text-white">Delete Entry</AlertDialogTitle><AlertDialogDescription className="text-muted-text">This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel className="border-stroke text-white hover:bg-surface">Cancel</AlertDialogCancel><AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">Delete</AlertDialogAction></AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-}
-
 // ----- Main Page -----
 export default function ResumePage() {
   return (
@@ -383,23 +172,7 @@ export default function ResumePage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <Tabs defaultValue="experience" className="space-y-4">
-        <TabsList className="bg-surface border border-stroke">
-          <TabsTrigger value="experience" className="data-[state=active]:bg-brand data-[state=active]:text-white text-muted-text gap-1.5">
-            <Briefcase className="w-3.5 h-3.5" /> Experience
-          </TabsTrigger>
-          <TabsTrigger value="languages" className="data-[state=active]:bg-brand data-[state=active]:text-white text-muted-text gap-1.5">
-            <Languages className="w-3.5 h-3.5" /> Languages
-          </TabsTrigger>
-          <TabsTrigger value="soft-skills" className="data-[state=active]:bg-brand data-[state=active]:text-white text-muted-text gap-1.5">
-            <Heart className="w-3.5 h-3.5" /> Soft Skills
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="experience"><ExperienceTab /></TabsContent>
-        <TabsContent value="languages"><LanguagesTab /></TabsContent>
-        <TabsContent value="soft-skills"><SoftSkillsTab /></TabsContent>
-      </Tabs>
+      <ExperienceTab />
     </motion.div>
   );
 }
