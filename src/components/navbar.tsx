@@ -7,11 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Github, Linkedin, Instagram } from 'lucide-react';
 
 const navLinks = [
-  { label: 'Home', href: '/', num: '01' },
-  { label: 'Projects', href: '/projects', num: '02' },
-  { label: 'Certificates', href: '/certificates', num: '03' },
-  { label: 'Resume', href: '/resume', num: '04' },
-  { label: 'Contact', href: '/contact', num: '05' },
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Certificates', href: '/certificates' },
+  { label: 'Resume', href: '/resume' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 const socialLinks = [
@@ -97,9 +97,9 @@ export function Navbar() {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
-    exit: { opacity: 0, y: -15, transition: { duration: 0.2 } },
+    hidden: { opacity: 0, x: -12 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+    exit: { opacity: 0, x: -8, transition: { duration: 0.2 } },
   };
 
   return (
@@ -200,10 +200,10 @@ export function Navbar() {
             {/* Close button — top right */}
             <button
               onClick={closeMobileMenu}
-              className="absolute top-5 right-4 z-[65] w-11 h-11 flex items-center justify-center rounded-full border border-stroke/60 text-white/70 hover:text-white hover:border-brand/50 hover:bg-surface/50 transition-all duration-300"
+              className="absolute top-5 right-4 z-[65] w-10 h-10 flex items-center justify-center rounded-full text-white/50 hover:text-white transition-colors duration-300"
               aria-label="Close menu"
             >
-              <X size={20} strokeWidth={1.8} />
+              <X size={20} strokeWidth={1.5} />
             </button>
 
             {/* Content */}
@@ -212,10 +212,10 @@ export function Navbar() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative z-[60] flex flex-col justify-center h-full px-8 sm:px-12"
+              className="relative z-[60] flex flex-col justify-center h-full px-10 sm:px-14"
             >
               {/* Navigation items */}
-              <nav className="flex flex-col gap-2">
+              <nav className="flex flex-col">
                 {navLinks.map((link) => {
                   const isActive = pathname === link.href;
                   return (
@@ -223,32 +223,28 @@ export function Navbar() {
                       key={link.href}
                       variants={itemVariants}
                       onClick={() => handleNavClick(link.href)}
-                      className={`group/item w-full text-left flex items-center gap-4 py-4 px-4 rounded-xl transition-all duration-300 ${
+                      className={`group/item w-full text-left py-3.5 transition-all duration-300 origin-left ${
                         isActive
-                          ? 'bg-brand/10 border border-brand/20'
-                          : 'border border-transparent hover:bg-surface/40 hover:border-stroke/30'
+                          ? 'translate-x-0'
+                          : 'translate-x-0 group-hover/item:translate-x-1'
                       }`}
                     >
-                      <span className={`text-xs font-mono tracking-wider transition-colors duration-300 ${
-                        isActive ? 'text-brand' : 'text-muted-text/60 group-hover/item:text-muted-text'
-                      }`}>
-                        {link.num}
-                      </span>
-                      <span className={`text-2xl sm:text-3xl font-bold tracking-[-0.02em] transition-colors duration-300 ${
+                      <span className={`text-lg sm:text-xl font-medium tracking-[-0.01em] transition-all duration-300 inline-flex items-center gap-3 ${
                         isActive
                           ? 'text-brand'
-                          : 'text-white group-hover/item:text-brand/90'
+                          : 'text-white/70 group-hover/item:text-white/95 group-hover/item:pl-1'
                       }`}>
-                        {link.label}
+                        <span className="relative">
+                          {link.label}
+                          {isActive && (
+                            <motion.span
+                              layoutId="mobile-nav-indicator"
+                              className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-brand"
+                              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                            />
+                          )}
+                        </span>
                       </span>
-                      {isActive && (
-                        <motion.div
-                          layoutId="mobile-nav-active"
-                          className="ml-auto w-2 h-2 rounded-full bg-brand"
-                          style={{ boxShadow: '0 0 8px rgba(255,57,0,0.5)' }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                        />
-                      )}
                     </motion.button>
                   );
                 })}
@@ -257,28 +253,28 @@ export function Navbar() {
               {/* Divider */}
               <motion.div
                 variants={itemVariants}
-                className="mt-10 mb-8 h-px bg-gradient-to-r from-transparent via-stroke/50 to-transparent"
+                className="mt-12 mb-6 h-px bg-gradient-to-r from-transparent via-stroke/40 to-transparent"
               />
 
               {/* Social links */}
-              <motion.div variants={itemVariants} className="flex items-center gap-3">
+              <motion.div variants={itemVariants} className="flex items-center gap-2.5">
                 {socialLinks.map((social) => (
                   <a
                     key={social.label}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-11 h-11 flex items-center justify-center rounded-full border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 hover:bg-brand/5 transition-all duration-300"
+                    className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300"
                     aria-label={social.label}
                   >
-                    <social.icon size={18} strokeWidth={1.6} />
+                    <social.icon size={16} strokeWidth={1.5} />
                   </a>
                 ))}
               </motion.div>
 
               {/* Bottom branding */}
               <motion.div variants={itemVariants} className="mt-auto pb-8">
-                <p className="text-xs text-muted-text/40 tracking-wider uppercase">
+                <p className="text-[11px] text-muted-text/30 tracking-wider uppercase">
                   © {new Date().getFullYear()} Abdellah Ait-Si
                 </p>
               </motion.div>

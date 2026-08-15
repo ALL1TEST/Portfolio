@@ -636,3 +636,29 @@ Stage Summary:
 - Certificates show clean "Skill • Issued Year" overlay without icons
 - Project cards have increased height with clear image/content separation
 - Home page layout: Hero → Marquee → Stats → Who I Am → Featured Projects → Certificates → Resume → Contact
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Refine mobile navigation menu to be cleaner, lighter, and more elegant
+
+Work Log:
+- Removed navigation numbers (01, 02, 03, 04, 05) from navLinks array and all rendered elements
+- Removed heavy rectangular orange/brown background blocks behind active and hovered items
+- Removed border, rounded-xl, and background-based styling from nav buttons
+- Redesigned nav items as clean text links: `text-lg sm:text-xl font-medium` instead of `text-2xl sm:text-3xl font-bold`
+- Active state: orange text (`text-brand`) with a tiny 1px dot indicator (`w-1 h-1 rounded-full bg-brand`) using `layoutId` for smooth animation
+- Hover effect: subtle `translate-x-1` movement + color transition from `text-white/70` to `text-white/95` with `pl-1` padding shift
+- Item animations changed from vertical (`y: 40`) to horizontal (`x: -12`) for elegant slide-in from left
+- Close button simplified: removed border, background, and size — now minimal `text-white/50 hover:text-white` with thin stroke
+- Social icons made more subtle: removed borders/backgrounds, smaller size (16px), lighter opacity (`text-muted-text/50`)
+- Divider and branding text made more subtle with reduced opacity
+- Content padding increased (`px-10 sm:px-14`) for balanced spacing
+- Desktop navigation remains completely unchanged (verified via browser)
+- Auto-close on click and body scroll lock preserved
+
+Stage Summary:
+- Mobile menu now feels premium, minimal, and lightweight
+- No heavy backgrounds, borders, or glowing effects on any nav state
+- Clean text links with subtle hover/active indicators
+- Desktop nav untouched, verified via agent browser
