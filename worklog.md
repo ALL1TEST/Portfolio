@@ -842,3 +842,27 @@ Stage Summary:
 - Added "A bit about me" intro section with professional description
 - All existing layout, styling, buttons, and responsive behavior preserved
 - File modified: src/components/about-preview.tsx
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix Resume Display Order not reflecting on frontend + Technologies input formatting error
+
+Work Log:
+- Read dashboard resume page, frontend resume section, API routes, and data provider
+- Identified root cause of Technologies error: `openEdit` put raw JSON string into input; API `JSON.stringify` caused double/multi-encoding on each save
+- Identified root cause of Display Order: input used `parseInt(e.target.value) || 0` which reset to 0 when user cleared field
+- Fixed `openEdit` in dashboard to parse JSON technologies back to comma-separated string
+- Fixed Display Order input to allow clearing (using `e.target.value === '' ? 0 : parseInt(e.target.value) || 0`)
+- Added "#" display order column to the experience table in dashboard
+- Fixed API double-encoding bug: added `normalizeTechnologies()` helper that detects already-stringified values
+- Added defensive multi-layer JSON unwrapping in frontend resume-section.tsx
+- Fixed corrupted DentClinic DB record: technologies reset to `["Laravel","PHP","MySQL","FilamentPHP"]`
+- Fixed displayOrder values: DentClinic=1, CRUD Étudiant=2, Library Management System=3
+
+Stage Summary:
+- All 10 browser verification points passed
+- Technologies now shows as clean comma-separated string when editing (e.g., "Laravel, PHP, MySQL, FilamentPHP")
+- Display Order input can be cleared and retyped without resetting to 0
+- Frontend shows correct experience order and clean technology badges
+- No more double-encoding risk from API

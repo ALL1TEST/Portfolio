@@ -167,7 +167,18 @@ export function ResumeSection() {
                     <p className="text-muted-text">No experience yet.</p>
                   ) : (
                     experiences.map((exp, index) => {
-                      const techs: string[] = (() => { try { return JSON.parse(exp.technologies); } catch { return []; } })();
+                      const techs: string[] = (() => {
+                        try {
+                          let parsed: unknown = exp.technologies;
+                          // Defensively unwrap multiple JSON encoding layers
+                          for (let i = 0; i < 10; i++) {
+                            if (typeof parsed === 'string') {
+                              try { parsed = JSON.parse(parsed); } catch { break; }
+                            } else break;
+                          }
+                          return Array.isArray(parsed) ? parsed : [];
+                        } catch { return []; }
+                      })();
                       const dateStr = [exp.startDate, exp.endDate].filter(Boolean).join(' – ');
                       return (
                         <article

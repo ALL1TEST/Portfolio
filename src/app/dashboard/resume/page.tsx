@@ -70,7 +70,15 @@ function ExperienceTab() {
   const openCreate = () => { setEditingId(null); setForm(emptyExperience); setFormOpen(true); };
   const openEdit = (item: Experience) => {
     setEditingId(item.id);
-    setForm({ title: item.title, description: item.description, technologies: item.technologies, startDate: item.startDate, endDate: item.endDate, location: item.location, displayOrder: item.displayOrder });
+    // Parse technologies from JSON string to comma-separated string for editing
+    let techStr = '';
+    try {
+      const techArr = JSON.parse(item.technologies);
+      techStr = Array.isArray(techArr) ? techArr.join(', ') : item.technologies;
+    } catch {
+      techStr = item.technologies;
+    }
+    setForm({ title: item.title, description: item.description, technologies: techStr, startDate: item.startDate, endDate: item.endDate, location: item.location, displayOrder: item.displayOrder });
     setFormOpen(true);
   };
 
@@ -104,6 +112,7 @@ function ExperienceTab() {
             <Table>
               <TableHeader>
                 <TableRow className="border-stroke hover:bg-transparent">
+                  <TableHead className="text-muted-text font-medium w-16">#</TableHead>
                   <TableHead className="text-muted-text font-medium">Title</TableHead>
                   <TableHead className="text-muted-text font-medium hidden md:table-cell">Period</TableHead>
                   <TableHead className="text-muted-text font-medium hidden lg:table-cell">Location</TableHead>
@@ -113,6 +122,7 @@ function ExperienceTab() {
               <TableBody>
                 {items.map((item) => (
                   <TableRow key={item.id} className="border-stroke hover:bg-dark/50">
+                    <TableCell className="text-muted-text text-sm">{item.displayOrder}</TableCell>
                     <TableCell className="font-medium text-white">{item.title}</TableCell>
                     <TableCell className="text-muted-text hidden md:table-cell text-sm">{item.startDate} — {item.endDate || 'Present'}</TableCell>
                     <TableCell className="text-muted-text hidden lg:table-cell text-sm">{item.location}</TableCell>
@@ -145,7 +155,7 @@ function ExperienceTab() {
               <div className="space-y-2"><Label className="text-sm text-white">End Date</Label><Input value={form.endDate} onChange={(e) => setForm((p) => ({ ...p, endDate: e.target.value }))} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="Present" /></div>
             </div>
             <div className="space-y-2"><Label className="text-sm text-white">Location</Label><Input value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} className="bg-dark border-stroke text-white placeholder:text-muted-text" /></div>
-            <div className="space-y-2"><Label className="text-sm text-white">Display Order</Label><Input type="number" value={form.displayOrder} onChange={(e) => setForm((p) => ({ ...p, displayOrder: parseInt(e.target.value) || 0 }))} className="bg-dark border-stroke text-white placeholder:text-muted-text" /></div>
+            <div className="space-y-2"><Label className="text-sm text-white">Display Order</Label><Input type="number" min={0} value={form.displayOrder || ''} onChange={(e) => setForm((p) => ({ ...p, displayOrder: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="0" /></div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setFormOpen(false)} className="border-stroke text-white hover:bg-surface">Cancel</Button>
               <Button type="submit" disabled={saving} className="bg-brand hover:bg-brand-light text-white">{saving && <Loader2 className="w-4 h-4 animate-spin mr-2" />}{editingId ? 'Update' : 'Create'}</Button>

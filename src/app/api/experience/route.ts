@@ -7,10 +7,18 @@ export const GET = publicRoute(async () => {
   return NextResponse.json(data);
 });
 
+function normalizeTechnologies(raw: unknown): string {
+  if (typeof raw === 'string') {
+    try { const parsed = JSON.parse(raw); if (Array.isArray(parsed)) return JSON.stringify(parsed); } catch { /* not JSON, keep as-is */ }
+    return raw;
+  }
+  return JSON.stringify(Array.isArray(raw) ? raw : []);
+}
+
 export const POST = withAuth(async (req: Request) => {
   const body = await req.json();
   return NextResponse.json(await db.experience.create({
-    data: { ...body, technologies: JSON.stringify(body.technologies || []) },
+    data: { ...body, technologies: normalizeTechnologies(body.technologies) },
   }));
 });
 
@@ -19,7 +27,7 @@ export const PUT = withAuth(async (req: Request) => {
   if (!body.id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
   return NextResponse.json(await db.experience.update({
     where: { id: body.id },
-    data: { ...body, technologies: JSON.stringify(body.technologies || []) },
+    data: { ...body, technologies: normalizeTechnologies(body.technologies) },
   }));
 });
 
