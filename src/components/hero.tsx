@@ -5,6 +5,7 @@ import { useRef, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { HeroGlow } from './hero-glow';
+import DigitalRain from './digital-rain';
 import { useData } from '@/lib/data-provider';
 
 function useMounted() {
@@ -56,6 +57,17 @@ export function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       <HeroGlow />
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+        <DigitalRain
+          headColor="rgba(255,57,0,0.08)"
+          trailColor="rgba(154,154,154,0.04)"
+          glyphSize={12}
+          speed={4}
+          density={25}
+          trail={14}
+          shuffle={true}
+        />
+      </div>
       <div className="absolute inset-0 grid-bg opacity-30" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
