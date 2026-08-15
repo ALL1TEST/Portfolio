@@ -37,27 +37,18 @@ export function AboutPreview() {
   const { profile } = useData();
   const router = useRouter();
 
-  // Build cards from profile data, fall back to defaults
-  const valueCards = [
-    {
-      number: '01',
-      title: profile?.aboutCard1Title || DEFAULT_CARDS[0].title,
-      description: profile?.aboutCard1Description || DEFAULT_CARDS[0].description,
-      icon: Code2,
-    },
-    {
-      number: '02',
-      title: profile?.aboutCard2Title || DEFAULT_CARDS[1].title,
-      description: profile?.aboutCard2Description || DEFAULT_CARDS[1].description,
-      icon: Bot,
-    },
-    {
-      number: '03',
-      title: profile?.aboutCard3Title || DEFAULT_CARDS[2].title,
-      description: profile?.aboutCard3Description || DEFAULT_CARDS[2].description,
-      icon: BookOpen,
-    },
-  ];
+  // Build cards: when profile exists use its data (filter out empty cards);
+  // when no profile exists use hardcoded defaults
+  const allCards = profile
+    ? [
+        { number: '01', title: profile.aboutCard1Title || '', description: profile.aboutCard1Description || '', icon: Code2 },
+        { number: '02', title: profile.aboutCard2Title || '', description: profile.aboutCard2Description || '', icon: Bot },
+        { number: '03', title: profile.aboutCard3Title || '', description: profile.aboutCard3Description || '', icon: BookOpen },
+      ].filter((c) => c.title.trim() !== '')
+    : DEFAULT_CARDS.map((c) => ({ ...c }));
+
+  // Re-number cards after filtering
+  const valueCards = allCards.map((c, i) => ({ ...c, number: String(i + 1).padStart(2, '0') }));
 
   return (
     <section id="about" className="relative py-24 lg:py-32">
@@ -90,12 +81,14 @@ export function AboutPreview() {
               </span>
             </ScrollReveal>
 
-            {/* Intro Paragraph — from profile data */}
-            <ScrollReveal direction="right" delay={0.15}>
-              <p className="text-base lg:text-lg text-muted-text leading-relaxed whitespace-pre-line">
-                {profile?.aboutText || 'I\'m a Full-Stack Developer focused on building modern, scalable web applications and intelligent automation solutions. I enjoy turning complex ideas into clean, efficient, and user-friendly digital experiences.'}
-              </p>
-            </ScrollReveal>
+            {/* Intro Paragraph — from profile data, only show if non-empty */}
+            {(profile?.aboutText || !profile) && (
+              <ScrollReveal direction="right" delay={0.15}>
+                <p className="text-base lg:text-lg text-muted-text leading-relaxed whitespace-pre-line">
+                  {profile?.aboutText || 'I\'m a Full-Stack Developer focused on building modern, scalable web applications and intelligent automation solutions. I enjoy turning complex ideas into clean, efficient, and user-friendly digital experiences.'}
+                </p>
+              </ScrollReveal>
+            )}
 
             {/* Value Cards */}
             <div className="mt-8 space-y-4">

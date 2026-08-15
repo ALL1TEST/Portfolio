@@ -47,9 +47,12 @@ export function Footer() {
                   {profile?.brandName || 'CodeVirtox'}
                 </span>
               </Link>
-              <p className="text-sm text-muted-text leading-relaxed max-w-xs">
-                {profile?.footerBio || profile?.shortBio || 'Full Stack Developer building modern web applications and smart automated solutions.'}
-              </p>
+              {/* Footer bio: use footerBio if set, otherwise shortBio, otherwise nothing (no hardcoded default) */}
+              {(profile?.footerBio || profile?.shortBio) && (
+                <p className="text-sm text-muted-text leading-relaxed max-w-xs">
+                  {profile?.footerBio || profile?.shortBio}
+                </p>
+              )}
               {socialLinks.length > 0 && (
                 <div className="flex items-center gap-3 mt-4">
                   {socialLinks.map((social) => (

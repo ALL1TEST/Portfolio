@@ -118,9 +118,12 @@ export function FeaturedProjects() {
     .filter((p) => p.featured)
     .sort((a, b) => a.displayOrder - b.displayOrder);
 
-  // Use profile data for section heading, with defaults
-  const sectionTitle = profile?.featuredProjectsTitle || 'Featured Projects';
-  const sectionDescription = profile?.featuredProjectsDescription || 'A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving.';
+  // Use profile data for section heading. When profile exists, use its values directly
+  // (empty = intentionally cleared). When no profile, use defaults.
+  const sectionTitle = profile ? (profile.featuredProjectsTitle || 'Featured Projects') : 'Featured Projects';
+  const sectionDescription = profile
+    ? (profile.featuredProjectsDescription || undefined)
+    : 'A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving.';
 
   return (
     <section id="featured-projects" className="relative py-24 lg:py-32">
