@@ -13,6 +13,14 @@ export interface Profile {
   linkedinUrl: string;
   instagramUrl: string;
   twitterUrl: string;
+  featuredProjectsTitle: string;
+  featuredProjectsDescription: string;
+  aboutCard1Title: string;
+  aboutCard1Description: string;
+  aboutCard2Title: string;
+  aboutCard2Description: string;
+  aboutCard3Title: string;
+  aboutCard3Description: string;
   profileImage: string;
   cvFile: string;
 }

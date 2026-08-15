@@ -110,7 +110,7 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 }
 
 export function FeaturedProjects() {
-  const { projects, loading } = useData();
+  const { projects, loading, profile } = useData();
   const router = useRouter();
 
   // Filter featured projects and sort by displayOrder
@@ -118,14 +118,18 @@ export function FeaturedProjects() {
     .filter((p) => p.featured)
     .sort((a, b) => a.displayOrder - b.displayOrder);
 
+  // Use profile data for section heading, with defaults
+  const sectionTitle = profile?.featuredProjectsTitle || 'Featured Projects';
+  const sectionDescription = profile?.featuredProjectsDescription || 'A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving.';
+
   return (
     <section id="featured-projects" className="relative py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           label="Projects"
           labelStyle="skills"
-          title="Featured Projects"
-          description="A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving."
+          title={sectionTitle}
+          description={sectionDescription}
         />
 
         {loading ? (

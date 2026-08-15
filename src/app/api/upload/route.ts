@@ -40,6 +40,8 @@ export const POST = withAuth(async (req: Request) => {
     let subDir: string;
     if (category === 'profile') {
       subDir = 'profile';
+    } else if (category === 'cv') {
+      subDir = 'cv';
     } else if (file.type === 'application/pdf') {
       subDir = 'certificates';
     } else {

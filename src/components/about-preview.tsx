@@ -8,7 +8,8 @@ import { SectionHeading } from './section-heading';
 import { ScrollReveal } from './scroll-reveal';
 import { useData } from '@/lib/data-provider';
 
-const VALUE_CARDS = [
+// Default cards used when profile data is empty
+const DEFAULT_CARDS = [
   {
     number: '01',
     title: 'Build & Develop',
@@ -35,6 +36,28 @@ const VALUE_CARDS = [
 export function AboutPreview() {
   const { profile } = useData();
   const router = useRouter();
+
+  // Build cards from profile data, fall back to defaults
+  const valueCards = [
+    {
+      number: '01',
+      title: profile?.aboutCard1Title || DEFAULT_CARDS[0].title,
+      description: profile?.aboutCard1Description || DEFAULT_CARDS[0].description,
+      icon: Code2,
+    },
+    {
+      number: '02',
+      title: profile?.aboutCard2Title || DEFAULT_CARDS[1].title,
+      description: profile?.aboutCard2Description || DEFAULT_CARDS[1].description,
+      icon: Bot,
+    },
+    {
+      number: '03',
+      title: profile?.aboutCard3Title || DEFAULT_CARDS[2].title,
+      description: profile?.aboutCard3Description || DEFAULT_CARDS[2].description,
+      icon: BookOpen,
+    },
+  ];
 
   return (
     <section id="about" className="relative py-24 lg:py-32">
@@ -76,7 +99,7 @@ export function AboutPreview() {
 
             {/* Value Cards */}
             <div className="mt-8 space-y-4">
-              {VALUE_CARDS.map((card, i) => (
+              {valueCards.map((card, i) => (
                 <ScrollReveal key={card.number} direction="right" delay={0.2 + i * 0.1}>
                   <div className="group relative flex gap-4 p-4 bg-surface/50 border border-stroke/30 rounded-xl transition-colors duration-300 hover:border-stroke/60 hover:bg-surface/70">
                     {/* Left accent bar */}

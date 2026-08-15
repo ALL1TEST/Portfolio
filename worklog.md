@@ -997,3 +997,31 @@ Stage Summary:
 - Profile image upload saves to `/uploads/profile/` directory
 - Footer bio displayed in footer with fallback to shortBio
 - No application errors
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Add CV upload, Featured Projects text editing, and About Cards text editing to Settings
+
+Work Log:
+- Updated Prisma schema: added `featuredProjectsTitle`, `featuredProjectsDescription`, `aboutCard1Title/Description`, `aboutCard2Title/Description`, `aboutCard3Title/Description` to Profile model
+- Ran `bun run db:push` to sync database
+- Updated `/src/app/api/profile/route.ts`: added all new fields to PUT handler
+- Updated `/src/app/api/upload/route.ts`: added `category=cv` subdirectory support
+- Updated `/src/lib/types.ts`: added 9 new fields to Profile interface
+- Rewrote `/src/app/dashboard/settings/page.tsx`:
+  - Added CV/Resume upload card with PDF upload button, preview (shows "View CV" link), remove button
+  - Added "About Cards" section with Card 1/2/3 each having Title + Description inputs
+  - Added "Featured Projects Section" with Section Title + Section Description inputs
+  - Removed old CV File URL input from Social Links section
+- Updated `/src/components/featured-projects.tsx`: uses `profile.featuredProjectsTitle` and `profile.featuredProjectsDescription` with fallback defaults
+- Updated `/src/components/about-preview.tsx`: uses `profile.aboutCard*Title` and `profile.aboutCard*Description` with fallback defaults
+- Ran lint: all passed
+- Verified in browser: all sections present, frontend displays correct default text, no errors
+
+Stage Summary:
+- CV upload saves PDFs to `/uploads/cv/` directory
+- About Cards text is now fully editable from Settings (3 cards)
+- Featured Projects heading/description is now editable from Settings
+- All frontend components use profile data with sensible defaults
+- No application errors
