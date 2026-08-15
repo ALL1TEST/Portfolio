@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
-import { Plus, Pencil, Trash2, Loader2, ExternalLink } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, ExternalLink, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
@@ -46,6 +46,8 @@ interface Certificate {
   skills: string;
   certificateImage: string;
   credentialUrl: string;
+  credentialId: string;
+  category: string;
   displayOrder: number;
   createdAt: string;
 }
@@ -57,6 +59,8 @@ const emptyForm = {
   skills: '',
   certificateImage: '',
   credentialUrl: '',
+  credentialId: '',
+  category: '',
   displayOrder: 0,
 };
 
@@ -64,6 +68,7 @@ export default function CertificatesPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -84,6 +89,15 @@ export default function CertificatesPage() {
   useEffect(() => {
     fetchCertificates();
   }, [fetchCertificates]);
+
+  // Dynamically derive categories from existing certificates
+  const existingCategories = useMemo(() => {
+    const cats = new Set<string>();
+    certificates.forEach((c) => {
+      if (c.category && c.category.trim()) cats.add(c.category.trim());
+    });
+    return Array.from(cats).sort();
+  }, [certificates]);
 
   const openCreate = () => {
     setEditingId(null);
@@ -109,9 +123,36 @@ export default function CertificatesPage() {
       skills: parsedSkills,
       certificateImage: cert.certificateImage,
       credentialUrl: cert.credentialUrl,
+      credentialId: cert.credentialId || '',
+      category: cert.category || '',
       displayOrder: cert.displayOrder,
     });
     setFormOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setForm((p) => ({ ...p, certificateImage: data.url }));
+        toast.success('Image uploaded');
+      } else {
+        toast.error('Failed to upload image');
+      }
+    } catch {
+      toast.error('Failed to upload image');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -123,7 +164,11 @@ export default function CertificatesPage() {
         .map((t) => t.trim())
         .filter(Boolean);
 
-      const payload = { ...form, skills };
+      const payload = {
+        ...form,
+        skills,
+        category: form.category.trim(),
+      };
 
       const res = await fetch('/api/certificates', {
         method: editingId ? 'PUT' : 'POST',
@@ -136,7 +181,8 @@ export default function CertificatesPage() {
         setFormOpen(false);
         fetchCertificates();
       } else {
-        toast.error('Failed to save certificate');
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || 'Failed to save certificate');
       }
     } catch {
       toast.error('Failed to save certificate');
@@ -171,7 +217,18 @@ export default function CertificatesPage() {
       className="space-y-4"
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-text">{certificates.length} certificates total</p>
+        <div>
+          <p className="text-sm text-muted-text">{certificates.length} certificates total</p>
+          {existingCategories.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {existingCategories.map((cat) => (
+                <span key={cat} className="text-[10px] px-2 py-0.5 bg-brand/10 text-brand rounded-full">
+                  {cat}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
         <Button onClick={openCreate} className="bg-brand hover:bg-brand-light text-white gap-2">
           <Plus className="w-4 h-4" /> Add Certificate
         </Button>
@@ -195,7 +252,7 @@ export default function CertificatesPage() {
                 <TableRow className="border-stroke hover:bg-transparent">
                   <TableHead className="text-muted-text font-medium">Title</TableHead>
                   <TableHead className="text-muted-text font-medium hidden md:table-cell">Issuer</TableHead>
-                  <TableHead className="text-muted-text font-medium hidden sm:table-cell">Issue Date</TableHead>
+                  <TableHead className="text-muted-text font-medium hidden sm:table-cell">Category</TableHead>
                   <TableHead className="text-muted-text font-medium hidden lg:table-cell">Skills</TableHead>
                   <TableHead className="text-muted-text font-medium text-right">Actions</TableHead>
                 </TableRow>
@@ -210,28 +267,26 @@ export default function CertificatesPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-white">{cert.title}</span>
                           {cert.credentialUrl && (
-                            <a
-                              href={cert.credentialUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-muted-text hover:text-brand"
-                            >
+                            <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer" className="text-muted-text hover:text-brand">
                               <ExternalLink className="w-3 h-3" />
                             </a>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="text-muted-text hidden md:table-cell">{cert.issuer}</TableCell>
-                      <TableCell className="text-muted-text hidden sm:table-cell text-sm">
-                        {cert.issueDate}
+                      <TableCell className="hidden sm:table-cell">
+                        {cert.category ? (
+                          <Badge variant="outline" className="text-[10px] px-2 py-0.5 border-brand/30 text-brand bg-brand/5">
+                            {cert.category}
+                          </Badge>
+                        ) : (
+                          <span className="text-xs text-stroke">—</span>
+                        )}
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
                         <div className="flex flex-wrap gap-1 max-w-xs">
                           {skills.slice(0, 3).map((skill) => (
-                            <span
-                              key={skill}
-                              className="text-[10px] px-1.5 py-0.5 bg-brand/10 text-brand rounded"
-                            >
+                            <span key={skill} className="text-[10px] px-1.5 py-0.5 bg-brand/10 text-brand rounded">
                               {skill}
                             </span>
                           ))}
@@ -242,20 +297,10 @@ export default function CertificatesPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-text hover:text-white hover:bg-surface"
-                            onClick={() => openEdit(cert)}
-                          >
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-text hover:text-white hover:bg-surface" onClick={() => openEdit(cert)}>
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-text hover:text-red-500 hover:bg-surface"
-                            onClick={() => { setDeleteId(cert.id); setDeleteOpen(true); }}
-                          >
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-text hover:text-red-500 hover:bg-surface" onClick={() => { setDeleteId(cert.id); setDeleteOpen(true); }}>
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
@@ -279,58 +324,80 @@ export default function CertificatesPage() {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Title */}
             <div className="space-y-2">
-              <Label className="text-sm text-white">Title</Label>
+              <Label className="text-sm text-white">Title *</Label>
               <Input
                 value={form.title}
                 onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
                 required
                 className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                placeholder="AWS Cloud Practitioner"
+                placeholder="Python Programming Fundamentals"
               />
             </div>
 
+            {/* Issuer & Issue Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-sm text-white">Issuer</Label>
+                <Label className="text-sm text-white">Issuing Organization *</Label>
                 <Input
                   value={form.issuer}
                   onChange={(e) => setForm((p) => ({ ...p, issuer: e.target.value }))}
                   required
                   className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                  placeholder="Amazon Web Services"
+                  placeholder="Microsoft"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm text-white">Issue Date</Label>
+                <Label className="text-sm text-white">Issue Date *</Label>
                 <Input
                   value={form.issueDate}
                   onChange={(e) => setForm((p) => ({ ...p, issueDate: e.target.value }))}
                   required
                   className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                  placeholder="2024-01"
+                  placeholder="2025-05"
                 />
               </div>
             </div>
 
+            {/* Category — with datalist for existing + new */}
             <div className="space-y-2">
-              <Label className="text-sm text-white">Skills (comma-separated)</Label>
+              <Label className="text-sm text-white">Category</Label>
+              <Input
+                value={form.category}
+                onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+                list="category-suggestions"
+                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                placeholder="e.g. Programming, Cybersecurity, AI..."
+              />
+              <datalist id="category-suggestions">
+                {['Programming', 'Web Development', 'Cybersecurity', 'Databases', 'AI', 'Cloud Computing', 'PHP', 'Python', 'Computer Hardware', ...existingCategories.filter(c => !['Programming', 'Web Development', 'Cybersecurity', 'Databases', 'AI', 'Cloud Computing', 'PHP', 'Python', 'Computer Hardware'].includes(c))].filter((v, i, a) => a.indexOf(v) === i).map((cat) => (
+                  <option key={cat} value={cat} />
+                ))}
+              </datalist>
+              <p className="text-[11px] text-stroke">Type an existing category or create a new one. Only categories with certificates appear as filters on the public page.</p>
+            </div>
+
+            {/* Skills */}
+            <div className="space-y-2">
+              <Label className="text-sm text-white">Skills / Technologies (comma-separated)</Label>
               <Input
                 value={form.skills}
                 onChange={(e) => setForm((p) => ({ ...p, skills: e.target.value }))}
                 className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                placeholder="Cloud, DevOps, Networking"
+                placeholder="Python, Data Structures, Algorithms"
               />
             </div>
 
+            {/* Credential ID & Credential URL */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-sm text-white">Certificate Image URL</Label>
+                <Label className="text-sm text-white">Credential ID</Label>
                 <Input
-                  value={form.certificateImage}
-                  onChange={(e) => setForm((p) => ({ ...p, certificateImage: e.target.value }))}
+                  value={form.credentialId}
+                  onChange={(e) => setForm((p) => ({ ...p, credentialId: e.target.value }))}
                   className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                  placeholder="/images/cert.jpg"
+                  placeholder="ABC-123-XYZ"
                 />
               </div>
               <div className="space-y-2">
@@ -339,11 +406,35 @@ export default function CertificatesPage() {
                   value={form.credentialUrl}
                   onChange={(e) => setForm((p) => ({ ...p, credentialUrl: e.target.value }))}
                   className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                  placeholder="https://..."
+                  placeholder="https://credentials.example.com/..."
                 />
               </div>
             </div>
 
+            {/* Image upload */}
+            <div className="space-y-2">
+              <Label className="text-sm text-white">Certificate Image</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={form.certificateImage}
+                  onChange={(e) => setForm((p) => ({ ...p, certificateImage: e.target.value }))}
+                  className="bg-dark border-stroke text-white placeholder:text-muted-text flex-1"
+                  placeholder="/uploads/certificate.jpg"
+                />
+                <Button type="button" variant="outline" className="border-stroke text-muted-text hover:text-white hover:bg-surface shrink-0" onClick={() => document.getElementById('cert-image-upload')?.click()}>
+                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                </Button>
+                <input
+                  id="cert-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </div>
+            </div>
+
+            {/* Display Order */}
             <div className="space-y-2">
               <Label className="text-sm text-white">Display Order</Label>
               <Input

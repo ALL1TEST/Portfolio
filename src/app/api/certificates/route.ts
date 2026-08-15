@@ -17,6 +17,8 @@ export const POST = withAuth(async (req: Request) => {
       skills: JSON.stringify(body.skills || []),
       certificateImage: body.certificateImage || '',
       credentialUrl: body.credentialUrl || '',
+      credentialId: body.credentialId || '',
+      category: body.category || '',
       displayOrder: body.displayOrder || 0,
     },
   });
@@ -35,6 +37,8 @@ export const PUT = withAuth(async (req: Request) => {
       ...(body.skills !== undefined && { skills: JSON.stringify(body.skills) }),
       ...(body.certificateImage !== undefined && { certificateImage: body.certificateImage }),
       ...(body.credentialUrl !== undefined && { credentialUrl: body.credentialUrl }),
+      ...(body.credentialId !== undefined && { credentialId: body.credentialId }),
+      ...(body.category !== undefined && { category: body.category }),
       ...(body.displayOrder !== undefined && { displayOrder: body.displayOrder }),
     },
   });

@@ -39,6 +39,8 @@ export interface Certificate {
   skills: string; // JSON string
   certificateImage: string;
   credentialUrl: string;
+  credentialId: string;
+  category: string;
   displayOrder: number;
 }
 

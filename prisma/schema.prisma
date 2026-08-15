@@ -61,6 +61,8 @@ model Certificate {
   skills          String   @default("[]")
   certificateImage String   @default("")
   credentialUrl   String   @default("")
+  credentialId    String   @default("")
+  category        String   @default("")
   displayOrder    Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

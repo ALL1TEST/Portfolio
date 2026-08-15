@@ -410,6 +410,184 @@
   }
 }
 
+/* ─── Certificate Cards v2 — Modern Grid Layout ─── */
+.cert-v2-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.cert-v2-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #1a1a1a;
+  border: 1px solid rgba(53, 53, 53, 0.4);
+  transition:
+    transform 0.4s cubic-bezier(.2,.8,.2,1),
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
+}
+
+.cert-v2-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 57, 0, 0.1);
+  border-color: rgba(53, 53, 53, 0.7);
+}
+
+/* Image area */
+.cert-v2-image-area {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+.cert-v2-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+}
+
+.cert-v2-card:hover .cert-v2-image {
+  transform: scale(1.05);
+}
+
+.cert-v2-image-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Content area */
+.cert-v2-content {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.cert-v2-category-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #ff3900;
+  background: rgba(255, 57, 0, 0.1);
+  border: 1px solid rgba(255, 57, 0, 0.2);
+  border-radius: 9999px;
+  margin-bottom: 12px;
+}
+
+.cert-v2-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.3;
+  transition: color 0.3s ease;
+}
+
+.cert-v2-card:hover .cert-v2-title {
+  color: #ff5a2b;
+}
+
+.cert-v2-issuer {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #9a9a9a;
+  font-weight: 400;
+}
+
+.cert-v2-date {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.cert-v2-skills {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(53, 53, 53, 0.5);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.cert-v2-skills-label {
+  font-weight: 500;
+  color: #9a9a9a;
+  margin-right: 6px;
+}
+
+.cert-v2-skills-text {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* View Credential button */
+.cert-v2-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: 16px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #ff3900;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.cert-v2-view-btn:hover {
+  background: #ff4a16;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(255, 57, 0, 0.3);
+}
+
+.cert-v2-view-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.cert-v2-view-btn:hover svg {
+  transform: translate(2px, -2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cert-v2-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cert-v2-content {
+    padding: 16px 18px 18px;
+  }
+
+  .cert-v2-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cert-v2-grid {
+    gap: 16px;
+  }
+}
+
 /* ─── Experience & Projects — Journey Style ─── */
 .experience-projects {
   position: relative;
