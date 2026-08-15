@@ -1,17 +1,19 @@
 'use client';
 
 // Focus Reveal — Character-by-character blur + scale reveal
-// Uses framer-motion viewport detection via a wrapper div.
+// Uses native IntersectionObserver for reliable viewport detection.
+// Animation triggers ONCE when the element enters the viewport.
 
 import {
   motion,
-  useInView,
   useReducedMotion,
-  type Transition,
 } from 'framer-motion';
 import {
-  useMemo,
+  useState,
+  useEffect,
   useRef,
+  useMemo,
+  useCallback,
   type CSSProperties,
   type ElementType,
 } from 'react';
@@ -28,11 +30,11 @@ type FocusRevealProps = {
   as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
   /** Blur amount in hidden state (0–20). Default: 14. */
   blur?: number;
-  /** Scale in hidden state. Default: 1.3. */
+  /** Scale in hidden state. Default: 1.15. */
   scaleStart?: number;
   /** Stagger direction for characters. Default: "start". */
   staggerFrom?: StaggerFrom;
-  /** Duration per character animation in seconds. Default: 0.35. */
+  /** Duration per character animation in seconds. Default: 0.4. */
   duration?: number;
   /** Seconds between each character's animation start. Default: 0.03. */
   staggerChildren?: number;
@@ -42,7 +44,7 @@ type FocusRevealProps = {
 };
 
 const MAX_BLUR = 20;
-const EASE_OUT: Transition['ease'] = [0.215, 0.61, 0.355, 1];
+const EASE_OUT = [0.215, 0.61, 0.355, 1] as const;
 
 const MOTION_TAGS = {
   h1: motion.h1,
@@ -83,17 +85,40 @@ const FocusReveal = ({
   className = '',
   as: Tag = 'h2',
   blur = 14,
-  scaleStart = 1.3,
+  scaleStart = 1.15,
   staggerFrom = 'start',
-  duration = 0.35,
+  duration = 0.4,
   staggerChildren = 0.03,
   viewportAmount = 0.3,
   onComplete,
 }: FocusRevealProps) => {
   const reduceMotion = useReducedMotion();
   const skipMotion = reduceMotion === true;
+
+  // Track whether the element has entered the viewport
+  const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, amount: viewportAmount });
+  const triggeredRef = useRef(false);
+
+  // Native IntersectionObserver — most reliable viewport detection
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || triggeredRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          triggeredRef.current = true;
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: viewportAmount },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [viewportAmount]);
 
   const safeBlur = Math.min(Math.max(blur, 0), MAX_BLUR);
 
@@ -103,17 +128,14 @@ const FocusReveal = ({
     [text.length, skipMotion, staggerChildren, staggerFrom],
   );
 
-  // Build per-character transition objects
-  const charTransitions = useMemo(
-    () =>
-      delays.map((d) => ({
-        type: 'tween' as const,
-        duration: skipMotion ? 0.15 : duration,
-        delay: d,
-        ease: EASE_OUT,
-      })),
-    [delays, duration, skipMotion],
-  );
+  // Fire onComplete after last character animation finishes
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
+  const handleLastCharComplete = useCallback(() => {
+    onCompleteRef.current?.();
+  }, []);
 
   const MotionTag = MOTION_TAGS[Tag];
 
@@ -125,21 +147,36 @@ const FocusReveal = ({
     ...(font ?? null),
   };
 
-  // When not in view → hidden state. When in view → visible state.
-  // useInView starts as false for off-screen elements, so initial render
-  // gets animate="hidden" while initial="hidden" — but framer-motion
-  // applies `initial` styles on first render before `animate`, ensuring
-  // the hidden state is visible. When isInView becomes true, animate
-  // switches to "visible" and the stagger animation triggers.
-  const charHidden: Record<string, unknown> = skipMotion
-    ? { opacity: 0 }
-    : { opacity: 0, scale: scaleStart, filter: `blur(${safeBlur}px)` };
+  // Reduced motion: render plain text immediately visible
+  if (skipMotion) {
+    return (
+      <div ref={containerRef}>
+        <MotionTag aria-label={text} className={className} style={rootStyle}>
+          {text}
+        </MotionTag>
+      </div>
+    );
+  }
 
-  const charVisible: Record<string, unknown> = skipMotion
-    ? { opacity: 1 }
-    : { opacity: 1, scale: 1, filter: 'blur(0px)' };
+  // Before viewport entry: invisible placeholder (preserves layout space)
+  if (!isVisible) {
+    return (
+      <div ref={containerRef}>
+        <MotionTag
+          aria-label={text}
+          className={className}
+          style={{ ...rootStyle, visibility: 'hidden' }}
+        >
+          {text}
+        </MotionTag>
+      </div>
+    );
+  }
 
+  // After viewport entry: mount animated characters
+  // initial=hidden, animate=visible → guaranteed animation because values differ
   const chars = text.split('');
+  const lastIndex = chars.length - 1;
 
   return (
     <div ref={containerRef}>
@@ -147,32 +184,43 @@ const FocusReveal = ({
         aria-label={text}
         className={className}
         style={rootStyle}
-        initial="hidden"
-        animate={isInView ? 'visible' : 'hidden'}
-        variants={{
-          hidden: {},
-          visible: { transition: { staggerChildren: 0 } },
-        }}
-        onAnimationComplete={onComplete}
       >
-        {chars.map((char, index) => (
-          <span
-            key={`${index}-${char}`}
-            className="inline-block whitespace-nowrap"
-            aria-hidden="true"
-          >
-            <motion.span
-              className="inline-block will-change-[transform,opacity,filter]"
-              variants={{
-                hidden: charHidden,
-                visible: charVisible,
-              }}
-              transition={charTransitions[index] ?? { duration, ease: EASE_OUT }}
+        {chars.map((char, index) => {
+          const delay = delays[index] ?? 0;
+
+          return (
+            <span
+              key={`${index}-${char}`}
+              className="inline-block whitespace-nowrap"
+              aria-hidden="true"
             >
-              {char === ' ' ? '\u00A0' : char}
-            </motion.span>
-          </span>
-        ))}
+              <motion.span
+                className="inline-block will-change-[transform,opacity,filter]"
+                initial={{
+                  opacity: 0,
+                  scale: scaleStart,
+                  filter: `blur(${safeBlur}px)`,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  filter: 'blur(0px)',
+                }}
+                transition={{
+                  type: 'tween',
+                  duration,
+                  delay,
+                  ease: EASE_OUT,
+                }}
+                onAnimationComplete={
+                  index === lastIndex ? handleLastCharComplete : undefined
+                }
+              >
+                {char === ' ' ? '\u00A0' : char}
+              </motion.span>
+            </span>
+          );
+        })}
       </MotionTag>
     </div>
   );

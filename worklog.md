@@ -721,3 +721,30 @@ Stage Summary:
 - Triggers ONLY when section enters viewport, plays ONCE, never replays
 - Reduced motion supported via useReducedMotion
 - All 7 titles verified working across all 5 pages
+---
+Task ID: 9
+Agent: Main Agent
+Task: Fix FocusReveal animation — characters permanently blurred, animation not triggering
+
+Work Log:
+- Diagnosed root cause: previous implementation used framer-motion `useInView` hook with `initial="hidden"` + `animate={isInView ? 'visible' : 'hidden'}` variant labels. When `isInView=false`, `initial === animate` ("hidden" === "hidden"), causing framer-motion to skip applying initial styles. Characters rendered visible/stuck.
+- Rewrote FocusReveal component with fundamentally different architecture:
+  - Replaced framer-motion `useInView` with native `IntersectionObserver` + `useState` for reliable viewport detection
+  - Implemented conditional rendering pattern: before viewport entry renders invisible placeholder (`visibility: hidden`, plain text), after entry mounts animated spans
+  - This guarantees `initial={hidden}` ≠ `animate={visible}` (different object values), so framer-motion always plays the animation
+  - Uses `triggeredRef` to enforce once-only behavior and `observer.disconnect()` to clean up
+- Reduced `scaleStart` default from 1.3 to 1.15 (per user request, 1.3 was too aggressive)
+- Updated `duration` default to 0.4s for elegant timing
+- Simplified all consuming components (section-heading, certificates, resume) to use clean FocusReveal without explicit props
+- Verified via agent-browser: all 7 titles (8 FocusReveal instances) animate correctly:
+  - Titles in viewport on page load: animate immediately
+  - Titles below fold: animate when scrolled into view
+  - All characters end at opacity:1, blur(0px), scale:1 (fully sharp, no residual blur)
+- Verified mobile responsiveness (375px viewport): word wrapping works, animation plays
+- Verified no lint errors, no console errors
+
+Stage Summary:
+- FocusReveal animation fully fixed — no more permanently blurred titles
+- Key insight: conditional rendering (placeholder before viewport, animated after) avoids all `initial === animate` bugs
+- Native IntersectionObserver is more reliable than framer-motion's `useInView` in Next.js SSR context
+- All 7 section titles verified working: Who I Am, Featured Projects, Selected Projects, Certificates & Credentials, Technologies I / work with, Experience & Projects, Let's Build Something Great Together.

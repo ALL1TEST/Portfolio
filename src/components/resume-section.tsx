@@ -73,21 +73,11 @@ export function ResumeSection() {
                   text="Technologies I"
                   as="h2"
                   className="skills-faq-title"
-                  blur={14}
-                  scaleStart={1.3}
-                  duration={0.35}
-                  staggerChildren={0.03}
-                  staggerFrom="start"
                 />
                 <FocusReveal
                   text="work with"
                   as="h2"
                   className="skills-faq-title"
-                  blur={14}
-                  scaleStart={1.3}
-                  duration={0.35}
-                  staggerChildren={0.03}
-                  staggerFrom="start"
                 />
               </div>
 
@@ -121,11 +111,6 @@ export function ResumeSection() {
                     text="Experience & Projects"
                     as="h2"
                     className="journey-title"
-                    blur={14}
-                    scaleStart={1.3}
-                    duration={0.35}
-                    staggerChildren={0.03}
-                    staggerFrom="start"
                   />
                 </div>
 

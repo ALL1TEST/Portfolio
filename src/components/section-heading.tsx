@@ -33,11 +33,6 @@ export function SectionHeading({
         text={title}
         as="h2"
         className={TITLE_CLASSES}
-        blur={14}
-        scaleStart={1.3}
-        duration={0.35}
-        staggerChildren={0.03}
-        staggerFrom="start"
       />
       {description && (
         <ScrollReveal delay={0.3}>
