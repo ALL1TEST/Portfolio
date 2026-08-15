@@ -266,7 +266,7 @@
 
 .certificate-card {
   position: relative;
-  min-height: 520px;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 12px;
   background: #1a1a1a;
@@ -397,7 +397,7 @@
   }
 
   .certificate-card {
-    min-height: 420px;
+    aspect-ratio: 16 / 10;
   }
 
   .certificate-card-content {
