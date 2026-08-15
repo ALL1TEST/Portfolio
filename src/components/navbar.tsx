@@ -125,7 +125,7 @@ export function Navbar() {
                 className="flex items-center min-w-0"
               >
                 <Image
-                  src="/uploads/pasted_image_1786816147925.png"
+                  src="/uploads/codevirtox-logo.png"
                   alt="CodeVirtox"
                   width={320}
                   height={80}
