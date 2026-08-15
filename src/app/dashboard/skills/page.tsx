@@ -411,14 +411,22 @@ export default function SkillsPage() {
                   <div className="flex items-center gap-1">
                     <Hash className="w-3 h-3 text-stroke" />
                     <Input
+                      key={`${category}-${catIndex}`}
                       type="number"
                       min={1}
                       max={allCategories.length}
-                      value={catIndex + 1}
-                      onChange={(e) => {
+                      defaultValue={catIndex + 1}
+                      onBlur={(e) => {
                         const val = parseInt(e.target.value);
                         if (!isNaN(val) && val >= 1 && val <= allCategories.length) {
                           setCategoryOrder(category, val);
+                        } else {
+                          e.target.value = String(catIndex + 1);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.currentTarget.blur();
                         }
                       }}
                       className="h-6 w-10 text-center text-[11px] text-muted-text bg-dark border-stroke p-0"

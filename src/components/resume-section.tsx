@@ -8,19 +8,26 @@ import FocusReveal from './focus-reveal';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 
-function SkillsAccordion({ skills }: { skills: { name: string; category: string }[] }) {
+function SkillsAccordion({ skills }: { skills: { name: string; category: string; displayOrder?: number }[] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  // Group skills by category, deduplicate
-  const grouped = skills.reduce<Record<string, string[]>>((acc, skill) => {
-    if (!acc[skill.category]) acc[skill.category] = [];
-    if (!acc[skill.category].includes(skill.name)) {
-      acc[skill.category].push(skill.name);
-    }
-    return acc;
-  }, {});
+  // Sort skills by displayOrder first, then group by category
+  const sorted = [...skills].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 
-  const categories = Object.entries(grouped);
+  // Group skills by category in displayOrder, deduplicate skill names
+  const categoryOrder: string[] = [];
+  const grouped: Record<string, string[]> = {};
+  for (const skill of sorted) {
+    if (!grouped[skill.category]) {
+      grouped[skill.category] = [];
+      categoryOrder.push(skill.category);
+    }
+    if (!grouped[skill.category].includes(skill.name)) {
+      grouped[skill.category].push(skill.name);
+    }
+  }
+
+  const categories = categoryOrder.map(cat => [cat, grouped[cat]] as [string, string[]]);
 
   const toggle = useCallback((index: number) => {
     setActiveIndex((prev) => (prev === index ? null : index));
