@@ -79,29 +79,16 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
           {/* Links row */}
           <div className="flex items-center gap-3 pt-5 border-t border-stroke/40">
-            {project.liveDemoUrl ? (
-              <a
-                href={project.liveDemoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/vp inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-brand rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-brand/25 hover:scale-105 active:scale-95 relative overflow-hidden"
-              >
-                <span className="absolute inset-0 bg-white/0 group-hover/vp:bg-white/10 transition-colors duration-300" />
-                <ArrowUpRight className="relative w-3.5 h-3.5 transition-transform duration-300 group-hover/vp:translate-x-0.5 group-hover/vp:-translate-y-0.5" />
-                <span className="relative">View Project</span>
-              </a>
-            ) : project.githubUrl ? (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/vp inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-brand rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-brand/25 hover:scale-105 active:scale-95 relative overflow-hidden"
-              >
-                <span className="absolute inset-0 bg-white/0 group-hover/vp:bg-white/10 transition-colors duration-300" />
-                <Github className="relative w-3.5 h-3.5 transition-transform duration-300 group-hover/vp:rotate-12" />
-                <span className="relative">View Project</span>
-              </a>
-            ) : null}
+            <a
+              href={project.liveDemoUrl || project.githubUrl || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group/vp relative inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-brand rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-brand/25 hover:scale-105 active:scale-95"
+            >
+              <span className="absolute inset-0 bg-white/0 group-hover/vp:bg-white/10 transition-colors duration-300" />
+              <ArrowUpRight className="relative w-3.5 h-3.5 transition-transform duration-300 group-hover/vp:translate-x-0.5 group-hover/vp:-translate-y-0.5" />
+              <span className="relative">View Project</span>
+            </a>
             {project.githubUrl && project.liveDemoUrl && project.githubUrl !== project.liveDemoUrl && (
               <a
                 href={project.githubUrl}
