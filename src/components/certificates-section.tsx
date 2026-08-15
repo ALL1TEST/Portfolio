@@ -21,8 +21,7 @@ function parseSkills(skillsJson: string): string[] {
 
 function formatIssueYear(dateStr: string): string {
   if (!dateStr) return '';
-  const yearMatch = dateStr.match(/\d{4}/);
-  return yearMatch ? yearMatch[0] : dateStr;
+  return dateStr.trim();
 }
 
 function CertificateCard({ cert, index }: { cert: Certificate; index: number }) {
