@@ -903,3 +903,22 @@ Stage Summary:
 - Image upload with preview works via new `/api/upload` API
 - Frontend components use fullDescription with shortDescription fallback
 - All changes backward compatible with existing data
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Add PDF upload button for Certificates dashboard
+
+Work Log:
+- Updated `/api/upload` to accept PDF files in addition to images (max size increased to 10MB)
+- PDFs are saved to `/public/uploads/certificates/` directory
+- Added `handlePdfUpload` function in certificates page that uploads PDF and stores URL in `credentialUrl`
+- Added PDF upload button next to Credential URL field with Upload icon
+- When a PDF is uploaded, shows a red badge with filename and X to remove it
+- Improved Certificate Image section with proper Upload Image button and preview thumbnail
+- Added `imageInputRef` and `pdfInputRef` for proper file input management
+
+Stage Summary:
+- PDF upload button added next to Credential URL field
+- Certificate Image upload also improved with preview and remove
+- Upload API now supports both images and PDFs

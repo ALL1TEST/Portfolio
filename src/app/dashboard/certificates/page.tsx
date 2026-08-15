@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Loader2, ExternalLink, Upload } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, ExternalLink, Upload, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -74,6 +74,8 @@ export default function CertificatesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   const fetchCertificates = useCallback(async () => {
     try {
@@ -137,21 +139,44 @@ export default function CertificatesPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
       if (res.ok) {
         const data = await res.json();
         setForm((p) => ({ ...p, certificateImage: data.url }));
         toast.success('Image uploaded');
       } else {
-        toast.error('Failed to upload image');
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || 'Failed to upload image');
       }
     } catch {
       toast.error('Failed to upload image');
     } finally {
       setUploading(false);
+      if (imageInputRef.current) imageInputRef.current.value = '';
+    }
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        setForm((p) => ({ ...p, credentialUrl: data.url }));
+        toast.success('PDF uploaded');
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || 'Failed to upload PDF');
+      }
+    } catch {
+      toast.error('Failed to upload PDF');
+    } finally {
+      setUploading(false);
+      if (pdfInputRef.current) pdfInputRef.current.value = '';
     }
   };
 
@@ -402,35 +427,94 @@ export default function CertificatesPage() {
               </div>
               <div className="space-y-2">
                 <Label className="text-sm text-white">Credential URL</Label>
-                <Input
-                  value={form.credentialUrl}
-                  onChange={(e) => setForm((p) => ({ ...p, credentialUrl: e.target.value }))}
-                  className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                  placeholder="https://credentials.example.com/..."
+                <div className="flex items-center gap-2">
+                  {form.credentialUrl && form.credentialUrl.endsWith('.pdf') && (
+                    <div className="flex items-center gap-1.5 px-2 py-1.5 bg-red-500/10 border border-red-500/20 rounded-md shrink-0">
+                      <FileText className="w-3.5 h-3.5 text-red-400" />
+                      <span className="text-[10px] text-red-300 max-w-[80px] truncate">{form.credentialUrl.split('/').pop()}</span>
+                      <button
+                        type="button"
+                        onClick={() => setForm((p) => ({ ...p, credentialUrl: '' }))}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                  <Input
+                    value={form.credentialUrl}
+                    onChange={(e) => setForm((p) => ({ ...p, credentialUrl: e.target.value }))}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text flex-1"
+                    placeholder="https://credentials.example.com/..."
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="border-stroke text-muted-text hover:text-white hover:bg-surface shrink-0"
+                    onClick={() => pdfInputRef.current?.click()}
+                  >
+                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <input
+                  ref={pdfInputRef}
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  className="hidden"
+                  onChange={handlePdfUpload}
                 />
+                <p className="text-[11px] text-stroke">Paste a URL or click the upload button to upload a PDF file.</p>
               </div>
             </div>
 
             {/* Image upload */}
             <div className="space-y-2">
               <Label className="text-sm text-white">Certificate Image</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={form.certificateImage}
-                  onChange={(e) => setForm((p) => ({ ...p, certificateImage: e.target.value }))}
-                  className="bg-dark border-stroke text-white placeholder:text-muted-text flex-1"
-                  placeholder="/uploads/certificate.jpg"
-                />
-                <Button type="button" variant="outline" className="border-stroke text-muted-text hover:text-white hover:bg-surface shrink-0" onClick={() => document.getElementById('cert-image-upload')?.click()}>
-                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                </Button>
-                <input
-                  id="cert-image-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
+              <div className="flex items-start gap-3">
+                {form.certificateImage ? (
+                  <div className="relative w-16 h-12 rounded-md overflow-hidden border border-stroke flex-shrink-0">
+                    <img src={form.certificateImage} alt="Preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setForm((p) => ({ ...p, certificateImage: '' }))}
+                      className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 transition-colors"
+                    >
+                      <X className="w-2.5 h-2.5 text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-16 h-12 rounded-md border border-dashed border-stroke flex items-center justify-center flex-shrink-0">
+                    <span className="text-[9px] text-muted-text">No img</span>
+                  </div>
+                )}
+                <div className="flex-1 space-y-2">
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => imageInputRef.current?.click()}
+                      disabled={uploading}
+                      className="border-stroke text-white hover:bg-surface gap-1.5"
+                    >
+                      {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                      Upload Image
+                    </Button>
+                  </div>
+                  <Input
+                    value={form.certificateImage}
+                    onChange={(e) => setForm((p) => ({ ...p, certificateImage: e.target.value }))}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text text-xs"
+                    placeholder="or paste image URL..."
+                  />
+                </div>
               </div>
             </div>
 

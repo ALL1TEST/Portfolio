@@ -3,6 +3,15 @@ import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
+const ALLOWED_TYPES = [
+  // Images
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+  // PDFs
+  'application/pdf',
+];
+
+const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
 export const POST = withAuth(async (req: Request) => {
   try {
     const formData = await req.formData();
@@ -12,34 +21,29 @@ export const POST = withAuth(async (req: Request) => {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Only images are allowed.' }, { status: 400 });
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: 'Invalid file type. Only images and PDFs are allowed.' }, { status: 400 });
     }
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 5MB.' }, { status: 400 });
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Generate unique filename
-    const ext = path.extname(file.name) || '.png';
+    const ext = path.extname(file.name) || (file.type === 'application/pdf' ? '.pdf' : '.png');
     const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
 
-    // Ensure uploads directory exists
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'projects');
+    // Determine subdirectory based on file type
+    const subDir = file.type === 'application/pdf' ? 'certificates' : 'projects';
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', subDir);
     await mkdir(uploadDir, { recursive: true });
 
-    // Write file
     const filePath = path.join(uploadDir, uniqueName);
     await writeFile(filePath, buffer);
 
-    const url = `/uploads/projects/${uniqueName}`;
+    const url = `/uploads/${subDir}/${uniqueName}`;
 
     return NextResponse.json({ url, name: file.name, size: file.size, type: file.type });
   } catch (error) {
