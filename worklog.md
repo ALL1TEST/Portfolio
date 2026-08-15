@@ -794,3 +794,24 @@ Stage Summary:
 - FocusReveal (Originkit) component applied exactly as user provided
 - Titles: Who I Am, Featured Projects, Selected Projects, Certificates & Credentials, Technologies I work with, Experience & Projects, Let's Build Something Great Together.
 - All using START_SCALE=1.45, blur=20, staggerFrom="start", duration=0.3, staggerChildren=0.035
+---
+Task ID: 12
+Agent: Main Agent
+Task: Fix FocusReveal titles appearing as white shadow/blur
+
+Work Log:
+- Diagnosed root cause: user's FocusReveal code used `initial={hidden}` and `animate={visible}` with non-memoised plain objects. On re-render, framer-motion received new object references for `animate`, causing the animation to restart from `initial` state (opacity:0, scale:1.45, blur:20px), leaving characters stuck as white glowing shadows.
+- Applied minimal fix to user's exact component code:
+  - Wrapped `hidden` and `visible` in `useMemo` for stable references
+  - Changed parent `<MotionTag>` to use `initial="hidden"` + `whileInView="visible"` + `viewport={{ once: true, amount: 0.3 }}`
+  - Changed children `<motion.span>` from `initial={hidden} animate={visible}` to `variants={characterVariants}`
+  - Parent propagates variant label change to children via framer-motion variant propagation
+  - All animation values preserved exactly: START_SCALE=1.45, MAX_BLUR=20, duration=0.3, stagger=0.035, ease=easeOut
+  - Word wrapping logic, reduced motion support, onComplete logic all unchanged
+- Verified all 5 pages compile successfully: /, /certificates, /resume, /projects, /contact
+- Lint clean, no errors
+
+Stage Summary:
+- Fixed white shadow issue by switching from `animate={object}` to `whileInView="visible"` + variants pattern
+- Root cause: non-memoised plain objects in animate prop caused framer-motion to restart animation on re-render
+- Fix: variant labels (stable strings) + whileInView viewport trigger = reliable, once-only animation

@@ -2,7 +2,7 @@
 // Originkit preset `custom-style` — defaults rewritten to match preview.
 "use client";
 
-// Focus Reveal — Originkit (motion/react)
+// Focus Reveal — Originkit (framer-motion)
 // Props set in the preview:
 //   text: "FOCUS REVEAL"
 //   blur: 20
@@ -201,23 +201,44 @@ const FocusReveal = ({
     ...(font ?? null),
   };
 
-  const hidden = skipMotion
-    ? { opacity: 0 }
-    : {
-        opacity: 0,
-        scale: START_SCALE,
-        filter: `blur(${safeBlur}px)`,
-      };
-  const visible = skipMotion
-    ? { opacity: 1 }
-    : {
-        opacity: 1,
-        scale: 1,
-        filter: "blur(0px)",
-      };
+  // Memoised variant objects so framer-motion can compare by reference.
+  // Must be before the early return (rules-of-hooks).
+  const hidden = useMemo(
+    () =>
+      skipMotion
+        ? { opacity: 0 }
+        : { opacity: 0, scale: START_SCALE, filter: `blur(${safeBlur}px)` },
+    [safeBlur, skipMotion],
+  );
+  const visible = useMemo(
+    () => (skipMotion ? { opacity: 1 } : { opacity: 1, scale: 1, filter: "blur(0px)" }),
+    [skipMotion],
+  );
+  const characterVariants = useMemo(
+    () => ({ hidden, visible }),
+    [hidden, visible],
+  );
+
+  // Reduced motion: render immediately as plain, visible text.
+  if (skipMotion) {
+    return (
+      <MotionTag aria-label={text} className={className} style={rootStyle}>
+        {text}
+      </MotionTag>
+    );
+  }
 
   return (
-    <MotionTag aria-label={text} className={className} style={rootStyle}>
+    <MotionTag
+      aria-label={text}
+      className={className}
+      style={rootStyle}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={{ hidden: {}, visible: {} }}
+      onAnimationComplete={onComplete}
+    >
       {words.map((word, wordIndex) => {
         const isWhitespace = word.chars.every((c) => /\s/.test(c));
 
@@ -236,11 +257,10 @@ const FocusReveal = ({
                 <motion.span
                   key={`${char}-${index}`}
                   className="inline-block will-change-[transform,opacity,filter]"
-                  initial={hidden}
-                  animate={visible}
+                  variants={characterVariants}
                   transition={{
                     type: "tween",
-                    duration: skipMotion ? 0.15 : duration,
+                    duration,
                     delay: delays[index] ?? 0,
                     ease: resolveEase(ease),
                   }}
