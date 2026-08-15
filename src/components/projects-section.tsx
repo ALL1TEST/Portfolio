@@ -50,7 +50,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         {/* Content area — clearly separated from image with generous padding */}
         <div className="p-6 lg:p-8 flex flex-col flex-1">
           {/* Title */}
-          <h3 className="text-xl lg:text-2xl font-bold text-white leading-snug mb-3 group-hover:text-brand transition-colors duration-300">
+          <h3 className="text-xl lg:text-2xl font-bold text-white leading-snug mb-3 group-hover:text-brand transition-colors duration-300 whitespace-nowrap">
             {project.title}
           </h3>
 
