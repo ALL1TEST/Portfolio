@@ -20,7 +20,6 @@ function parseSkills(skillsJson: string): string[] {
 
 function formatIssueYear(dateStr: string): string {
   if (!dateStr) return '';
-  // Extract year from various formats
   const yearMatch = dateStr.match(/\d{4}/);
   return yearMatch ? yearMatch[0] : dateStr;
 }
@@ -31,17 +30,10 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
   const skills = parseSkills(cert.skills);
   const year = formatIssueYear(cert.issueDate);
 
-  // Build the subtitle line: "Skill / Category • Issued Year"
   const subtitleParts: string[] = [];
-  if (cert.category) {
-    subtitleParts.push(cert.category);
-  }
-  if (skills.length > 0) {
-    subtitleParts.push(skills[0]);
-  }
-  if (year) {
-    subtitleParts.push(`Issued ${year}`);
-  }
+  if (cert.category) subtitleParts.push(cert.category);
+  if (skills.length > 0) subtitleParts.push(skills[0]);
+  if (year) subtitleParts.push(`Issued ${year}`);
 
   return (
     <motion.div
@@ -56,13 +48,8 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
       }}
       className="certificate-card"
     >
-      {/* Full-bleed image */}
       {hasImage ? (
-        <img
-          src={cert.certificateImage}
-          alt={cert.title}
-          className="certificate-card-image"
-        />
+        <img src={cert.certificateImage} alt={cert.title} className="certificate-card-image" />
       ) : (
         <div
           className="certificate-card-image"
@@ -75,23 +62,16 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
         />
       )}
 
-      {/* Content overlay — title + meta at bottom */}
       <div className="certificate-card-content">
-        {/* Spacer for top (no tags) */}
         <div />
-
-        {/* Title + subtitle at bottom-left */}
         <div className="certificate-info">
           <h3 className="certificate-title">{cert.title}</h3>
           {subtitleParts.length > 0 && (
-            <p className="certificate-meta">
-              {subtitleParts.join(' • ')}
-            </p>
+            <p className="certificate-meta">{subtitleParts.join(' • ')}</p>
           )}
         </div>
       </div>
 
-      {/* Centered View button — appears on hover */}
       {href !== '#' ? (
         <a
           href={href}
@@ -117,17 +97,8 @@ export function CertificatesSection() {
   const { certificates, loading } = useData();
   const [activeFilter, setActiveFilter] = useState('All');
 
-  // Dynamically extract categories from certificates in DB
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    certificates.forEach((cert) => {
-      if (cert.category && cert.category.trim()) {
-        cats.add(cert.category.trim());
-      }
-    });
-    // Return sorted: All first, then alphabetically
-    return ['All', ...Array.from(cats).sort((a, b) => a.localeCompare(b))];
-  }, [certificates]);
+  // Hardcoded filter categories
+  const categories = ['All', 'Cybersecurity', 'PHP', 'Python', 'Computer Hardware'];
 
   // Filter certificates by selected category
   const filteredCerts = useMemo(() => {
@@ -135,15 +106,12 @@ export function CertificatesSection() {
     return certificates.filter((cert) => cert.category === activeFilter);
   }, [certificates, activeFilter]);
 
-  // Total count for stats
-  const totalCount = certificates.length;
-
   return (
     <section id="certificates" className="relative py-24 lg:py-32 bg-gradient-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header with title, subtitle, and stats */}
+        {/* Section header */}
         <ScrollReveal>
-          <div className="text-center mb-12 lg:mb-16">
+          <div className="text-center mb-10 lg:mb-12">
             <span className="inline-block px-5 py-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-muted-text bg-surface border border-stroke rounded-sm mb-5">
               Certificates
             </span>
@@ -153,37 +121,27 @@ export function CertificatesSection() {
             <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base leading-relaxed">
               A collection of certifications and professional training I&apos;ve completed throughout my learning journey.
             </p>
-
-            {/* Stats counter */}
-            {!loading && (
-              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-brand/10 border border-brand/20 rounded-full">
-                <span className="text-2xl font-bold text-brand">{totalCount}+</span>
-                <span className="text-sm font-medium text-brand/80">Certificates</span>
-              </div>
-            )}
           </div>
         </ScrollReveal>
 
-        {/* Dynamic filter buttons */}
-        {!loading && categories.length > 1 && (
-          <ScrollReveal delay={0.1}>
-            <div className="flex flex-wrap justify-center gap-2 mb-12 lg:mb-16">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveFilter(cat)}
-                  className={`px-4 py-2 text-xs font-semibold tracking-wider uppercase rounded-full border transition-all duration-300 ${
-                    activeFilter === cat
-                      ? 'bg-brand text-white border-brand shadow-lg shadow-brand/20'
-                      : 'bg-surface/50 text-muted-text border-stroke/40 hover:text-white hover:border-brand/40'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </ScrollReveal>
-        )}
+        {/* Filter buttons — centered */}
+        <ScrollReveal delay={0.1}>
+          <div className="flex flex-wrap justify-center gap-2 mb-12 lg:mb-16">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveFilter(cat)}
+                className={`px-4 py-2 text-xs font-semibold tracking-wider uppercase rounded-full border transition-all duration-300 ${
+                  activeFilter === cat
+                    ? 'bg-brand text-white border-brand shadow-lg shadow-brand/20'
+                    : 'bg-surface/50 text-muted-text border-stroke/40 hover:text-white hover:border-brand/40'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </ScrollReveal>
 
         {/* Certificate grid */}
         {loading ? (
