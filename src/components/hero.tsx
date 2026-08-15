@@ -57,14 +57,14 @@ export function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       <HeroGlow />
-      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
         <DigitalRain
-          headColor="rgba(255,57,0,0.08)"
-          trailColor="rgba(154,154,154,0.04)"
-          glyphSize={12}
-          speed={4}
-          density={25}
-          trail={14}
+          headColor="rgba(255,57,0,0.45)"
+          trailColor="rgba(154,154,154,0.15)"
+          glyphSize={14}
+          speed={5}
+          density={30}
+          trail={18}
           shuffle={true}
         />
       </div>

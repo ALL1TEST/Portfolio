@@ -239,6 +239,8 @@ function OriginkitBaseDigitalRain(props: DigitalRainProps) {
                 ...style,
                 position: "relative",
                 overflow: "hidden",
+                width: "100%",
+                height: "100%",
             }}
         >
             <canvas
