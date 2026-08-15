@@ -76,7 +76,7 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
             className="certificate-link"
             aria-label={`View credential for ${cert.title}`}
           >
-            View Certificate →
+            View Certificate
           </a>
         </div>
       </div>

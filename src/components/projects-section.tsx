@@ -82,10 +82,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               href={project.liveDemoUrl || project.githubUrl || '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-brand rounded-full hover:bg-brand/80 transition-colors duration-300"
+              className="group/btn relative inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-brand rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-brand/25 hover:scale-105 active:scale-95"
             >
-              <ArrowUpRight className="w-3.5 h-3.5" />
-              View Project
+              <span className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/10 transition-colors duration-300" />
+              <ArrowUpRight className="relative w-3.5 h-3.5 transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+              <span className="relative">View Project</span>
             </a>
             {project.githubUrl && project.liveDemoUrl && project.githubUrl !== project.liveDemoUrl && (
               <a
@@ -159,17 +160,18 @@ export function ProjectsSection() {
               <div className="mt-12 lg:mt-16 text-center">
                 <button
                   onClick={() => setShowAll(!showAll)}
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white/80 bg-surface border border-stroke/50 rounded-full hover:text-white hover:border-brand/40 transition-all duration-300"
+                  className="group/toggle relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white/80 bg-surface border border-stroke/50 rounded-full overflow-hidden transition-all duration-300 hover:text-white hover:border-brand/40 hover:shadow-lg hover:shadow-brand/15 hover:scale-105 active:scale-95"
                 >
+                  <span className="absolute inset-0 bg-brand/0 group-hover/toggle:bg-brand/10 transition-colors duration-300" />
                   {showAll ? (
                     <>
-                      <ChevronUp className="w-4 h-4" />
-                      <span>Show Less</span>
+                      <ChevronUp className="relative w-4 h-4 transition-transform duration-300 group-hover/toggle:-translate-y-0.5" />
+                      <span className="relative">Show Less</span>
                     </>
                   ) : (
                     <>
-                      <ChevronDown className="w-4 h-4" />
-                      <span>Show More</span>
+                      <ChevronDown className="relative w-4 h-4 transition-transform duration-300 group-hover/toggle:translate-y-0.5" />
+                      <span className="relative">Show More</span>
                     </>
                   )}
                 </button>

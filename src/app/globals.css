@@ -345,17 +345,41 @@
 }
 
 .certificate-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-top: 16px;
+  padding: 8px 18px;
+  border-radius: 999px;
   color: #ff3900;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-  transition: color 0.3s ease, transform 0.3s ease;
+  background: rgba(255, 57, 0, 0);
+  border: 1px solid transparent;
+  transition:
+    color 0.3s ease,
+    transform 0.3s cubic-bezier(.2,.8,.2,1),
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .certificate-link:hover {
-  color: #ff5a2b;
+  color: #ffffff;
+  transform: translateX(6px);
+  background: #ff3900;
+  border-color: #ff3900;
+  box-shadow: 0 4px 20px rgba(255, 57, 0, 0.35);
+}
+
+.certificate-link::after {
+  content: '→';
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
+}
+
+.certificate-link:hover::after {
   transform: translateX(4px);
 }
 
