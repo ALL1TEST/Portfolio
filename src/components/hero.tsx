@@ -106,7 +106,7 @@ export function Hero() {
           animate={mounted && !loading ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 1.2 }}
         >
-          {profile?.shortBio || 'Building modern web applications and smart automated solutions.'}
+          {profile?.shortBio || 'I build modern web applications, scalable backend systems, and automation solutions that help turn ideas into reliable digital products.'}
         </motion.p>
 
         <motion.div

@@ -179,7 +179,7 @@ export default function SettingsPage() {
               value={profile.shortBio}
               onChange={(e) => updateField('shortBio', e.target.value)}
               className="bg-dark border-stroke text-white placeholder:text-muted-text"
-              placeholder="Building modern web applications and smart automated solutions."
+              placeholder="I build modern web applications, scalable backend systems, and automation solutions that help turn ideas into reliable digital products."
             />
           </div>
         </div>
