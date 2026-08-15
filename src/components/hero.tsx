@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
+import { HeroGlow } from './hero-glow';
 import { useData } from '@/lib/data-provider';
 
 function useMounted() {
@@ -54,8 +55,7 @@ export function Hero() {
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-brand/10 rounded-full blur-[128px] animate-pulse-glow" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-brand/5 rounded-full blur-[128px] animate-pulse-glow" />
+      <HeroGlow />
       <div className="absolute inset-0 grid-bg opacity-30" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
