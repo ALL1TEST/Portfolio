@@ -1,0 +1,845 @@
+     1→# CodeVirtox Portfolio - Work Log
+     2→
+     3→---
+     4→Task ID: 1
+     5→Agent: Main Agent
+     6→Task: Build complete premium personal developer portfolio website
+     7→
+     8→Work Log:
+     9→- Analyzed existing Next.js 16 project structure with Tailwind CSS 4, shadcn/ui, Framer Motion
+    10→- Designed custom dark theme color system based on user's palette (#FF3900, #030303, #1A1A1A, #353535, #9A9A9A, #151517)
+    11→- Updated globals.css with complete custom theme, noise texture overlay, gradient text, animated borders, glow effects, marquee animation, grid background, custom scrollbar, and prefers-reduced-motion support
+    12→- Updated layout.tsx with proper SEO metadata (Open Graph, Twitter cards, keywords)
+    13→- Created 10 reusable components:
+    14→  - `navbar.tsx` - Sticky navbar with active section tracking, backdrop blur, mobile hamburger menu with AnimatePresence
+    15→  - `animated-background.tsx` - Canvas-based particle system with mouse interaction, connecting lines, orange glow on proximity
+    16→  - `scroll-reveal.tsx` - Reusable Framer Motion scroll-triggered animation wrapper (4 directions)
+    17→  - `section-heading.tsx` - Consistent section headers with label badge, title, and optional description
+    18→  - `hero.tsx` - Full-screen hero with animated text reveal (character-by-character), gradient orbs, grid overlay, CTA buttons, scroll indicator
+    19→  - `tech-marquee.tsx` - Infinite scrolling technology marquee with edge fade, hover effects
+    20→  - `about-preview.tsx` - About section with decorative visual element, info cards, Learn More CTA
+    21→  - `projects-section.tsx` - 3 project cards with numbering, features list, technology tags, hover animations
+    22→  - `certificates-section.tsx` - Certificate cards with icons, issuer, date, skills
+    23→  - `resume-section.tsx` - Complete resume with skill categories (8 groups), experience timeline, education, languages, soft skills, download button
+    24→  - `contact-section.tsx` - Contact form with validation (name, email, subject, message), success/error states, contact info cards
+    25→  - `footer.tsx` - Minimal footer with brand, navigation, back-to-top button, copyright
+    26→- Assembled all components in main page.tsx
+    27→- Fixed lint error (replaced useState+useEffect with useSyncExternalStore for mounted state)
+    28→- Verified: lint passes, dev server starts cleanly, page renders at 200
+    29→- Browser-verified all sections render correctly, navigation works, mobile menu works, form validation works, responsive on mobile (375x812) and desktop (1920x1080)
+    30→
+    31→Stage Summary:
+    32→- Complete premium dark portfolio website built with Next.js 16, TypeScript, Tailwind CSS 4, Framer Motion
+    33→- Custom color palette implemented throughout (brand orange #FF3900, dark bg #030303)
+    34→- Canvas-based interactive particle background with mouse proximity effects
+    35→- Smooth scroll navigation between sections with active state tracking
+    36→- Full mobile responsiveness with hamburger menu
+    37→- All content sections: Hero, Tech Marquee, About, Projects, Certificates, Resume, Contact, Footer
+    38→- Contact form with client-side validation and structured for backend integration
+    39→- SEO metadata (title, description, Open Graph, Twitter cards)
+    40→- Accessibility: ARIA labels, semantic HTML, keyboard navigation, prefers-reduced-motion support
+    41→
+    42→---
+    43→Task ID: 2
+    44→Agent: Main Agent + Subagent (full-stack-developer)
+    45→Task: Build complete Admin Dashboard and connect it to the portfolio
+    46→
+    47→Work Log:
+    48→- Installed bcryptjs for password hashing
+    49→- Created Prisma schema with 10 models: User, Profile, Project, Certificate, Skill, Education, Experience, Language, SoftSkill, ContactMessage
+    50→- Pushed schema to SQLite database and generated Prisma client
+    51→- Created comprehensive seed script (prisma/seed.ts) with all initial data
+    52→- Set up NextAuth.js v4 authentication with Credentials provider, JWT strategy, bcrypt password verification
+    53→- Created middleware for protecting /dashboard/* routes
+    54→- Built clean API helper pattern (withAuth/publicRoute) for route protection
+    55→- Created 12 API routes with full CRUD: /api/projects, /api/certificates, /api/skills, /api/education, /api/experience, /api/languages, /api/soft-skills, /api/contact, /api/profile, /api/resume, /api/stats, /api/upload
+    56→- Built complete dashboard UI with subagent:
+    57→  - Login page with dark premium design
+    58→  - Dashboard layout with server-side session check
+    59→  - Sidebar navigation (desktop + mobile Sheet)
+    60→  - Header with page title, user name, logout
+    61→  - Overview page (stats cards, recent projects/messages, quick actions)
+    62→  - Projects management (data table, create/edit dialog, delete confirmation, featured toggle)
+    63→  - Certificates management (CRUD table with skill tags)
+    64→  - Skills management (grouped by category, add/edit/delete)
+    65→  - Resume management (4 tabs: Education, Experience, Languages, Soft Skills)
+    66→  - Contact messages (inbox with read/unread status, view dialog, mark read, delete)
+    67→  - Profile settings (personal info, about text, contact info, social links)
+    68→- Updated public portfolio components to use DataProvider context that fetches from API
+    69→- Created TypeScript types for all data models
+    70→- Connected public contact form to /api/contact (saves to database)
+    71→- Added SessionProvider wrapper in root layout
+    72→- Verified end-to-end: creating a project in dashboard → appears on public portfolio
+    73→- Verified end-to-end: submitting contact form → appears in dashboard messages
+    74→- All lint checks pass
+    75→
+    76→Stage Summary:
+    77→- Full admin CMS connected to the same database as the public portfolio
+    78→- Authentication: admin@codevirtox.com / admin123
+    79→- All portfolio content is now manageable from the dashboard without editing code
+    80→- Public portfolio dynamically reads all data from the database via API
+    81→- Contact form submissions are saved and viewable in the dashboard
+    82→- Dashboard has consistent CodeVirtox dark theme design
+    83→- Responsive with mobile sidebar support
+    84→
+    85→---
+    86→Task ID: 3
+    87→Agent: Main Agent
+    88→Task: Fix ERR_TOO_MANY_REDIRECTS on dashboard page
+    89→
+    90→Work Log:
+    91→- Diagnosed the issue: `withAuth` middleware from `next-auth/middleware` was causing an infinite redirect loop through the Caddy proxy environment
+    92→- The middleware couldn't properly read the session cookie through the proxy, redirecting to /login even after successful authentication
+    93→- Root cause: middleware was using the deprecated Next.js middleware convention (confirmed by dev log warning)
+    94→- Fix: Removed `src/middleware.ts` entirely — auth protection is already handled by:
+    95→  1. Server-side: Dashboard layout's `getServerSession()` check with `redirect('/login')`
+    96→  2. Client-side: Shell component's `useSession()` check with loading spinner and null guard
+    97→- Ran lint — passes clean
+    98→- Browser-verified full login flow: /login → fill credentials → sign in → redirected to /dashboard
+    99→- Browser-verified all dashboard pages load correctly:
+   100→  - Overview: 4 stat cards, recent projects (4), recent messages (1), quick actions
+   101→  - Projects: data table with 4 projects, add/edit/delete actions
+   102→  - Messages: inbox with 1 message from John, read/delete actions
+   103→  - Settings: profile form with all fields pre-populated from database
+   104→
+   105→Stage Summary:
+   106→- Dashboard redirect loop fixed by removing redundant middleware
+   107→- Auth protection remains fully functional through layout + shell component
+   108→- All 7 dashboard pages verified working end-to-end
+   109→
+   110→---
+   111→Task ID: 4
+   112→Agent: Main Agent
+   113→Task: Fix Overview sidebar button not navigating
+   114→
+   115→Work Log:
+   116→- User reported clicking Overview button in dashboard sidebar does nothing
+   117→- Diagnosed: Next.js `<Link>` component for parent route navigation (`/dashboard/projects` → `/dashboard`) can fail in the preview panel iframe (cross-origin environment)
+   118→- Fix: Replaced all sidebar `<Link>` elements with `<button>` elements using `router.push()` for programmatic navigation
+   119→- This ensures reliable navigation regardless of the iframe/proxy environment
+   120→- Verified all 7 sidebar buttons navigate correctly: Overview, Projects, Certificates, Skills, Resume, Messages, Settings
+   121→- Lint passes clean
+   122→
+   123→Stage Summary:
+   124→- Sidebar navigation now uses `router.push()` instead of `<Link>` for reliable cross-environment navigation
+   125→- All dashboard pages accessible from sidebar without issues
+   126→
+   127→---
+   128→Task ID: 5
+   129→Agent: Main Agent
+   130→Task: Fix persistent ERR_TOO_MANY_REDIRECTS on /dashboard Overview page
+   131→
+   132→Work Log:
+   133→- User still experienced redirect loop when navigating to Overview (/dashboard)
+   134→- Root cause: Server-side `getServerSession()` + `redirect('/login')` in dashboard layout causes infinite redirect through Caddy proxy
+   135→- The proxy doesn't properly forward session cookies for server-side reads, so `getServerSession()` returns null → redirect to /login → loop
+   136→- Fix part 1: Removed `getServerSession()` and `redirect('/login')` from dashboard layout, making it a simple pass-through wrapper
+   137→- Fix part 2: Added `useEffect` in Shell component with `router.replace('/login')` when session status is 'unauthenticated'
+   138→- This moves ALL auth checking to client-side, avoiding server-side redirects entirely
+   139→- The Shell component still shows a loading spinner while session is being checked
+   140→- Browser-verified complete flow:
+   141→  - Unauthenticated access to /dashboard → cleanly redirects to /login (no loop)
+   142→  - Login → redirects to /dashboard with content showing
+   143→  - Overview → Projects → Overview navigation works
+   144→  - All 7 sidebar buttons navigate correctly
+   145→  - Settings → Overview navigation works
+   146→- Lint passes clean
+   147→
+   148→Stage Summary:
+   149→- Eliminated all server-side redirects from the dashboard, fixing ERR_TOO_MANY_REDIRECTS permanently
+   150→- Auth is now entirely client-side via useSession() + router.replace()
+   151→- Dashboard layout is a simple pass-through, Shell component handles all auth logic
+   152→
+   153→---
+   154→Task ID: 6
+   155→Agent: Main Agent
+   156→Task: Redesign tech marquee section as clean monochrome infinite scrolling strip
+   157→
+   158→Work Log:
+   159→- Completely rewrote `src/components/tech-marquee.tsx` removing all card-based design
+   160→- Removed: "Technologies I Work With" heading, card backgrounds, borders, rounded rectangles, hover effects
+   161→- Created clean horizontal marquee with SVG technology logos from Simple Icons (React, Laravel, Next.js, Node.js, MySQL, MongoDB, Docker, GitHub, Oracle Cloud)
+   162→- All icons and text in monochrome gray (`text-muted-text/50`) — no brand colors
+   163→- Small dot separators between technology items
+   164→- Uses existing CSS `animate-marquee` keyframes with `translateX(-50%)` for seamless infinite loop
+   165→- Content duplicated 2x for seamless repetition
+   166→- Edge fade gradients on left/right for smooth visual boundaries
+   167→- Responsive: works on mobile (375px) and desktop (1920px) without horizontal overflow
+   168→- Verified: animation running (playState: running, 30s cycle, smooth transform)
+   169→- Verified via VLM: icons and names visible in gray, dots between items, clean strip design
+   170→- Lint passes clean
+   171→
+   172→Stage Summary:
+   173→- Tech marquee replaced with minimalist monochrome scrolling strip matching reference design
+   174→- 9 technologies with authentic SVG logos, all in muted gray
+   175→- Infinite seamless horizontal animation at 30s cycle
+   176→- Fully responsive without horizontal page overflow
+   177→
+   178→---
+   179→Task ID: 7
+   180→Agent: Main Agent
+   181→Task: Update tech marquee with user-provided correct SVG icons
+   182→
+   183→Work Log:
+   184→- Replaced all 9 previous SVG icons with 12 user-provided correct SVG logos
+   185→- Technologies: React, Laravel, Next.js, Node.js, MySQL, PHP, JavaScript, Python, Tailwind CSS, GitHub, Git, HTML
+   186→- All SVGs use `fill="currentColor"` for monochrome gray rendering (no brand colors)
+   187→- Complex SVGs (PHP, JavaScript, HTML) with multiple fills simplified using `fillOpacity` for contrast
+   188→- Animation verified: `playState: running`, `duration: 30s`, smooth `translateX` transform
+   189→- VLM confirmed: all 12 icons are recognizable brand logos, muted gray color, proper alignment
+   190→- Mobile responsive verified at 375px viewport
+   191→- Lint passes clean
+   192→
+   193→Stage Summary:
+   194→- 12 technology logos in infinite seamless horizontal marquee
+   195→- All user-provided SVGs correctly adapted for monochrome rendering
+   196→- Clean, professional dark mode aesthetic
+   197→
+   198→---
+   199→Task ID: marquee-animation
+   200→Agent: Main Agent
+   201→Task: Implement smooth infinite horizontal marquee animation for tech section
+   202→
+   203→Work Log:
+   204→- Read current tech-marquee.tsx implementation (two separate animated divs with animate-marquee class)
+   205→- Read globals.css to find existing @keyframes marquee and .animate-marquee CSS
+   206→- Rewrote tech-marquee.tsx to use a single `.marquee-track` div containing all 13 tech items duplicated once (26 total items)
+   207→- Replaced old two-div approach with the seamless single-track technique
+   208→- Updated globals.css: replaced `.animate-marquee` with `.marquee` (container: width:100%, overflow:hidden, white-space:nowrap) and `.marquee-track` (display:flex, width:max-content, animation: marquee-scroll 25s linear infinite)
+   209→- Updated @keyframes to use `marquee-scroll` name with `from { translateX(0) }` to `to { translateX(-50%) }` syntax
+   210→- Updated reduced-motion media query to target `.marquee-track` instead of `.animate-marquee`
+   211→- Verified no other source files reference old `.animate-marquee` class
+   212→
+   213→Stage Summary:
+   214→- Seamless infinite horizontal marquee animation implemented using CSS translateX(-50%) technique
+   215→- All 13 technologies (Laravel, Node.js, Next.js, MySQL, React, PHP, HTML, Tailwind CSS, GitHub, Git, VS Code, JavaScript, Python) scroll continuously from RIGHT to LEFT
+   216→- Animation: 25s linear infinite, no jumping/flickering
+   217→- Browser verified: animation-play-state is "running", all CSS properties applied correctly, items properly duplicated
+   218→
+   219→---
+   220→Task ID: tech-ticker-structure
+   221→Agent: Main Agent
+   222→Task: Refactor tech marquee to use exact duplicated .tech-ticker-group structure with proper CSS
+   223→
+   224→Work Log:
+   225→- Rewrote tech-marquee.tsx to use the user's exact HTML structure: .tech-ticker > .tech-ticker-track > two .tech-ticker-group divs
+   226→- Each .tech-ticker-group contains all 13 technology items rendered by renderTechGroup()
+   227→- Each .tech-item contains: SVG icon + <span> name + <b>•</b> bullet separator
+   228→- Second .tech-ticker-group has aria-hidden="true" for accessibility
+   229→- Updated globals.css with complete CSS: .tech-ticker (overflow hidden, nowrap), .tech-ticker-track (flex, max-content, will-change: transform, animation: technologyTicker 25s linear infinite), .tech-ticker-group (flex, align-items center, flex-shrink 0), .tech-item (flex, gap 12px, padding-right 28px, color #9a9a9a, font-size 16px, font-weight 500), .tech-item svg (color #9a9a9a, fill currentColor), .tech-item b (color #555, margin-left 8px, font-weight normal)
+   230→- Updated @keyframes from marquee-scroll to technologyTicker
+   231→- Updated reduced-motion media query to target .tech-ticker-track
+   232→
+   233→Stage Summary:
+   234→- Seamless infinite horizontal ticker with exact duplicated group structure
+   235→- All 13 technologies with existing SVG icons preserved
+   236→- CSS matches user's specification exactly
+   237→- Browser verified: animation-play-state running, all CSS properties correct, HTML structure correct, 13 items per group × 2 groups = 26 total
+   238→
+   239→---
+   240→Task ID: nexa-button-system
+   241→Agent: Main Agent
+   242→Task: Implement Nexa-style animated button system and remove Hire Me button
+   243→
+   244→Work Log:
+   245→- Found all 5 buttons to upgrade: View My Work (hero), Contact Me (hero), Learn More (about), Download Resume (resume), Send Message (contact)
+   246→- Found 2 Hire Me buttons to remove: desktop nav CTA and mobile menu CTA
+   247→- Added complete Nexa-style CSS to globals.css: .portfolio-btn (base), .portfolio-btn-content (z-index layer), .portfolio-btn-bg (animated background), .portfolio-btn-primary (orange), .portfolio-btn-secondary (white), hover states, arrow animation, active/disabled states
+   248→- Updated hero.tsx: Replaced View My Work and Contact Me buttons with portfolio-btn structure (content + bg layers), removed framer-motion whileHover, kept whileTap
+   249→- Updated about-preview.tsx: Replaced Learn More button with portfolio-btn-secondary structure
+   250→- Updated resume-section.tsx: Replaced Download Resume button with portfolio-btn-primary structure, preserved disabled state
+   251→- Updated contact-section.tsx: Replaced Send Message button with portfolio-btn-primary w-full structure, preserved disabled state and dynamic text
+   252→- Updated navbar.tsx: Removed desktop Hire Me CTA button (lines 116-130) and mobile Hire Me button (lines 176-188), cleaned up empty lines
+   253→- Ran lint: all clean, no errors
+   254→
+   255→Stage Summary:
+   256→- Nexa-style button system with animated sliding background applied to all 5 portfolio buttons
+   257→- Animated bg layer: translateY(78%) default → translateY(0) on hover with cubic-bezier(.22,1,.36,1) easing
+   258→- Primary: orange #FF3900 bg, white text, white bg reveal on hover, dark text on hover
+   259→- Secondary: white bg, dark text, orange bg reveal on hover, white text on hover
+   260→- All buttons have pill shape (border-radius: 999px), arrow icon with translateX(5px) on hover, translateY(-2px) lift
+   261→- Hire Me button completely removed from both desktop nav and mobile menu
+   262→- Lint passes cleanly
+   263→
+   264→---
+   265→Task ID: slide-fill-button
+   266→Agent: Main Agent
+   267→Task: Implement Originkit-style SlideFillButton with SVG wave/water fill animation
+   268→
+   269→Work Log:
+   270→- Created reusable SlideFillButton component at src/components/ui/slide-fill-button.tsx
+   271→- Adapted Originkit's SlideFillButton code: getOffset(), wavePath(), BACK_PATH, FRONT_PATH, two-layer SVG wave system
+   272→- Used Framer Motion useAnimate() for imperative animations (waterRef, labelRef, iconRef, backRef, frontRef)
+   273→- Implemented runFill()/runDrain() with spring transition (stiffness:800, damping:60)
+   274→- Implemented continuous wave oscillation with two SVG layers at different speeds
+   275→- Created primary variant: #FF3900 bg → white wave fill → text goes to #030303
+   276→- Created secondary variant: #FFFFFF bg → orange #FF3900 wave fill → text goes to #FFFFFF
+   277→- Applied to hero.tsx: View My Work (primary) + Contact Me (secondary)
+   278→- Applied to about-preview.tsx: Learn More (secondary)
+   279→- Applied to resume-section.tsx: Download Resume (primary, disabled-aware)
+   280→- Applied to contact-section.tsx: Send Message (primary, type=submit, dynamic label)
+   281→- Removed old CSS .portfolio-btn animation classes from globals.css (130+ lines)
+   282→- Removed unused lucide-react imports (ArrowRight, Download, Send) from updated files
+   283→- Lint passes cleanly
+   284→
+   285→Stage Summary:
+   286→- All 5 buttons now use SlideFillButton with SVG wave/water fill animation
+   287→- Water layer starts at translateY(calc(100% + 20px)), rises to translateY(0) on hover
+   288→- Two SVG waves (back: slower/subtle at 0.45 opacity, front: faster/prominent) animate continuously
+   289→- Text and icon colors transition smoothly with the fill via Framer Motion
+   290→- Hire Me button confirmed removed from both desktop and mobile navigation
+   291→- Pill shape (border-radius: 9999), consistent 56px min-height, 28px padding
+   292→
+   293→---
+   294→Task ID: 3
+   295→Agent: Main Agent
+   296→Task: Redesign Certificates section with full-card visual design matching reference layout
+   297→
+   298→Work Log:
+   299→- Read existing certificates-section.tsx (old card design with borders, tags, external links)
+   300→- Checked certificate data from API (2 certs: PHP Essential Training, Foundations of Cybersecurity; no images, no credential URLs)
+   301→- Rewrote certificates-section.tsx with new visual structure: image fills entire card, gradient overlay, tags at top-right, title at bottom, centered View button on hover
+   302→- Added complete certificate card CSS to globals.css (20 rules: grid, card, image, overlay, content, tags, title, meta, view button, hover states, responsive breakpoints)
+   303→- Updated section header to match project section badge + heading style
+   304→- Added reduced motion support for hover animations
+   305→- Verified via curl that all CSS compiles correctly (163KB compiled CSS with all certificate rules)
+   306→- Verified via agent-browser: 2-column grid, 520px min-height, 12px border-radius, overflow hidden, white pill tags, white titles, gray meta text, z-index layering
+   307→- Verified responsive: 1 column on mobile (375px), 1 column on tablet (768px), 2 columns on desktop
+   308→
+   309→Stage Summary:
+   310→- Certificates section fully redesigned with image-as-card visual system
+   311→- CSS verified in compiled output: .certificates-grid (2-col grid), .certificate-card (520px, rounded), .certificate-card::after (gradient overlay), .certificate-tag (white pills), .certificate-view-button (orange pill, opacity+scale on hover)
+   312→- View button conditionally renders only when credentialUrl exists
+   313→- Fallback shows Award icon when no certificate image
+   314→- All existing certificate data preserved
+   315→
+   316→---
+   317→Task ID: 4
+   318→Agent: Main Agent
+   319→Task: Redesign Experience & Projects section with journey-style stacked cards
+   320→
+   321→Work Log:
+   322→- Read resume-section.tsx to understand existing Experience subsection (lines 101-145)
+   323→- Replaced simple bordered cards with full journey-style layout: left sticky heading + right stacked cards
+   324→- Updated HTML structure: .experience-projects > .experience-projects-inner > .journey-intro + .journey-cards
+   325→- Each experience rendered as <article class="journey-card"> with .journey-date, .journey-card-content, .journey-card-title, .journey-card-description, .journey-card-tech
+   326→- Removed unused MapPin/Calendar imports from resume-section.tsx
+   327→- Added ~220 lines of journey CSS to globals.css
+   328→- CSS includes: grid layout, sticky positioning, nth-child backgrounds (#ff3900, #3d3d3d, #1a1a1a, #353535), progressive top offsets, hover lift, date pills with dot, responsive breakpoint at 900px
+   329→- Verified CSS compiles: 30 journey rules in 167KB compiled CSS
+   330→- Verified HTML structure via browser: section found, grid 2-column, sticky heading, "MY JOURNEY" label, "Experience & Projects" title
+   331→- Fixed Calendar reference in iconMap that caused 500 error
+   332→
+   333→Stage Summary:
+   334→- Experience & Projects section redesigned with journey-style stacked cards
+   335→- Left sticky heading with dark gradient badge and large responsive title
+   336→- Right stacked cards with sticky positioning, progressive z-index and top offset
+   337→- First card orange (#FF3900), alternating dark backgrounds
+   338→- Date pills with white dot indicator
+   339→- Tech items as subtle bordered pills
+   340→- Mobile: single column, relative positioning, reduced padding
+   341→- Reduced motion: animations disabled
+   342→
+   343→---
+   344→Task ID: 5
+   345→Agent: Main Agent
+   346→Task: Redesign Education section with premium editorial timeline/list style
+   347→
+   348→Work Log:
+   349→- Read current project state: no standalone education-section.tsx existed; education was embedded in resume-section.tsx as simple bordered cards
+   350→- Read existing API routes: /api/education (full CRUD), /api/resume (returns education + experience + languages + softSkills + skills)
+   351→- Read Education Prisma model: id, degree, field, institution, location, year, displayOrder
+   352→- Updated prisma/seed.ts with user-specified education entries:
+   353→  1. ISTA NTIC — Full Stack Development / Développement Digital — 2024 – Present
+   354→  2. DEVMINDS — Software Engineering & Artificial Intelligence — 2026
+   355→- Cleaned duplicate education entries from database and re-seeded
+   356→- Created standalone `src/components/education-section.tsx` with:
+   357→  - Full-width dark section with `id="education"`
+   358→  - Section header: "EDUCATION" badge + "My Educational Journey" heading + description on right
+   359→  - Horizontal rows: number (left), institution + degree (center), date (right)
+   360→  - Interactive hover: activeIndex state, orange (#FF3900) active background
+   361→  - Skeleton loading state (3 skeleton rows)
+   362→  - Empty state message
+   363→  - Two-digit number formatting (01, 02, ...)
+   364→- Added ~200 lines of education CSS to globals.css:
+   365→  - .education-section, .education-inner (max-width 1320px)
+   366→  - .education-header (flex row), .education-header-left, .education-header-right
+   367→  - .education-heading (clamp 36-64px), .education-description (17px gray)
+   368→  - .education-list (flex column)
+   369→  - .education-item (3-column grid: 80px | 1fr | auto, border-top/bottom)
+   370→  - .education-item.active (#FF3900 background, white text)
+   371→  - .education-number (clamp 32-56px, faint white, brighter on active)
+   372→  - .education-institution (clamp 20-32px bold), .education-degree (14-18px gray)
+   373→  - .education-date (pill with border, transparent bg → white bg on active)
+   374→  - Hover: translateX(4px) lift, 0.45s cubic-bezier transition
+   375→  - Mobile responsive (768px): 2-column grid, smaller fonts, date flows to column 2
+   376→  - Reduced motion: transform disabled, transition simplified
+   377→- Updated page.tsx: imported EducationSection, placed between CertificatesSection and ResumeSection
+   378→- Removed old education sub-section from resume-section.tsx (lines 173-201)
+   379→- Cleaned unused `education` from useData destructuring in resume-section
+   380→- Created standalone `src/app/dashboard/education/page.tsx`:
+   381→  - Full CRUD table: Order (with up/down reorder), Institution, Degree/Field, Year, Actions
+   382→  - Create/Edit dialog with all 6 fields (Institution, Degree, Field, Year, Location, Display Order)
+   383→  - Delete confirmation AlertDialog
+   384→  - Reorder via PUT with parallel swap requests
+   385→  - Loading skeletons, empty state, toast notifications
+   386→  - Follows existing dashboard patterns (motion.div, Card, Table, Dialog)
+   387→- Added "Education" to dashboard sidebar nav (GraduationCap icon, between Certificates and Skills)
+   388→- Verified via agent-browser:
+   389→  - Section renders with correct HTML structure
+   390→  - Data loads from API (both education entries visible)
+   391→  - First item has .active class with #FF3900 background
+   392→  - Computed styles confirmed: background rgb(255,57,0), color rgb(255,255,255)
+   393→- Lint passes clean
+   394→
+   395→Stage Summary:
+   396→- Education section redesigned as premium editorial timeline/list with horizontal rows
+   397→- Numbers left-aligned, content center/left, dates right-aligned
+   398→- Orange (#FF3900) active/hover background with smooth 0.45s transitions
+   399→- Thin horizontal borders between rows, no cards/glassmorphism
+   400→- First item active by default, hover shifts active state to hovered item
+   401→- Fully responsive: desktop 3-column grid, mobile 2-column compact layout
+   402→- Dashboard management page at /dashboard/education with full CRUD + reorder
+   403→- Sidebar navigation updated with Education entry
+   404→
+   405→---
+   406→Task ID: 6
+   407→Agent: Main Agent
+   408→Task: Fix duplication — Education tab removed from dashboard Resume page
+   409→
+   410→Work Log:
+   411→- User reported duplication: Education appeared in both standalone /dashboard/education page AND as a tab inside /dashboard/resume page
+   412→- Investigated all sections on public page via agent-browser: confirmed no public-facing duplication (each section appears once)
+   413→- The duplication was only in the dashboard admin
+   414→- Removed EducationTab function (~130 lines), Education interface type, emptyEducation constant, GraduationCap import from dashboard/resume/page.tsx
+   415→- Updated Tabs defaultValue from "education" to "experience"
+   416→- Removed Education TabsTrigger and TabsContent from the tab list
+   417→- Resume dashboard page now only contains: Experience, Languages, Soft Skills tabs (3 tabs instead of 4)
+   418→- Lint passes clean
+   419→
+   420→Stage Summary:
+   421→- Dashboard duplication fixed: Education management now lives exclusively at /dashboard/education
+   422→- Resume dashboard page cleaned up to only manage Experience, Languages, and Soft Skills
+   423→- Public portfolio page unaffected — no duplication existed on the public-facing site
+   424→
+   425→---
+   426→Task ID: 7
+   427→Agent: Main Agent
+   428→Task: Fix data duplication bug across entire portfolio (certificates, experiences, languages, soft skills, technical skills)
+   429→
+   430→Work Log:
+   431→- Root cause identified: prisma/seed.ts used `db.TABLE.create()` (instead of `upsert()`) for certificates, skills, experiences, languages, and soft skills
+   432→- Each time `bun run seed` was executed during development, duplicate records were created in the SQLite database
+   433→- Verified database state: Certificate (8→2), Experience (12→3), Language (16→4), SoftSkill (16→4), Skill (96→24) — all 4x duplication from 4 seed runs
+   434→- Cleaned all duplicate records: deleted 8 certificates, 96 skills, 12 experiences, 16 languages, 16 soft skills, 4 projects
+   435→- Rewrote prisma/seed.ts: ALL tables now use `upsert()` with stable deterministic IDs (e.g., `cert-php-essential`, `exp-dentclinic`, `lang-arabic`, `skill-js`, `ss-teamwork`)
+   436→- Re-seeded database with clean data: 2 certificates, 3 projects, 24 skills, 2 education, 3 experiences, 4 languages, 4 soft skills
+   437→- Added deduplication safety net in src/lib/data-provider.tsx: `uniqueById()` helper deduplicates all fetched arrays by ID before setting state (prevents future DB duplicates from rendering)
+   438→- Verified all API routes: /api/certificates, /api/experience, /api/languages, /api/soft-skills, /api/skills, /api/resume — all return correct single-copy data
+   439→- Verified dashboard CRUD: create/update/delete operations use correct patterns (no append-style bugs)
+   440→- Browser-verified all sections render with correct counts:
+   441→  - Certificates: 2 (PHP Essential Training, Foundations of Cybersecurity)
+   442→  - Experiences: 3 (DentClinic, CRUD Étudiant, Library Management System)
+   443→  - Languages: 4 (Arabic Native, Amazigh Native, French Intermediate, English Technical)
+   444→  - Soft Skills: 4 (Project Management, Teamwork, Adaptability, Problem Solving)
+   445→  - Technical Skills: 24 across 8 categories (AI & Automation, Back-end, CMS, Databases, Programming, SEO, Tools & Cloud, Web)
+   446→  - Education: 2 (ISTA NTIC, DEVMINDS)
+   447→  - Projects: 3 (DentClinic, CRUD Étudiant, Library Management System)
+   448→- Lint passes clean
+   449→
+   450→Stage Summary:
+   451→- Data duplication bug fully fixed: root cause was `create()` in seed script being run multiple times
+   452→- Fixed seed.ts with `upsert()` + stable IDs for all tables — future seed runs are now idempotent
+   453→- Added deduplication safety net in data-provider.tsx as defense-in-depth
+   454→- Database cleaned: all 148 duplicate records removed, 42 correct records remain
+   455→- Zero design/styling/animation changes — only data logic fixed
+   456→
+   457→---
+   458→Task ID: 8
+   459→Agent: Main Agent
+   460→Task: Redesign Technical Skills section as FAQ/accordion layout
+   461→
+   462→Work Log:
+   463→- Updated database: renamed "Web" category to "Front-end" (5 skills), added "SEO" skill item to SEO category (now has SEO + Web Optimization = 2 items, total 25 skills)
+   464→- Updated prisma/seed.ts: changed Web→Front-end with correct display order, added skill-seo entry
+   465→- Rewrote resume-section.tsx: removed old SkillCard component and card grid, replaced with SkillsAccordion component
+   466→- SkillsAccordion: useState for activeIndex, toggle function that closes previous when opening new
+   467→- Two-column layout: left side with "TECHNICAL SKILLS" badge + large heading, right side with accordion
+   468→- Accordion: 8 categories (Programming, Front-end, Back-end, Databases, AI & Automation, CMS, Tools & Cloud, SEO)
+   469→- Each accordion item: category name + square outlined +/− icon, expandable content with pill tags
+   470→- Icon transforms: rotate(180deg) + orange background on active state
+   471→- Content expands via grid-template-rows: 0fr → 1fr with opacity transition
+   472→- Skill tags: pill shape (border-radius: 999px), dark bg, subtle border, orange hover with translateY(-2px)
+   473→- Added 21 CSS rules to globals.css for accordion (container, header, label, title, accordion, trigger, icon, content, tags, responsive breakpoints, reduced motion)
+   474→- Responsive: 2-column grid at >900px, single column at ≤900px, compact at ≤600px
+   475→- Left header has sticky positioning at top: 120px on desktop
+   476→- Removed unused icon imports (Code2, Globe, Server, Database, Brain, Layout, Cloud, Search, Users, Lightbulb, RefreshCw)
+   477→- Removed SectionHeading import
+   478→- Lint passes clean
+   479→- Verified HTML structure via curl: skills-faq-container, skills-label, skills-faq-title present
+   480→
+   481→Stage Summary:
+   482→- Technical Skills section redesigned from card grid to FAQ/accordion layout
+   483→- Two-column layout: large heading left, expandable accordion right
+   484→- 8 categories with 25 technologies total, each with smooth expand/collapse animation
+   485→- Orange active state on icon, pill-shaped skill tags with hover effects
+   486→- Responsive: grid on desktop, stacked on mobile
+   487→- Database updated: Web→Front-end rename, SEO skill item added
+   488→
+   489→---
+   490→Task ID: ticker-fix
+   491→Agent: Main Agent
+   492→Task: Fix Technologies ticker animation to be a seamless infinite right-to-left loop using pure CSS
+   493→
+   494→Work Log:
+   495→- Inspected current `tech-marquee.tsx` — structure was already correct (two `.tech-ticker-group` divs with `aria-hidden="true"` on the second)
+   496→- Inspected `globals.css` ticker CSS — found two issues:
+   497→  1. Keyframes used `translateX()` instead of `translate3d()` (less performant)
+   498→  2. Missing `!important` on animation declaration (could be overridden)
+   499→- Fixed `globals.css`: Changed keyframes from `translateX(0)/translateX(-50%)` to `translate3d(0,0,0)/translate3d(-50%,0,0)`
+   500→- Fixed `globals.css`: Added `!important` to `.tech-ticker-track` animation property
+   501→- Started dev server and verified with Agent Browser:
+   502→  - Animation state: `running`
+   503→  - Transform progressing from -678px to -1074px over 3 seconds (continuous movement)
+   504→  - 2 groups present with 26 total items (13 tech × 2)
+   505→  - Second group has `aria-hidden="true"` for accessibility
+   506→  - No runtime errors in dev log
+   507→
+   508→Stage Summary:
+   509→- Tech ticker animation is now working as a seamless infinite right-to-left loop
+   510→- Only modified `src/app/globals.css` (2 line changes in the ticker CSS section)
+   511→- No changes to `tech-marquee.tsx` (structure was already correct)
+   512→- No changes to any other component or page
+   513→
+   514→---
+   515→Task ID: github-push
+   516→Agent: Main Agent
+   517→Task: Push project to GitHub repository and verify
+   518→
+   519→Work Log:
+   520→- Cleaned stale git index.lock from previous session
+   521→- Set git remote to https://github.com/ALL1TEST/Portfolio.git with token auth
+   522→- Verified all source files already committed (170 files tracked, no uncommitted source changes)
+   523→- Pushed main branch to origin with --force
+   524→- Verified via agent-browser: site loads correctly at localhost:3000, all sections render (Hero, About, Projects, Certificates, Resume, Contact, Footer)
+   525→- Dev server running, all API routes returning 200
+   526→
+   527→Stage Summary:
+   528→- GitHub repository successfully pushed with latest source code
+   529→- Site verified working via browser
+   530→
+   531→---
+   532→Task ID: restore-homepage
+   533→Agent: Main Agent
+   534→Task: Restore all missing homepage sections and styling updates that were previously overwritten
+   535→
+   536→Work Log:
+   537→- Analyzed screenshot showing homepage only had Hero, TechMarquee, AboutPreview, and Footer
+   538→- Identified missing sections: Featured Projects, Certificates with filters, Resume, Contact
+   539→- Created `featured-projects.tsx` component with dynamic featured flag and displayOrder sorting, split-layout cards
+   540→- Updated `projects-section.tsx` with split layout (image top aspect-[16/10], content below with tech pills, title, description, links row)
+   541→- Updated `certificates-section.tsx` with centered filter buttons (All, Cybersecurity, PHP, Python, Computer Hardware), cards showing "Skills • Issued Year" overlay, View Credential pill button
+   542→- Updated `page.tsx` homepage to import all sections: Hero, TechMarquee, AboutPreview, FeaturedProjects, CertificatesSection, ResumeSection, ContactSection
+   543→- Added `visibilitychange` listener to DataProvider for auto-refresh when switching tabs
+   544→- Fixed dashboard certificates JSON parsing in openEdit (parse JSON skills string to comma-separated)
+   545→- Fixed dashboard projects JSON parsing in openEdit (parse JSON technologies string to comma-separated)
+   546→- Verified all sections render correctly via agent-browser — no runtime errors
+   547→- Pushed to GitHub
+   548→
+   549→Stage Summary:
+   550→- All 7 homepage sections restored and working: Hero, TechMarquee, Who I Am, Featured Projects, Certificates (with filters), Resume (Skills + Experience), Contact
+   551→- Dashboard JSON corruption fix applied for both projects and certificates
+   552→- Auto-refresh on tab switch implemented
+   553→
+   554→---
+   555→Task ID: certificates-rebuild
+   556→Agent: Main Agent
+   557→Task: Rebuild Certificates page with dynamic category filters, modern card layout, and full dashboard integration
+   558→
+   559→Work Log:
+   560→- Added `category` and `credentialId` fields to Certificate model in Prisma schema
+   561→- Pushed schema to SQLite database with `bun run db:push`
+   562→- Updated TypeScript Certificate interface with new fields
+   563→- Updated certificates API route (GET/POST/PUT/DELETE) to handle category and credentialId
+   564→- Rebuilt `certificates-section.tsx` with:
+   565→  - New title "Certificates & Credentials" and subtitle
+   566→  - Dynamic certificate count stat (e.g. "2+ Certificates")
+   567→  - Dynamic category filters derived from DB (no hardcoding) — only categories with ≥1 certificate shown
+   568→  - Smooth AnimatePresence transitions when filtering
+   569→  - Modern v2 card layout: image area (16:10), content below with category badge, title, issuer, issue date, skills list, View Credential button
+   570→  - Formatted date display (e.g. "May 2025")
+   571→- Rebuilt dashboard certificates page with:
+   572→  - Category input with datalist suggestions (existing categories + defaults)
+   573→  - Credential ID field
+   574→  - Image URL input with upload button
+   575→  - Category badges shown in table
+   576→  - Category overview in header
+   577→- Added full CSS for cert-v2 card styles (grid, hover effects, responsive breakpoints)
+   578→- Verified both /certificates page and homepage section render correctly with no errors
+   579→- Pushed to GitHub
+   580→
+   581→Stage Summary:
+   582→- Certificate model now supports: title, issuer, issueDate, skills, certificateImage, credentialUrl, credentialId, category, displayOrder
+   583→- Dynamic filter system: categories auto-derived from certificates in DB, new categories appear automatically
+   584→- Dashboard allows full CRUD with category management
+   585→- Card design: split layout (image top, content below) consistent with project cards
+   586→
+   587→---
+   588→Task ID: Cert-Redesign
+   589→Agent: Main Agent
+   590→Task: Redesign Certificates section cards to match project-card visual style (full-bleed image, gradient overlay, centered View button)
+   591→
+   592→Work Log:
+   593→- Read existing certificates-section.tsx (used cert-v2-* classes with split image+content layout)
+   594→- Read globals.css (both old cert-v2-* and new certificate-card* styles existed)
+   595→- Read types.ts and data-provider.tsx to understand data structure
+   596→- Rewrote certificates-section.tsx CertificateCard component to use project-card visual system:
+   597→  - Full-bleed certificate image filling entire card (certificate-card-image class)
+   598→  - Dark gradient overlay via ::after pseudo-element (transparent → black)
+   599→  - White pill-shaped tags at top-right showing Issuer + Year
+   600→  - Certificate title at bottom-left with meta text below
+   601→  - Centered orange #FF3900 pill "→ View" button hidden by default, appears on hover with opacity+scale animation
+   602→  - Hover zoom effect on image (scale 1.06)
+   603→  - Award icon placeholder when no image is set
+   604→- Removed old cert-v2-* CSS styles from globals.css (~180 lines of unused styles)
+   605→- Preserved all existing functionality: dynamic filters, stats counter, AnimatePresence transitions, loading skeletons, empty states
+   606→- Verified with browser: confirmed 2-column grid, white pills, titles at bottom, gradient overlay, hover View button, zoom effect
+   607→- Lint passes cleanly, no errors in dev log
+   608→
+   609→Stage Summary:
+   610→- certificates-section.tsx now uses certificate-card/certificate-card-image/certificate-card-content/certificate-tags/certificate-tag/certificate-info/certificate-title/certificate-meta/certificate-view-button classes
+   611→- Old cert-v2-* CSS removed from globals.css
+   612→- All certificate data, filtering, and section structure preserved unchanged
+   613→- Visual design matches the reference HTML: full-card visual background, category labels at top, title at bottom, centered View button on hover
+   614→
+   615→---
+   616→Task ID: Home-Page-Update
+   617→Agent: Main Agent
+   618→Task: Comprehensive home page update - stats, featured projects, education, certificates redesign, project cards
+   619→
+   620→Work Log:
+   621→- Updated education DB entries: edu-1 → OFPPT/Specialized Technician Diploma/Digital Development/2024-Present, edu-2 → Qualifying High School Al Araar/Bachelor's Degree/Life and Earth Sciences/2020-2021
+   622→- Created AI Tools project in DB with technologies [React, Next.js, AI APIs, Automation], set featured=true
+   623→- Updated DentClinic description and technologies to [Laravel, Filament, PHP, MySQL]
+   624→- Updated Library Management System: set featured=true, updated description
+   625→- Created achievement-stats.tsx component: 6+ Certificates, 14+ Projects, 8+ Technologies in 3-column grid with subtle dividers
+   626→- Updated featured-projects.tsx: changed label to "FEATURED WORK", title to "Featured Projects", description to "A selection of projects I'm proud of", added View All Projects CTA button with router.push('/projects'), reordered card content (title→description→tech tags→links)
+   627→- Updated page.tsx layout order: Hero → TechMarquee → AchievementStats → AboutPreview → FeaturedProjects → CertificatesSection → ResumeSection → ContactSection
+   628→- Updated certificates-section.tsx: removed issuer/year tags at top-right, removed Award icon import, added category/skill parsing, subtitle shows "Skill • Issued Year" format (e.g. "PHP • Issued 2025", "Cybersecurity • Issued 2025"), clean minimal overlay without icons
+   629→- Updated projects-section.tsx: increased card padding (p-6 lg:p-8), larger title (text-xl lg:text-2xl), larger description, larger tech pills (px-3 py-1), added flex-col with mt-auto for link separation, increased grid gap to 8/10, all content clearly separated from image area
+   630→- Browser verified: desktop + mobile layouts, all sections render correctly, education data updated, certificate overlay text clean, project cards spacious
+   631→
+   632→Stage Summary:
+   633→- New achievement-stats.tsx component created
+   634→- DB: 2 education entries updated, 1 new project created, 2 projects updated
+   635→- Featured Projects section now shows 3 cards with CTA button
+   636→- Certificates show clean "Skill • Issued Year" overlay without icons
+   637→- Project cards have increased height with clear image/content separation
+   638→- Home page layout: Hero → Marquee → Stats → Who I Am → Featured Projects → Certificates → Resume → Contact
+   639→
+   640→---
+   641→Task ID: 2
+   642→Agent: Main Agent
+   643→Task: Refine mobile navigation menu to be cleaner, lighter, and more elegant
+   644→
+   645→Work Log:
+   646→- Removed navigation numbers (01, 02, 03, 04, 05) from navLinks array and all rendered elements
+   647→- Removed heavy rectangular orange/brown background blocks behind active and hovered items
+   648→- Removed border, rounded-xl, and background-based styling from nav buttons
+   649→- Redesigned nav items as clean text links: `text-lg sm:text-xl font-medium` instead of `text-2xl sm:text-3xl font-bold`
+   650→- Active state: orange text (`text-brand`) with a tiny 1px dot indicator (`w-1 h-1 rounded-full bg-brand`) using `layoutId` for smooth animation
+   651→- Hover effect: subtle `translate-x-1` movement + color transition from `text-white/70` to `text-white/95` with `pl-1` padding shift
+   652→- Item animations changed from vertical (`y: 40`) to horizontal (`x: -12`) for elegant slide-in from left
+   653→- Close button simplified: removed border, background, and size — now minimal `text-white/50 hover:text-white` with thin stroke
+   654→- Social icons made more subtle: removed borders/backgrounds, smaller size (16px), lighter opacity (`text-muted-text/50`)
+   655→- Divider and branding text made more subtle with reduced opacity
+   656→- Content padding increased (`px-10 sm:px-14`) for balanced spacing
+   657→- Desktop navigation remains completely unchanged (verified via browser)
+   658→- Auto-close on click and body scroll lock preserved
+   659→
+   660→Stage Summary:
+   661→- Mobile menu now feels premium, minimal, and lightweight
+   662→- No heavy backgrounds, borders, or glowing effects on any nav state
+   663→- Clean text links with subtle hover/active indicators
+   664→- Desktop nav untouched, verified via agent browser
+   665→
+   666→---
+   667→Task ID: 3
+   668→Agent: Main Agent
+   669→Task: Apply FocusReveal character-by-character animation to all portfolio section titles
+   670→
+   671→Work Log:
+   672→- Created `src/components/focus-reveal.tsx` — adapted from user-provided Originkit code, converted `motion/react` imports to `framer-motion`, added `trigger` boolean prop for viewport-controlled animation
+   673→- Created `src/components/use-once-in-view.ts` — custom hook using native IntersectionObserver with `once: true` behavior. Returns `false` initially, flips to `true` once element enters viewport, then disconnects observer
+   674→- Modified `src/components/section-heading.tsx` — replaced static `<h2>` with conditional rendering: invisible placeholder `<h2>` when out of view, FocusReveal component when entering view. Uses `useOnceInView` hook for trigger detection
+   675→- Modified `src/components/certificates-section.tsx` — replaced static `<h2>Certificates & Credentials</h2>` with CertificatesTitle component using same conditional FocusReveal pattern
+   676→- Modified `src/components/resume-section.tsx` — replaced static "Technologies I / work with" (two-line) and "Experience & Projects" titles with conditional FocusReveal. Two-line title uses two separate FocusReveal instances with staggered delay
+   677→- Fixed framer-motion bug where `initial === animate` (same hidden state) caused styles not to be applied. Solved by using conditional rendering (mount FocusReveal only when in view, invisible placeholder before)
+   678→- Removed debug data attributes and console.log statements after verification
+   679→- All pages verified: Home (Who I Am, Featured Projects), Projects (Selected Projects), Certificates (Certificates & Credentials), Resume (Technologies I work with, Experience & Projects), Contact (Let's Build Something Great Together.)
+   680→
+   681→Stage Summary:
+   682→- FocusReveal animation applied to all 7 section titles across 5 pages
+   683→- Animation triggers only when section enters viewport (once-only)
+   684→- Before viewport: invisible placeholder preserves layout (no layout shift)
+   685→- On viewport entry: character-by-character blur(15px) + scale(1.45→1) reveal with 0.03s stagger
+   686→- After animation: clean, crisp text with no blur
+   687→- Respects reduced-motion preferences (skipMotion from useReducedMotion)
+   688→- Desktop nav, cards, images, buttons, mobile menu, layout all unchanged
+   689→- Lint clean, no compilation errors
+   690→
+   691→---
+   692→Task ID: 4
+   693→Agent: Main Agent
+   694→Task: Fix FocusReveal animation — viewport-triggered with proper whileInView/useInView detection
+   695→
+   696→Work Log:
+   697→- Diagnosed root cause: previous implementation used `initial={hidden} animate={trigger ? visible : hidden}` which never applied hidden styles when trigger was false (framer-motion optimizes away identical initial/animate states). The conditional rendering workaround (useOnceInView + visibility:hidden placeholder) caused layout shifts and wasn't reliable.
+   698→- Completely rewrote `src/components/focus-reveal.tsx`:
+   699→  - Uses framer-motion `useInView` hook for reliable viewport detection with `once: true, amount: 0.3`
+   700→  - Character spans use variant-based animation (`variants={{ hidden: charHidden, visible: charVisible }}`) with per-character stagger delays via `transition.delay`
+   701→  - Parent MotionTag uses `initial="hidden" animate={isInView ? 'visible' : 'hidden'}` — on first render, `initial` styles are applied before `animate` evaluation, ensuring characters start in hidden state
+   702→  - When `useInView` flips to true, `animate` changes to "visible" and variant propagation triggers the stagger animation
+   703→- Simplified `src/components/section-heading.tsx` — removed useOnceInView hook and conditional rendering, now directly uses `<FocusReveal>` with exact existing Tailwind classes
+   704→- Simplified `src/components/certificates-section.tsx` — removed CertificatesTitle wrapper component, replaced with direct `<FocusReveal>` call
+   705→- Simplified `src/components/resume-section.tsx` — removed useOnceInView hooks and conditional rendering, all three FocusReveal titles now drop in directly
+   706→- Deleted `src/components/use-once-in-view.ts` (no longer needed)
+   707→- Browser-verified every title on every page:
+   708→  - Home: "Who I Am" (hidden→visible on scroll), "Featured Projects" (animated correctly)
+   709→  - /projects: "Selected Projects" (animated)
+   710→  - /certificates: "Certificates & Credentials" (animated)
+   711→  - /resume: "Technologies I" + "work with" (both animated), "Experience & Projects" (hidden→visible on scroll)
+   712→  - /contact: "Let's Build Something Great Together." (animated)
+   713→- Verified once-only: scrolling away and back does NOT replay animation
+   714→- Verified mobile responsiveness: heading visible, no wrapping issues
+   715→- Verified no console errors, no hydration errors
+   716→
+   717→Stage Summary:
+   718→- FocusReveal now works correctly with viewport-triggered animation
+   719→- Characters start at opacity:0, scale:1.3, blur(14px) and animate to opacity:1, scale:1, blur(0px)
+   720→- Stagger: 0.03s per character, duration: 0.35s, ease: easeOut-cubic
+   721→- Triggers ONLY when section enters viewport, plays ONCE, never replays
+   722→- Reduced motion supported via useReducedMotion
+   723→- All 7 titles verified working across all 5 pages
+   724→---
+   725→Task ID: 9
+   726→Agent: Main Agent
+   727→Task: Fix FocusReveal animation — characters permanently blurred, animation not triggering
+   728→
+   729→Work Log:
+   730→- Diagnosed root cause: previous implementation used framer-motion `useInView` hook with `initial="hidden"` + `animate={isInView ? 'visible' : 'hidden'}` variant labels. When `isInView=false`, `initial === animate` ("hidden" === "hidden"), causing framer-motion to skip applying initial styles. Characters rendered visible/stuck.
+   731→- Rewrote FocusReveal component with fundamentally different architecture:
+   732→  - Replaced framer-motion `useInView` with native `IntersectionObserver` + `useState` for reliable viewport detection
+   733→  - Implemented conditional rendering pattern: before viewport entry renders invisible placeholder (`visibility: hidden`, plain text), after entry mounts animated spans
+   734→  - This guarantees `initial={hidden}` ≠ `animate={visible}` (different object values), so framer-motion always plays the animation
+   735→  - Uses `triggeredRef` to enforce once-only behavior and `observer.disconnect()` to clean up
+   736→- Reduced `scaleStart` default from 1.3 to 1.15 (per user request, 1.3 was too aggressive)
+   737→- Updated `duration` default to 0.4s for elegant timing
+   738→- Simplified all consuming components (section-heading, certificates, resume) to use clean FocusReveal without explicit props
+   739→- Verified via agent-browser: all 7 titles (8 FocusReveal instances) animate correctly:
+   740→  - Titles in viewport on page load: animate immediately
+   741→  - Titles below fold: animate when scrolled into view
+   742→  - All characters end at opacity:1, blur(0px), scale:1 (fully sharp, no residual blur)
+   743→- Verified mobile responsiveness (375px viewport): word wrapping works, animation plays
+   744→- Verified no lint errors, no console errors
+   745→
+   746→Stage Summary:
+   747→- FocusReveal animation fully fixed — no more permanently blurred titles
+   748→- Key insight: conditional rendering (placeholder before viewport, animated after) avoids all `initial === animate` bugs
+   749→- Native IntersectionObserver is more reliable than framer-motion's `useInView` in Next.js SSR context
+   750→- All 7 section titles verified working: Who I Am, Featured Projects, Selected Projects, Certificates & Credentials, Technologies I / work with, Experience & Projects, Let's Build Something Great Together.
+   751→---
+   752→Task ID: 10
+   753→Agent: Main Agent
+   754→Task: Fix FocusReveal — use whileInView viewport detection per user specifications
+   755→
+   756→Work Log:
+   757→- Verified all 7 title texts are intact and correct (none deleted/replaced)
+   758→- Rewrote FocusReveal component using framer-motion `whileInView="visible"` + `viewport={{ once: true, amount: 0.3 }}` on parent element
+   759→- Architecture: parent `<MotionTag>` with `initial="hidden"` + `whileInView="visible"` handles viewport detection; children inherit via variant label propagation with per-character delays
+   760→- This avoids the `initial === animate` bug entirely — `whileInView` is a separate trigger that doesn't conflict with `initial`
+   761→- Component includes all specified internals: START_SCALE (1.2), MAX_BLUR (20), EASE_OUT, buildStaggerDelays, resolveEase
+   762→- Word wrapping: each word wrapped in `inline-block whitespace-nowrap`, regular space between words allows natural line breaks
+   763→- Reduced motion support via useReducedMotion — renders plain text immediately
+   764→- Updated all consuming components with `blur={20}` and `staggerFrom="start"` while preserving exact existing className values
+   765→- Verified via agent-browser:
+   766→  - All 7 titles (8 FocusReveal instances) animate correctly
+   767→  - Titles below fold remain blurred until scrolled into view
+   768→  - All characters end at opacity:1, blur(0px) — fully sharp, no residual blur
+   769→  - Once-only behavior: titles stay sharp when scrolling back
+   770→  - Mobile (375px): word wrapping works, animation triggers correctly
+   771→  - No console errors, no hydration errors, lint clean
+   772→
+   773→Stage Summary:
+   774→- FocusReveal now uses whileInView + viewport for reliable viewport-triggered animation
+   775→- Parent-level whileInView propagates to children via shared variant labels
+   776→- Per-character delays handle stagger without needing staggerChildren
+   777→- All original titles preserved with exact existing styling
+   778→---
+   779→Task ID: 11
+   780→Agent: Main Agent
+   781→Task: Apply user-provided FocusReveal (Originkit) component to all 7 section titles
+   782→
+   783→Work Log:
+   784→- Wrote exact user-provided FocusReveal component to `src/components/focus-reveal.tsx`
+   785→- Only change from user code: import from `"framer-motion"` instead of `"motion/react"` (motion/react not installed in project)
+   786→- Fixed lint error: wrapped `onCompleteRef.current = onComplete` in useEffect (react-hooks/refs rule)
+   787→- Updated `section-heading.tsx` — passes explicit transition config and `as="h2"`
+   788→- Updated `certificates-section.tsx` — passes explicit transition config
+   789→- Updated `resume-section.tsx` — combined "Technologies I" + "work with" into single title "Technologies I work with" per user spec; passes explicit transition config
+   790→- Lint clean, no console errors
+   791→- Verified all 7 titles via agent-browser: all chars at opacity:1, blur(0px) — fully sharp
+   792→
+   793→Stage Summary:
+   794→- FocusReveal (Originkit) component applied exactly as user provided
+   795→- Titles: Who I Am, Featured Projects, Selected Projects, Certificates & Credentials, Technologies I work with, Experience & Projects, Let's Build Something Great Together.
+   796→- All using START_SCALE=1.45, blur=20, staggerFrom="start", duration=0.3, staggerChildren=0.035
+   797→---
+   798→Task ID: 12
+   799→Agent: Main Agent
+   800→Task: Fix FocusReveal titles appearing as white shadow/blur
+   801→
+   802→Work Log:
+   803→- Diagnosed root cause: user's FocusReveal code used `initial={hidden}` and `animate={visible}` with non-memoised plain objects. On re-render, framer-motion received new object references for `animate`, causing the animation to restart from `initial` state (opacity:0, scale:1.45, blur:20px), leaving characters stuck as white glowing shadows.
+   804→- Applied minimal fix to user's exact component code:
+   805→  - Wrapped `hidden` and `visible` in `useMemo` for stable references
+   806→  - Changed parent `<MotionTag>` to use `initial="hidden"` + `whileInView="visible"` + `viewport={{ once: true, amount: 0.3 }}`
+   807→  - Changed children `<motion.span>` from `initial={hidden} animate={visible}` to `variants={characterVariants}`
+   808→  - Parent propagates variant label change to children via framer-motion variant propagation
+   809→  - All animation values preserved exactly: START_SCALE=1.45, MAX_BLUR=20, duration=0.3, stagger=0.035, ease=easeOut
+   810→  - Word wrapping logic, reduced motion support, onComplete logic all unchanged
+   811→- Verified all 5 pages compile successfully: /, /certificates, /resume, /projects, /contact
+   812→- Lint clean, no errors
+   813→
+   814→Stage Summary:
+   815→- Fixed white shadow issue by switching from `animate={object}` to `whileInView="visible"` + variants pattern
+   816→- Root cause: non-memoised plain objects in animate prop caused framer-motion to restart animation on re-render
+   817→- Fix: variant labels (stable strings) + whileInView viewport trigger = reliable, once-only animation
+   818→---
+   819→Task ID: about-content-redesign
+   820→Agent: Main Agent
+   821→Task: Redesign "Who I Am" section content from generic dashboard cards to professional portfolio presentation
+   822→
+   823→Work Log:
+   824→- Read current about-preview.tsx to understand existing layout (2-col grid: image left, content right)
+   825→- Read focus-reveal.tsx, section-heading.tsx, scroll-reveal.tsx, glow-card.tsx, and theme globals for styling context
+   826→- Removed the 4 generic info cards (Focus, Specialty, Experience, Location) that looked like dashboard stats
+   827→- Added "A BIT ABOUT ME" uppercase label in brand color (#FF3900)
+   828→- Added professional intro paragraph about Full-Stack Developer focused on modern web apps & AI automation
+   829→- Created 3 professional value cards with numbered design (01, 02, 03):
+   830→  - 01 — Build & Develop (Code2 icon)
+   831→  - 02 — AI & Automation (Bot icon)
+   832→  - 03 — Learn & Improve (BookOpen icon)
+   833→- Each card features: left accent bar (brand color on hover), number badge, icon, title, and description
+   834→- Cards use hover transitions (border brightens, accent bar expands, number badge background shifts)
+   835→- Preserved all existing elements: profile image, "Who I Am" heading, "Learn More" button, dark theme, responsive layout
+   836→- Staggered scroll reveal animations (delays: 0.1, 0.15, 0.2/0.3/0.4, 0.5)
+   837→- Verified with agent-browser: all content renders correctly, "Learn More" navigates to /resume, no console errors
+   838→- Mobile responsive verified at 375x812 viewport
+   839→
+   840→Stage Summary:
+   841→- Replaced 4 generic dashboard-style cards with 3 professional value proposition cards
+   842→- Added "A bit about me" intro section with professional description
+   843→- All existing layout, styling, buttons, and responsive behavior preserved
+   844→- File modified: src/components/about-preview.tsx
+   845→

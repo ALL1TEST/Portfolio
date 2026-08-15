@@ -73,6 +73,7 @@ export default function SkillsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [customCategory, setCustomCategory] = useState('');
 
   const fetchSkills = useCallback(async () => {
     try {
@@ -98,18 +99,22 @@ export default function SkillsPage() {
 
   const openCreate = (category?: string) => {
     setEditingId(null);
-    setForm({ ...emptyForm, category: category || 'Programming' });
+    const cat = category || 'Programming';
+    setForm({ ...emptyForm, category: DEFAULT_CATEGORIES.includes(cat) ? cat : 'Other' });
+    setCustomCategory(DEFAULT_CATEGORIES.includes(cat) ? '' : cat);
     setFormOpen(true);
   };
 
   const openEdit = (skill: Skill) => {
     setEditingId(skill.id);
+    const isDefault = DEFAULT_CATEGORIES.includes(skill.category);
     setForm({
       name: skill.name,
-      category: skill.category,
+      category: isDefault ? skill.category : 'Other',
       icon: skill.icon,
       displayOrder: skill.displayOrder,
     });
+    setCustomCategory(isDefault ? '' : skill.category);
     setFormOpen(true);
   };
 
@@ -117,15 +122,18 @@ export default function SkillsPage() {
     e.preventDefault();
     setSaving(true);
     try {
+      const finalCategory = form.category === 'Other' ? customCategory : form.category;
+      const payload = { ...form, category: finalCategory };
       const res = await fetch('/api/skills', {
         method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingId ? { ...form, id: editingId } : form),
+        body: JSON.stringify(editingId ? { ...payload, id: editingId } : payload),
       });
 
       if (res.ok) {
         toast.success(editingId ? 'Skill updated' : 'Skill created');
         setFormOpen(false);
+        setCustomCategory('');
         fetchSkills();
       } else {
         toast.error('Failed to save skill');
@@ -265,7 +273,10 @@ export default function SkillsPage() {
               <Label className="text-sm text-white">Category</Label>
               <Select
                 value={form.category}
-                onValueChange={(v) => setForm((p) => ({ ...p, category: v }))}
+                onValueChange={(v) => {
+                  setForm((p) => ({ ...p, category: v }));
+                  if (v !== 'Other') setCustomCategory('');
+                }}
               >
                 <SelectTrigger className="bg-dark border-stroke text-white">
                   <SelectValue placeholder="Select a category" />
@@ -280,8 +291,8 @@ export default function SkillsPage() {
               </Select>
               {form.category === 'Other' && (
                 <Input
-                  value={''}
-                  onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
                   required
                   autoFocus
                   className="bg-dark border-stroke text-white placeholder:text-muted-text mt-2"
