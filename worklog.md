@@ -883,3 +883,23 @@ Stage Summary:
 - Auto-reorder works on edit and delete
 - Items always stay numbered 1, 2, 3... with no gaps
 - Database and UI stay in sync
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Simplify Projects dashboard - merge descriptions, add image upload
+
+Work Log:
+- Removed separate "Short Description" and "Full Description" fields from dashboard form
+- Added single "Description" textarea that saves to both DB fields (backward compatible)
+- Created `/api/upload` endpoint for image upload (accepts jpeg, png, gif, webp, svg; max 5MB)
+- Added image upload button with preview thumbnail and remove (X) button
+- Added URL input as fallback ("or paste image URL...")
+- Updated frontend `projects-section.tsx` and `featured-projects.tsx` to use `fullDescription || shortDescription`
+- Browser verified: single Description field, Upload Image button, image preview placeholder, edit populates correctly
+
+Stage Summary:
+- Dashboard project form now has single Description input instead of two separate fields
+- Image upload with preview works via new `/api/upload` API
+- Frontend components use fullDescription with shortDescription fallback
+- All changes backward compatible with existing data

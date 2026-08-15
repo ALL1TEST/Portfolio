@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, ImagePlus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -62,8 +62,7 @@ interface Project {
 const emptyForm = {
   title: '',
   slug: '',
-  shortDescription: '',
-  fullDescription: '',
+  description: '',
   technologies: '',
   startDate: '',
   endDate: '',
@@ -86,11 +85,13 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -123,11 +124,12 @@ export default function ProjectsPage() {
 
   const openEdit = (project: Project) => {
     setEditingId(project.id);
+    // Merge short + full description into single field, prefer fullDescription
+    const description = project.fullDescription || project.shortDescription || '';
     setForm({
       title: project.title,
       slug: project.slug,
-      shortDescription: project.shortDescription,
-      fullDescription: project.fullDescription,
+      description,
       technologies: (() => {
         try {
           const parsed = JSON.parse(project.technologies);
@@ -148,6 +150,37 @@ export default function ProjectsPage() {
     setFormOpen(true);
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setForm((prev) => ({ ...prev, projectImage: data.url }));
+        toast.success('Image uploaded');
+      } else {
+        const err = await res.json();
+        toast.error(err.error || 'Upload failed');
+      }
+    } catch {
+      toast.error('Upload failed');
+    } finally {
+      setUploading(false);
+      // Reset file input so the same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -157,7 +190,13 @@ export default function ProjectsPage() {
         .map((t) => t.trim())
         .filter(Boolean);
 
-      const payload = { ...form, technologies };
+      const payload = {
+        ...form,
+        technologies,
+        // Store description in both fields for backward compatibility
+        shortDescription: form.description,
+        fullDescription: form.description,
+      };
 
       const res = await fetch('/api/projects', {
         method: editingId ? 'PUT' : 'POST',
@@ -313,24 +352,72 @@ export default function ProjectsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm text-white">Short Description</Label>
-              <Input
-                value={form.shortDescription}
-                onChange={(e) => setForm((p) => ({ ...p, shortDescription: e.target.value }))}
-                required
-                className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                placeholder="Brief description"
+              <Label className="text-sm text-white">Description</Label>
+              <Textarea
+                value={form.description}
+                onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+                className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+                placeholder="Project description..."
               />
             </div>
 
+            {/* Image Upload */}
             <div className="space-y-2">
-              <Label className="text-sm text-white">Full Description</Label>
-              <Textarea
-                value={form.fullDescription}
-                onChange={(e) => setForm((p) => ({ ...p, fullDescription: e.target.value }))}
-                className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
-                placeholder="Detailed project description"
-              />
+              <Label className="text-sm text-white">Project Image</Label>
+              <div className="flex items-start gap-3">
+                {form.projectImage ? (
+                  <div className="relative w-24 h-16 rounded-md overflow-hidden border border-stroke flex-shrink-0">
+                    <img
+                      src={form.projectImage}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setForm((p) => ({ ...p, projectImage: '' }))}
+                      className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 transition-colors"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-24 h-16 rounded-md border border-dashed border-stroke flex items-center justify-center flex-shrink-0">
+                    <span className="text-[10px] text-muted-text">No image</span>
+                  </div>
+                )}
+                <div className="flex-1 space-y-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="border-stroke text-white hover:bg-surface gap-1.5"
+                    >
+                      {uploading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <ImagePlus className="w-3.5 h-3.5" />
+                      )}
+                      {uploading ? 'Uploading...' : 'Upload Image'}
+                    </Button>
+                  </div>
+                  <Input
+                    value={form.projectImage}
+                    onChange={(e) => setForm((p) => ({ ...p, projectImage: e.target.value }))}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text text-xs"
+                    placeholder="or paste image URL..."
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -379,23 +466,16 @@ export default function ProjectsPage() {
                 <Label className="text-sm text-white">Display Order</Label>
                 <Input
                   type="number"
-                  value={form.displayOrder}
-                  onChange={(e) => setForm((p) => ({ ...p, displayOrder: parseInt(e.target.value) || 0 }))}
+                  min={0}
+                  value={form.displayOrder || ''}
+                  onChange={(e) => setForm((p) => ({ ...p, displayOrder: e.target.value === '' ? 0 : parseInt(e.target.value) || 0 }))}
                   className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                  placeholder="0"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm text-white">Project Image URL</Label>
-                <Input
-                  value={form.projectImage}
-                  onChange={(e) => setForm((p) => ({ ...p, projectImage: e.target.value }))}
-                  className="bg-dark border-stroke text-white placeholder:text-muted-text"
-                  placeholder="/images/project.jpg"
-                />
-              </div>
               <div className="space-y-2">
                 <Label className="text-sm text-white">GitHub URL</Label>
                 <Input
@@ -405,9 +485,6 @@ export default function ProjectsPage() {
                   placeholder="https://github.com/..."
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-sm text-white">Live Demo URL</Label>
                 <Input
@@ -417,13 +494,14 @@ export default function ProjectsPage() {
                   placeholder="https://..."
                 />
               </div>
-              <div className="flex items-center gap-3 pt-6">
-                <Switch
-                  checked={form.featured}
-                  onCheckedChange={(v) => setForm((p) => ({ ...p, featured: v }))}
-                />
-                <Label className="text-sm text-white">Featured Project</Label>
-              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={form.featured}
+                onCheckedChange={(v) => setForm((p) => ({ ...p, featured: v }))}
+              />
+              <Label className="text-sm text-white">Featured Project</Label>
             </div>
 
             <DialogFooter>

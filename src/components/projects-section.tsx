@@ -57,7 +57,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
           {/* Description */}
           <p className="text-sm lg:text-base text-muted-text leading-relaxed line-clamp-3 mb-5">
-            {project.shortDescription}
+            {project.fullDescription || project.shortDescription}
           </p>
 
           {/* Tech pills */}
