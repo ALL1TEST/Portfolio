@@ -122,7 +122,7 @@ export function ResumeSection() {
 
                 {/* LEFT SIDE — Sticky heading */}
                 <div className="journey-intro">
-                  <div className="journey-label">MY JOURNEY</div>
+                  <div className="skills-label">MY JOURNEY</div>
                   <FocusReveal
                     text="Experience & Projects"
                     as="h2"
