@@ -131,7 +131,9 @@ const FocusReveal = ({
   const reduceMotion = useReducedMotion();
   const completedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
 
   const duration = transition.duration ?? DEFAULT_TRANSITION.duration!;
   const baseDelay = transition.delay ?? DEFAULT_TRANSITION.delay!;

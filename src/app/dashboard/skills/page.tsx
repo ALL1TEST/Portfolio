@@ -36,7 +36,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   'Programming',
   'Web',
   'Back-end',
@@ -45,7 +45,9 @@ const CATEGORIES = [
   'CMS',
   'Tools & Cloud',
   'SEO',
-] as const;
+];
+
+const CATEGORIES = [...DEFAULT_CATEGORIES, 'Other'] as const;
 
 interface Skill {
   id: string;
@@ -87,7 +89,9 @@ export default function SkillsPage() {
     fetchSkills();
   }, [fetchSkills]);
 
-  const groupedSkills = CATEGORIES.map((cat) => ({
+    const allCategories = [...DEFAULT_CATEGORIES, ...new Set(skills.filter(s => !DEFAULT_CATEGORIES.includes(s.category)).map(s => s.category)), 'Other'];
+
+  const groupedSkills = allCategories.map((cat) => ({
     category: cat,
     skills: skills.filter((s) => s.category === cat),
   }));
@@ -159,7 +163,7 @@ export default function SkillsPage() {
       className="space-y-4"
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-text">{skills.length} skills across {CATEGORIES.length} categories</p>
+        <p className="text-sm text-muted-text">{skills.length} skills across {allCategories.length} categories</p>
         <Button onClick={() => openCreate()} className="bg-brand hover:bg-brand-light text-white gap-2">
           <Plus className="w-4 h-4" /> Add Skill
         </Button>
@@ -259,9 +263,18 @@ export default function SkillsPage() {
 
             <div className="space-y-2">
               <Label className="text-sm text-white">Category</Label>
-              <Select value={form.category} onValueChange={(v) => setForm((p) => ({ ...p, category: v }))}>
+              <Select
+                value={form.category === 'Other' ? '__other__' : form.category}
+                onValueChange={(v) => {
+                  if (v === '__other__') {
+                    setForm((p) => ({ ...p, category: '' }));
+                  } else {
+                    setForm((p) => ({ ...p, category: v }));
+                  }
+                }}
+              >
                 <SelectTrigger className="bg-dark border-stroke text-white">
-                  <SelectValue />
+                  <SelectValue placeholder="Select or type a category" />
                 </SelectTrigger>
                 <SelectContent className="bg-surface border-stroke">
                   {CATEGORIES.map((cat) => (
@@ -269,8 +282,20 @@ export default function SkillsPage() {
                       {cat}
                     </SelectItem>
                   ))}
+                  <SelectItem value="__other__" className="text-muted-text focus:bg-dark focus:text-white">
+                    + Other (type custom name)
+                  </SelectItem>
                 </SelectContent>
               </Select>
+              {(!DEFAULT_CATEGORIES.includes(form.category) && form.category) && (
+                <Input
+                  value={form.category}
+                  onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+                  required
+                  className="bg-dark border-stroke text-white placeholder:text-muted-text mt-2"
+                  placeholder="Enter custom category name"
+                />
+              )}
             </div>
 
             <div className="space-y-2">
