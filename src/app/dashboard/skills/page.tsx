@@ -283,7 +283,7 @@ export default function SkillsPage() {
                     </SelectItem>
                   ))}
                   <SelectItem value="__other__" className="text-muted-text focus:bg-dark focus:text-white">
-                    + Other (type custom name)
+                    + New Category
                   </SelectItem>
                 </SelectContent>
               </Select>
