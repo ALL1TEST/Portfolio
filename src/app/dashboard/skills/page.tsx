@@ -72,6 +72,8 @@ export default function SkillsPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteCategoryOpen, setDeleteCategoryOpen] = useState(false);
+  const [deleteCategoryName, setDeleteCategoryName] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [customCategory, setCustomCategory] = useState('');
 
@@ -150,6 +152,26 @@ export default function SkillsPage() {
     }
   };
 
+  const handleDeleteCategory = async () => {
+    if (!deleteCategoryName) return;
+    try {
+      const encoded = encodeURIComponent(deleteCategoryName);
+      const res = await fetch(`/api/skills?category=${encoded}`, { method: 'DELETE' });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Category "${deleteCategoryName}" deleted (${data.deleted} skill${data.deleted !== 1 ? 's' : ''})`);
+        setSkills((prev) => prev.filter((s) => s.category !== deleteCategoryName));
+      } else {
+        toast.error('Failed to delete category');
+      }
+    } catch {
+      toast.error('Failed to delete category');
+    } finally {
+      setDeleteCategoryOpen(false);
+      setDeleteCategoryName(null);
+    }
+  };
+
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
@@ -199,14 +221,24 @@ export default function SkillsPage() {
                     {catSkills.length}
                   </Badge>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-text hover:text-brand text-xs hover:bg-brand/10 gap-1"
-                  onClick={() => openCreate(category)}
-                >
-                  <Plus className="w-3 h-3" /> Add
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-text hover:text-red-500 text-xs hover:bg-red-500/10 gap-1"
+                    onClick={() => { setDeleteCategoryName(category); setDeleteCategoryOpen(true); }}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-text hover:text-brand text-xs hover:bg-brand/10 gap-1"
+                    onClick={() => openCreate(category)}
+                  >
+                    <Plus className="w-3 h-3" /> Add
+                  </Button>
+                </div>
               </div>
               <div className="px-4 pb-4">
                 {catSkills.length === 0 ? (
@@ -353,7 +385,25 @@ export default function SkillsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
+      {/* Delete Category Confirmation */}
+      <AlertDialog open={deleteCategoryOpen} onOpenChange={setDeleteCategoryOpen}>
+        <AlertDialogContent className="bg-surface border-stroke">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Delete Category</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-text">
+              Are you sure you want to delete the category &quot;{deleteCategoryName}&quot;? All skills in this category will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-stroke text-white hover:bg-surface">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteCategory} className="bg-red-600 hover:bg-red-700 text-white">
+              Delete Category
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Skill Confirmation */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent className="bg-surface border-stroke">
           <AlertDialogHeader>

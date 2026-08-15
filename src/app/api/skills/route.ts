@@ -33,6 +33,11 @@ export const PUT = withAuth(async (req: Request) => {
 export const DELETE = withAuth(async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
+  const category = searchParams.get('category');
+  if (category) {
+    const { count } = await db.skill.deleteMany({ where: { category } });
+    return NextResponse.json({ success: true, deleted: count });
+  }
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
   await db.skill.delete({ where: { id } });
   return NextResponse.json({ success: true });
