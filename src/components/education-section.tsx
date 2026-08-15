@@ -28,7 +28,7 @@ export function EducationSection() {
         {/* Section Header */}
         <div className="education-header">
           <div className="education-header-left">
-            <div className="section-badge">EDUCATION</div>
+            <span className="inline-block px-5 py-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-muted-text bg-surface border border-stroke rounded-sm mb-5">EDUCATION</span>
             <h2 className="education-heading">My Educational Journey</h2>
           </div>
           <div className="education-header-right">
