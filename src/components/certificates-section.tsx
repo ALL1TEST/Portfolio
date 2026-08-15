@@ -126,7 +126,7 @@ export function CertificatesSection() {
           />
           <ScrollReveal delay={0.3}>
             <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base leading-relaxed">
-              A collection of certifications and professional training I&apos;ve completed throughout my learning journey.
+              A collection of certifications and professional training completed throughout my journey in software development, programming, databases, and web technologies.
             </p>
           </ScrollReveal>
         </div>
