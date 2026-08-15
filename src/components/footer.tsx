@@ -47,10 +47,10 @@ export function Footer() {
                   {profile?.brandName || 'CodeVirtox'}
                 </span>
               </Link>
-              {/* Footer bio: use footerBio if set, otherwise shortBio, otherwise nothing (no hardcoded default) */}
-              {(profile?.footerBio || profile?.shortBio) && (
+              {/* Footer bio: only show if explicitly set by user in Settings */}
+              {profile?.footerBio && (
                 <p className="text-sm text-muted-text leading-relaxed max-w-xs">
-                  {profile?.footerBio || profile?.shortBio}
+                  {profile.footerBio}
                 </p>
               )}
               {socialLinks.length > 0 && (
