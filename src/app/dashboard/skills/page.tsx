@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, ChevronUp, ChevronDown, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -265,6 +265,47 @@ export default function SkillsPage() {
     }
   };
 
+  // --- Set Category Display Order directly ---
+  const setCategoryOrder = async (category: string, newPosition: number) => {
+    // newPosition is 1-based from the input
+    const targetIndex = Math.max(0, Math.min(newPosition - 1, allCategories.length - 1));
+    const currentIndex = allCategories.indexOf(category);
+    if (currentIndex === targetIndex || targetIndex < 0) return;
+
+    // Build reorder payload: reassign displayOrder ranges to all categories
+    // Each category gets a range of 100 starting from targetIndex * 100
+    const reorderPayload: { id: string; displayOrder: number }[] = [];
+    const reorderedCats = [...allCategories];
+    reorderedCats.splice(currentIndex, 1);
+    reorderedCats.splice(targetIndex, 0, category);
+
+    reorderedCats.forEach((cat, catIdx) => {
+      const catSkills = skills.filter(s => s.category === cat).sort((a, b) => a.displayOrder - b.displayOrder);
+      catSkills.forEach((skill, skillIdx) => {
+        reorderPayload.push({ id: skill.id, displayOrder: catIdx * 100 + skillIdx });
+      });
+    });
+
+    setReordering(true);
+    try {
+      const res = await fetch('/api/skills', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reorder: reorderPayload }),
+      });
+      if (res.ok) {
+        toast.success(`Category "${category}" moved to position ${targetIndex + 1}`);
+        fetchSkills();
+      } else {
+        toast.error('Failed to reorder category');
+      }
+    } catch {
+      toast.error('Failed to reorder category');
+    } finally {
+      setReordering(false);
+    }
+  };
+
   // --- Reorder Category (swap min displayOrder ranges between two adjacent categories) ---
   const moveCategory = async (category: string, direction: 'up' | 'down') => {
     const catIdx = allCategories.indexOf(category);
@@ -365,7 +406,25 @@ export default function SkillsPage() {
                     {catSkills.length}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
+                  {/* Category Display Order */}
+                  <div className="flex items-center gap-1">
+                    <Hash className="w-3 h-3 text-stroke" />
+                    <Input
+                      type="number"
+                      min={1}
+                      max={allCategories.length}
+                      value={catIndex + 1}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        if (!isNaN(val) && val >= 1 && val <= allCategories.length) {
+                          setCategoryOrder(category, val);
+                        }
+                      }}
+                      className="h-6 w-10 text-center text-[11px] text-muted-text bg-dark border-stroke p-0"
+                      disabled={reordering}
+                    />
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
