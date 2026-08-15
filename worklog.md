@@ -815,6 +815,7 @@ Stage Summary:
 - Fixed white shadow issue by switching from `animate={object}` to `whileInView="visible"` + variants pattern
 - Root cause: non-memoised plain objects in animate prop caused framer-motion to restart animation on re-render
 - Fix: variant labels (stable strings) + whileInView viewport trigger = reliable, once-only animation
+
 ---
 Task ID: about-content-redesign
 Agent: Main Agent
