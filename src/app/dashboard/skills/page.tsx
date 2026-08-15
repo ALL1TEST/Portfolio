@@ -47,7 +47,7 @@ const DEFAULT_CATEGORIES = [
   'SEO',
 ];
 
-const CATEGORIES = [...DEFAULT_CATEGORIES, 'Other'] as const;
+const CATEGORIES = DEFAULT_CATEGORIES;
 
 interface Skill {
   id: string;
@@ -90,18 +90,21 @@ export default function SkillsPage() {
     fetchSkills();
   }, [fetchSkills]);
 
-    const allCategories = [...DEFAULT_CATEGORIES, ...new Set(skills.filter(s => !DEFAULT_CATEGORIES.includes(s.category)).map(s => s.category)), 'Other'];
+    const allCategories = [...DEFAULT_CATEGORIES, ...new Set(skills.filter(s => !DEFAULT_CATEGORIES.includes(s.category)).map(s => s.category))];
 
   const groupedSkills = allCategories.map((cat) => ({
     category: cat,
     skills: skills.filter((s) => s.category === cat),
   }));
 
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
+
   const openCreate = (category?: string) => {
     setEditingId(null);
     const cat = category || 'Programming';
-    setForm({ ...emptyForm, category: DEFAULT_CATEGORIES.includes(cat) ? cat : 'Other' });
+    setForm({ ...emptyForm, category: DEFAULT_CATEGORIES.includes(cat) ? cat : cat });
     setCustomCategory(DEFAULT_CATEGORIES.includes(cat) ? '' : cat);
+    setShowCustomCategory(!DEFAULT_CATEGORIES.includes(cat));
     setFormOpen(true);
   };
 
@@ -110,11 +113,12 @@ export default function SkillsPage() {
     const isDefault = DEFAULT_CATEGORIES.includes(skill.category);
     setForm({
       name: skill.name,
-      category: isDefault ? skill.category : 'Other',
+      category: isDefault ? skill.category : skill.category,
       icon: skill.icon,
       displayOrder: skill.displayOrder,
     });
     setCustomCategory(isDefault ? '' : skill.category);
+    setShowCustomCategory(!isDefault);
     setFormOpen(true);
   };
 
@@ -122,7 +126,7 @@ export default function SkillsPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      const finalCategory = form.category === 'Other' ? customCategory : form.category;
+      const finalCategory = showCustomCategory ? customCategory.trim() : form.category;
       const payload = { ...form, category: finalCategory };
       const res = await fetch('/api/skills', {
         method: editingId ? 'PUT' : 'POST',
@@ -134,6 +138,7 @@ export default function SkillsPage() {
         toast.success(editingId ? 'Skill updated' : 'Skill created');
         setFormOpen(false);
         setCustomCategory('');
+        setShowCustomCategory(false);
         fetchSkills();
       } else {
         toast.error('Failed to save skill');
@@ -271,32 +276,46 @@ export default function SkillsPage() {
 
             <div className="space-y-2">
               <Label className="text-sm text-white">Category</Label>
-              <Select
-                value={form.category}
-                onValueChange={(v) => {
-                  setForm((p) => ({ ...p, category: v }));
-                  if (v !== 'Other') setCustomCategory('');
-                }}
-              >
-                <SelectTrigger className="bg-dark border-stroke text-white">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent className="bg-surface border-stroke">
-                  {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat} className="text-white focus:bg-dark focus:text-white">
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.category === 'Other' && (
+              <div className="flex gap-2 items-start">
+                <div className="flex-1 space-y-2">
+                  <Select
+                    value={showCustomCategory ? '__new__' : form.category}
+                    onValueChange={(v) => {
+                      if (v === '__new__') {
+                        setShowCustomCategory(true);
+                        setCustomCategory('');
+                        setForm((p) => ({ ...p, category: '' }));
+                      } else {
+                        setShowCustomCategory(false);
+                        setCustomCategory('');
+                        setForm((p) => ({ ...p, category: v }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="bg-dark border-stroke text-white">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-surface border-stroke">
+                      {CATEGORIES.map((cat) => (
+                        <SelectItem key={cat} value={cat} className="text-white focus:bg-dark focus:text-white">
+                          {cat}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="__new__" className="text-brand focus:bg-brand/10 focus:text-brand font-medium">
+                        + Add Category
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              {showCustomCategory && (
                 <Input
                   value={customCategory}
                   onChange={(e) => setCustomCategory(e.target.value)}
                   required
                   autoFocus
                   className="bg-dark border-stroke text-white placeholder:text-muted-text mt-2"
-                  placeholder="Enter category name"
+                  placeholder="Enter new category name"
                 />
               )}
             </div>
