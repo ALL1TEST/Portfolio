@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowUp, Github, Linkedin, Instagram } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
+import { useData } from '@/lib/data-provider';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -14,6 +15,7 @@ const navLinks = [
 ];
 
 export function Footer() {
+  const { profile } = useData();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -35,32 +37,43 @@ export function Footer() {
                   className="object-contain h-10 w-auto lg:h-12 transition-transform duration-300 group-hover/flogo:scale-105"
                 />
                 <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">
-                  CodeVirtox
+                  {profile?.brandName || 'CodeVirtox'}
                 </span>
               </Link>
               <p className="text-sm text-muted-text leading-relaxed max-w-xs">
-                Full Stack Developer building modern web applications and smart
-                automated solutions.
+                {profile?.shortBio || 'Full Stack Developer building modern web applications and smart automated solutions.'}
               </p>
               <div className="flex items-center gap-3 mt-4">
-                <a
-                  href="https://github.com/CodeVirtox"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all"
-                  aria-label="GitHub"
-                >
-                  <Github className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/abdellahaitsi-dev/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin className="w-4 h-4" />
-                </a>
+                {profile?.githubUrl ? (
+                  <a
+                    href={profile.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all"
+                    aria-label="GitHub"
+                  >
+                    <Github className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <a href="https://github.com/CodeVirtox" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all" aria-label="GitHub">
+                    <Github className="w-4 h-4" />
+                  </a>
+                )}
+                {profile?.linkedinUrl ? (
+                  <a
+                    href={profile.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <a href="https://www.linkedin.com/in/abdellahaitsi-dev/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg border border-stroke/50 text-muted-text hover:text-white hover:border-brand/50 transition-all" aria-label="LinkedIn">
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                )}
                 <a
                   href="https://www.instagram.com/dev.abdellah/"
                   target="_blank"
@@ -118,10 +131,10 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-stroke/30 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-text">
-            © {new Date().getFullYear()} Abdellah Ait-Si. All rights reserved.
+            © {new Date().getFullYear()} {profile?.fullName || 'Abdellah Ait-Si'}. All rights reserved.
           </p>
           <p className="text-xs text-muted-text">
-            Designed & Built by CodeVirtox
+            Designed & Built by {profile?.brandName || 'CodeVirtox'}
           </p>
         </div>
       </div>

@@ -940,3 +940,24 @@ Stage Summary:
 - Frontend filter categories are now dynamic (All + whatever categories exist in DB)
 - Display Order changes in dashboard immediately reflect on public frontend
 - No more hardcoded category filters
+
+---
+Task ID: 6
+Agent: Main Agent
+Task: Fix Settings changes not reflecting on frontend (About, Brand Name, Social Links)
+
+Work Log:
+- Found root cause: all frontend components had hardcoded values instead of reading from profile data
+- Fixed `about-preview.tsx`: replaced hardcoded about paragraph with `profile.aboutText` (with fallback)
+- Fixed `about-preview.tsx`: profile image now uses `profile.profileImage` with fallback
+- Fixed `navbar.tsx`: brand name now uses `profile.brandName` (was hardcoded "CodeVirtox")
+- Fixed `navbar.tsx`: mobile menu social links now use `profile.githubUrl` and `profile.linkedinUrl` (with fallback)
+- Fixed `navbar.tsx`: bottom branding uses `profile.fullName`
+- Fixed `footer.tsx`: brand name, shortBio, social links, and copyright line now use profile data
+- All social links have hardcoded fallbacks when profile values are empty
+
+Stage Summary:
+- Brand Name changes in Settings now reflect in navbar, footer logo, and footer credit
+- About Text changes now reflect in the About section on the homepage
+- Social Links (GitHub/LinkedIn) now reflect in navbar mobile menu and footer
+- All components have fallback defaults for when profile data is empty

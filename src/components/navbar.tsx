@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Github, Linkedin, Instagram } from 'lucide-react';
+import { useData } from '@/lib/data-provider';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -14,13 +15,14 @@ const navLinks = [
   { label: 'Contact', href: '/contact' },
 ];
 
-const socialLinks = [
+const defaultSocialLinks = [
   { label: 'GitHub', href: 'https://github.com/CodeVirtox', icon: Github },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/abdellahaitsi-dev/', icon: Linkedin },
   { label: 'Instagram', href: 'https://www.instagram.com/dev.abdellah/', icon: Instagram },
 ];
 
 export function Navbar() {
+  const { profile } = useData();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -128,7 +130,7 @@ export function Navbar() {
                   alt="Logo"
                   className="object-contain h-10 w-auto lg:h-12"
                 />
-                <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">CodeVirtox</span>
+                <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">{profile?.brandName || 'CodeVirtox'}</span>
               </motion.div>
               <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-gradient-to-r from-brand via-brand/60 to-transparent group-hover/logo:w-full transition-all duration-500 ease-out" />
             </Link>
@@ -255,15 +257,19 @@ export function Navbar() {
 
               {/* Social links */}
               <motion.div variants={itemVariants} className="flex items-center gap-2.5">
-                {socialLinks.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300"
-                    aria-label={social.label}
-                  >
+                {/* Social links from profile data */}
+                {profile?.githubUrl && (
+                  <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300" aria-label="GitHub">
+                    <Github size={16} strokeWidth={1.5} />
+                  </a>
+                )}
+                {profile?.linkedinUrl && (
+                  <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300" aria-label="LinkedIn">
+                    <Linkedin size={16} strokeWidth={1.5} />
+                  </a>
+                )}
+                {!profile?.githubUrl && !profile?.linkedinUrl && defaultSocialLinks.map((social) => (
+                  <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="w-9 h-9 flex items-center justify-center rounded-full text-muted-text/50 hover:text-white/80 transition-colors duration-300" aria-label={social.label}>
                     <social.icon size={16} strokeWidth={1.5} />
                   </a>
                 ))}
@@ -272,7 +278,7 @@ export function Navbar() {
               {/* Bottom branding */}
               <motion.div variants={itemVariants} className="mt-auto pb-8">
                 <p className="text-[11px] text-muted-text/30 tracking-wider uppercase">
-                  © {new Date().getFullYear()} Abdellah Ait-Si
+                  © {new Date().getFullYear()} {profile?.fullName || 'Abdellah Ait-Si'}
                 </p>
               </motion.div>
             </motion.div>

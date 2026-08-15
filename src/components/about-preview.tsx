@@ -42,13 +42,13 @@ export function AboutPreview() {
         <SectionHeading title="Who I Am" align="center" />
 
         <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* ── Profile Image (unchanged) ── */}
+          {/* ── Profile Image ── */}
           <ScrollReveal direction="left">
             <div className="relative aspect-square max-w-md mx-auto">
               <div className="absolute inset-0 bg-surface rounded-2xl border border-stroke/50 overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.5),inset_0_0_20px_rgba(0,0,0,0.3)]">
                 <Image
-                  src="/uploads/ABDELLAH.png"
-                  alt="Abdellah Ait-Si"
+                  src={profile?.profileImage || '/uploads/ABDELLAH.png'}
+                  alt={profile?.fullName || 'Abdellah Ait-Si'}
                   fill
                   className="object-cover"
                   priority
@@ -67,13 +67,10 @@ export function AboutPreview() {
               </span>
             </ScrollReveal>
 
-            {/* Intro Paragraph */}
+            {/* Intro Paragraph — from profile data */}
             <ScrollReveal direction="right" delay={0.15}>
-              <p className="text-base lg:text-lg text-muted-text leading-relaxed">
-                I&apos;m a Full-Stack Developer focused on building modern, scalable web
-                applications and intelligent automation solutions. I enjoy turning
-                complex ideas into clean, efficient, and user-friendly digital
-                experiences.
+              <p className="text-base lg:text-lg text-muted-text leading-relaxed whitespace-pre-line">
+                {profile?.aboutText || 'I\'m a Full-Stack Developer focused on building modern, scalable web applications and intelligent automation solutions. I enjoy turning complex ideas into clean, efficient, and user-friendly digital experiences.'}
               </p>
             </ScrollReveal>
 
