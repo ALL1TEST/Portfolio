@@ -344,6 +344,21 @@
   font-size: 15px;
 }
 
+.certificate-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: #ff3900;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.certificate-link:hover {
+  color: #ff5a2b;
+  transform: translateX(4px);
+}
+
 /* Centered View button — hidden by default, shown on hover */
 .certificate-view-button {
   position: absolute;

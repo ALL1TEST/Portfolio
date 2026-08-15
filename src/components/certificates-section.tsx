@@ -31,8 +31,8 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
   const year = formatIssueYear(cert.issueDate);
 
   const subtitleParts: string[] = [];
-  if (cert.category) subtitleParts.push(cert.category);
   if (skills.length > 0) subtitleParts.push(skills[0]);
+  if (cert.issuer) subtitleParts.push(cert.issuer);
   if (year) subtitleParts.push(`Issued ${year}`);
 
   return (
@@ -67,28 +67,19 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
         <div className="certificate-info">
           <h3 className="certificate-title">{cert.title}</h3>
           {subtitleParts.length > 0 && (
-            <p className="certificate-meta">{subtitleParts.join(' • ')}</p>
+            <p className="certificate-meta">{subtitleParts.join(' · ')}</p>
           )}
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="certificate-link"
+            aria-label={`View credential for ${cert.title}`}
+          >
+            View Certificate →
+          </a>
         </div>
       </div>
-
-      {href !== '#' ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="certificate-view-button"
-          aria-label={`View credential for ${cert.title}`}
-        >
-          <span>→</span>
-          <span>View</span>
-        </a>
-      ) : (
-        <div className="certificate-view-button" style={{ cursor: 'default' }}>
-          <span>→</span>
-          <span>View</span>
-        </div>
-      )}
     </motion.div>
   );
 }
