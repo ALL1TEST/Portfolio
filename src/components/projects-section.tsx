@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Github, ChevronUp, ChevronDown } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionHeading } from './section-heading';
+import { GlowCard } from '@/components/ui/glow-card';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Project } from '@/lib/types';
@@ -18,9 +19,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
   return (
     <ScrollReveal delay={index * 0.12} direction="up">
+      <GlowCard>
       <motion.div
         className="group rounded-xl overflow-hidden bg-surface border border-stroke/40 flex flex-col"
-        whileHover={{ y: -6 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* Image area — dedicated space with taller aspect ratio */}
@@ -102,6 +103,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </div>
         </div>
       </motion.div>
+      </GlowCard>
     </ScrollReveal>
   );
 }

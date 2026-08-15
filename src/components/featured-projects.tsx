@@ -5,6 +5,7 @@ import { ArrowUpRight, Github } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ScrollReveal } from './scroll-reveal';
 import { SectionHeading } from './section-heading';
+import { GlowCard } from '@/components/ui/glow-card';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,9 +20,9 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
 
   return (
     <ScrollReveal delay={index * 0.12} direction="up">
+      <GlowCard>
       <motion.div
         className="group rounded-xl overflow-hidden bg-surface border border-stroke/40 flex flex-col"
-        whileHover={{ y: -6 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* Image area — dedicated space with taller aspect ratio */}
@@ -103,6 +104,7 @@ function FeaturedProjectCard({ project, index }: { project: Project; index: numb
           </div>
         </div>
       </motion.div>
+      </GlowCard>
     </ScrollReveal>
   );
 }
