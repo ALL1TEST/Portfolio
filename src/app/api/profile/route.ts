@@ -45,6 +45,17 @@ export const PUT = withAuth(async (req: Request) => {
         ...(body.stat2Label !== undefined && { stat2Label: body.stat2Label }),
         ...(body.stat3Value !== undefined && { stat3Value: body.stat3Value }),
         ...(body.stat3Label !== undefined && { stat3Label: body.stat3Label }),
+        ...(body.projectsPageTitle !== undefined && { projectsPageTitle: body.projectsPageTitle }),
+        ...(body.projectsPageDescription !== undefined && { projectsPageDescription: body.projectsPageDescription }),
+        ...(body.certificatesPageTitle !== undefined && { certificatesPageTitle: body.certificatesPageTitle }),
+        ...(body.certificatesPageDescription !== undefined && { certificatesPageDescription: body.certificatesPageDescription }),
+        ...(body.educationPageTitle !== undefined && { educationPageTitle: body.educationPageTitle }),
+        ...(body.educationPageDescription !== undefined && { educationPageDescription: body.educationPageDescription }),
+        ...(body.resumeIntro !== undefined && { resumeIntro: body.resumeIntro }),
+        ...(body.resumeTechTitle !== undefined && { resumeTechTitle: body.resumeTechTitle }),
+        ...(body.resumeExpTitle !== undefined && { resumeExpTitle: body.resumeExpTitle }),
+        ...(body.contactPageTitle !== undefined && { contactPageTitle: body.contactPageTitle }),
+        ...(body.contactPageDescription !== undefined && { contactPageDescription: body.contactPageDescription }),
       },
     });
   } else {

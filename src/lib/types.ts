@@ -27,6 +27,17 @@ export interface Profile {
   stat2Label: string;
   stat3Value: string;
   stat3Label: string;
+  projectsPageTitle: string;
+  projectsPageDescription: string;
+  certificatesPageTitle: string;
+  certificatesPageDescription: string;
+  educationPageTitle: string;
+  educationPageDescription: string;
+  resumeIntro: string;
+  resumeTechTitle: string;
+  resumeExpTitle: string;
+  contactPageTitle: string;
+  contactPageDescription: string;
   logoUrl: string;
   profileImage: string;
   cvFile: string;

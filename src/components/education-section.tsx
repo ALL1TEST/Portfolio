@@ -6,7 +6,7 @@ import { ScrollReveal } from './scroll-reveal';
 import { useData } from '@/lib/data-provider';
 
 export function EducationSection() {
-  const { education, loading } = useData();
+  const { profile, education, loading } = useData();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleMouseEnter = useCallback((index: number) => {
@@ -29,10 +29,10 @@ export function EducationSection() {
         <div className="education-header">
           <div className="education-header-left">
             <span className="inline-block px-5 py-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-muted-text bg-surface border border-stroke rounded-sm mb-5">EDUCATION</span>
-            <h2 className="education-heading">My Educational Journey</h2>
-            <p className="education-description">
-              My academic background and continuous journey in software development and technology.
-            </p>
+            <h2 className="education-heading">{profile?.educationPageTitle || "My Educational Journey"}</h2>
+            {profile?.educationPageDescription && (
+              <p className="education-description">{profile.educationPageDescription}</p>
+            )}
           </div>
         </div>
 

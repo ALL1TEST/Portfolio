@@ -111,7 +111,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 const INITIAL_SHOW = 3;
 
 export function ProjectsSection() {
-  const { projects, loading } = useData();
+  const { profile, projects, loading } = useData();
   const [showAll, setShowAll] = useState(false);
 
   const hasMore = projects.length > INITIAL_SHOW;
@@ -123,8 +123,8 @@ export function ProjectsSection() {
         <SectionHeading
           label="Projects"
           labelStyle="skills"
-          title="Selected Projects"
-          description="A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving."
+          title={profile?.projectsPageTitle || "Selected Projects"}
+          description={profile?.projectsPageDescription || undefined}
         />
 
         {loading ? (

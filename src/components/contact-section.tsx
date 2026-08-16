@@ -72,8 +72,8 @@ export function ContactSection() {
         <SectionHeading
           label="Contact"
           labelStyle="skills"
-          title="Let's Build Something Great Together."
-          description="Have a project, a role,or just want to connect? I usually reply within 24 hours."
+          title={profile?.contactPageTitle || "Let's Build Something Great Together."}
+          description={profile?.contactPageDescription || undefined}
         />
 
         <div className="max-w-2xl mx-auto">

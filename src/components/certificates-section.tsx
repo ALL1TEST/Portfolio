@@ -87,7 +87,7 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
 const CERT_TITLE_CLASSES = 'text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight';
 
 export function CertificatesSection() {
-  const { certificates, loading } = useData();
+  const { profile, certificates, loading } = useData();
   const [activeFilter, setActiveFilter] = useState('All');
 
   // Dynamically derive filter categories from actual certificate data
@@ -116,7 +116,7 @@ export function CertificatesSection() {
             </span>
           </ScrollReveal>
           <FocusReveal
-            text="Certificates & Credentials"
+            text={profile?.certificatesPageTitle || "Certificates & Credentials"}
             as="h2"
             className={CERT_TITLE_CLASSES}
             blur={20}
@@ -129,11 +129,13 @@ export function CertificatesSection() {
               staggerChildren: 0.035,
             }}
           />
-          <ScrollReveal delay={0.3}>
-            <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base leading-relaxed">
-              A collection of certifications and professional training completed throughout my journey in software development, programming, databases, and web technologies.
-            </p>
-          </ScrollReveal>
+          {profile?.certificatesPageDescription && (
+            <ScrollReveal delay={0.3}>
+              <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base leading-relaxed">
+                {profile.certificatesPageDescription}
+              </p>
+            </ScrollReveal>
+          )}
         </div>
 
         {/* Filter buttons — centered */}

@@ -75,9 +75,9 @@ export function ResumeSection() {
             <div className="skills-label mb-4">RESUME</div>
           </ScrollReveal>
           <ScrollReveal delay={0.1}>
-            <p className="text-base lg:text-lg text-muted-text leading-relaxed">
-              Full-stack developer with hands-on experience building web applications, backend systems, and database-driven solutions. Focused on clean architecture, practical problem-solving, and continuous learning.
-            </p>
+            {profile?.resumeIntro ? (
+              <p className="text-base lg:text-lg text-muted-text leading-relaxed">{profile.resumeIntro}</p>
+            ) : undefined}
           </ScrollReveal>
         </div>
 
@@ -89,7 +89,7 @@ export function ResumeSection() {
               <div className="skills-faq-header">
                 <div className="skills-label">TECHNICAL SKILLS</div>
                 <FocusReveal
-                  text="Technologies I work with"
+                  text={profile?.resumeTechTitle || "Technologies I work with"}
                   as="h2"
                   className="journey-title"
                   blur={20}
@@ -131,7 +131,7 @@ export function ResumeSection() {
                 <div className="journey-intro">
                   <div className="skills-label">MY JOURNEY</div>
                   <FocusReveal
-                    text="Experience & Projects"
+                    text={profile?.resumeExpTitle || "Experience & Projects"}
                     as="h2"
                     className="journey-title"
                     blur={20}

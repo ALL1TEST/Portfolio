@@ -43,6 +43,17 @@ interface Profile {
   stat2Label: string;
   stat3Value: string;
   stat3Label: string;
+  projectsPageTitle: string;
+  projectsPageDescription: string;
+  certificatesPageTitle: string;
+  certificatesPageDescription: string;
+  educationPageTitle: string;
+  educationPageDescription: string;
+  resumeIntro: string;
+  resumeTechTitle: string;
+  resumeExpTitle: string;
+  contactPageTitle: string;
+  contactPageDescription: string;
 }
 
 const emptyProfile: Profile = {
@@ -76,6 +87,17 @@ const emptyProfile: Profile = {
   stat2Label: '',
   stat3Value: '',
   stat3Label: '',
+  projectsPageTitle: '',
+  projectsPageDescription: '',
+  certificatesPageTitle: '',
+  certificatesPageDescription: '',
+  educationPageTitle: '',
+  educationPageDescription: '',
+  resumeIntro: '',
+  resumeTechTitle: '',
+  resumeExpTitle: '',
+  contactPageTitle: '',
+  contactPageDescription: '',
 };
 
 export default function SettingsPage() {
@@ -467,6 +489,145 @@ export default function SettingsPage() {
               {num !== '3' && <div className="border-b border-stroke/20" />}
             </div>
           ))}
+        </div>
+      </Card>
+
+      {/* Projects Page Section */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Projects Page</h3>
+        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Projects section on your portfolio.</p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Section Title</Label>
+            <Input
+              value={profile.projectsPageTitle}
+              onChange={(e) => updateField('projectsPageTitle', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+              placeholder="Selected Projects"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Section Description</Label>
+            <Textarea
+              value={profile.projectsPageDescription}
+              onChange={(e) => updateField('projectsPageDescription', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+              placeholder="A selection of projects showcasing..."
+            />
+          </div>
+        </div>
+      </Card>
+
+      {/* Certificates Page Section */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Certificates Page</h3>
+        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Certificates section on your portfolio.</p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Section Title</Label>
+            <Input
+              value={profile.certificatesPageTitle}
+              onChange={(e) => updateField('certificatesPageTitle', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+              placeholder="Certificates & Credentials"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Section Description</Label>
+            <Textarea
+              value={profile.certificatesPageDescription}
+              onChange={(e) => updateField('certificatesPageDescription', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+              placeholder="A collection of certifications..."
+            />
+          </div>
+        </div>
+      </Card>
+
+      {/* Education Page Section */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Education Page</h3>
+        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Education section on your portfolio.</p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Section Title</Label>
+            <Input
+              value={profile.educationPageTitle}
+              onChange={(e) => updateField('educationPageTitle', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+              placeholder="My Educational Journey"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Section Description</Label>
+            <Textarea
+              value={profile.educationPageDescription}
+              onChange={(e) => updateField('educationPageDescription', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+              placeholder="My academic background..."
+            />
+          </div>
+        </div>
+      </Card>
+
+      {/* Resume Page Section */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Resume Page</h3>
+        <p className="text-xs text-muted-text mb-4">Edit the texts displayed in the Resume section of your portfolio.</p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Resume Intro</Label>
+            <Textarea
+              value={profile.resumeIntro}
+              onChange={(e) => updateField('resumeIntro', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+              placeholder="Full-stack developer with hands-on experience..."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Technologies Section Title</Label>
+            <Input
+              value={profile.resumeTechTitle}
+              onChange={(e) => updateField('resumeTechTitle', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+              placeholder="Technologies I work with"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Experience Section Title</Label>
+            <Input
+              value={profile.resumeExpTitle}
+              onChange={(e) => updateField('resumeExpTitle', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+              placeholder="Experience & Projects"
+            />
+          </div>
+        </div>
+      </Card>
+
+      {/* Contact Page Section */}
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Contact Page</h3>
+        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Contact section on your portfolio.</p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Section Title</Label>
+            <Input
+              value={profile.contactPageTitle}
+              onChange={(e) => updateField('contactPageTitle', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+              placeholder="Let's Build Something Great Together."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Section Description</Label>
+            <Textarea
+              value={profile.contactPageDescription}
+              onChange={(e) => updateField('contactPageDescription', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+              placeholder="Have a project, a role, or just want to connect?..."
+            />
+          </div>
         </div>
       </Card>
 
