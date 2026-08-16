@@ -196,14 +196,16 @@ export default function LoginPage() {
       >
         {/* Brand header — centered logo */}
         <div className="flex justify-center mb-8">
-          <motion.img
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-            src={profile?.logoUrl || '/logo.png'}
-            alt="Logo"
-            className="object-contain h-16 w-auto"
-          />
+          {(profile ? profile.logoUrl : '/logo.png') && (
+            <motion.img
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+              src={profile ? profile.logoUrl : '/logo.png'}
+              alt="Logo"
+              className="object-contain h-16 w-auto"
+            />
+          )}
         </div>
 
         {/* Animated card container */}

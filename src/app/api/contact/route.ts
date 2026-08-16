@@ -4,8 +4,13 @@ import { db } from '@/lib/db';
 import { sendContactEmail } from '@/lib/email';
 
 // GET - list messages (admin)
-export const GET = withAuth(async () => {
-  const messages = await db.contactMessage.findMany({ orderBy: { createdAt: 'desc' } });
+export const GET = withAuth(async (req: Request) => {
+  const { searchParams } = new URL(req.url);
+  const limit = searchParams.get('limit');
+  const messages = await db.contactMessage.findMany({
+    orderBy: { createdAt: 'desc' },
+    ...(limit && !isNaN(Number(limit)) ? { take: Number(limit) } : {}),
+  });
   return NextResponse.json(messages);
 });
 

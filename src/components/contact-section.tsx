@@ -69,14 +69,16 @@ export function ContactSection() {
   return (
     <section id="contact" className="relative py-24 lg:py-32 bg-gradient-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {(profile ? profile.contactPageTitle : "Let's Build Something Great Together.") && (
-        <SectionHeading
-          label="Contact"
-          labelStyle="skills"
-          title={profile?.contactPageTitle || "Let's Build Something Great Together."}
-          description={profile?.contactPageDescription || undefined}
-        />
-        )}
+        <div className="mb-16">
+          {profile?.contactPageTitle === "" ? null : (
+            <SectionHeading
+              label="Contact"
+              labelStyle="skills"
+              title={profile?.contactPageTitle ?? "Let's Build Something Great Together."}
+              description={profile?.contactPageDescription || undefined}
+            />
+          )}
+        </div>
 
         <div className="max-w-2xl mx-auto">
           <ScrollReveal>

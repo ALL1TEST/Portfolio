@@ -136,12 +136,14 @@ export function Navbar() {
                 whileTap={{ scale: 0.97 }}
                 className="flex items-center gap-2.5 min-w-0"
               >
-                <img
-                  src={profile?.logoUrl || '/logo.png'}
-                  alt="Logo"
-                  className="object-contain h-10 w-auto lg:h-12"
-                />
-                <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">{profile?.brandName || 'CodeVirtox'}</span>
+                {(profile ? profile.logoUrl : '/logo.png') && (
+                  <img
+                    src={profile ? profile.logoUrl : '/logo.png'}
+                    alt="Logo"
+                    className="object-contain h-10 w-auto lg:h-12"
+                  />
+                )}
+                <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">{profile?.brandName ?? 'CodeVirtox'}</span>
               </motion.div>
               <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-gradient-to-r from-brand via-brand/60 to-transparent group-hover/logo:w-full transition-all duration-500 ease-out" />
             </Link>
@@ -286,7 +288,7 @@ export function Navbar() {
               {/* Bottom branding */}
               <motion.div variants={itemVariants} className="mt-auto pb-8">
                 <p className="text-[11px] text-muted-text/30 tracking-wider uppercase">
-                  © {new Date().getFullYear()} {profile?.fullName || 'Abdellah Ait-Si'}
+                  © {new Date().getFullYear()} {profile?.fullName ?? 'Abdellah Ait-Si'}
                 </p>
               </motion.div>
             </motion.div>

@@ -44,16 +44,23 @@ export function Footer() {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }
                 }}
-                className="flex items-center gap-2.5 mb-4 group/flogo min-w-0"
               >
-                <img
-                  src={profile?.logoUrl || '/logo.png'}
-                  alt="Logo"
-                  className="object-contain h-10 w-auto lg:h-12 transition-transform duration-300 group-hover/flogo:scale-105"
-                />
-                <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">
-                  {profile?.brandName || 'CodeVirtox'}
-                </span>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2.5 mb-4 group/flogo min-w-0"
+                >
+                  {(profile ? profile.logoUrl : '/logo.png') && (
+                    <img
+                      src={profile ? profile.logoUrl : '/logo.png'}
+                      alt="Logo"
+                      className="object-contain h-10 w-auto lg:h-12 transition-transform duration-300 group-hover/flogo:scale-105"
+                    />
+                  )}
+                  <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">
+                    {profile?.brandName ?? 'CodeVirtox'}
+                  </span>
+                </motion.div>
               </Link>
               {/* Footer bio: only show if explicitly set by user in Settings */}
               {profile?.footerBio && (
@@ -132,12 +139,12 @@ export function Footer() {
           <p className="text-xs text-muted-text">
             {profile?.footerCopyright
               ? profile.footerCopyright
-              : `© ${new Date().getFullYear()} ${profile?.fullName || 'Abdellah Ait-Si'}. All rights reserved.`}
+              : `© ${new Date().getFullYear()} ${profile?.fullName ?? 'Abdellah Ait-Si'}. All rights reserved.`}
           </p>
           <p className="text-xs text-muted-text">
             {profile?.footerCredit
               ? profile.footerCredit
-              : `Designed & Built by ${profile?.brandName || 'CodeVirtox'}`}
+              : `Designed & Built by ${profile?.brandName ?? 'CodeVirtox'}`}
           </p>
         </div>
       </div>

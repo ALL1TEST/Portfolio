@@ -84,13 +84,15 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex flex-col h-full">
       {/* Brand */}
       <div className="px-4 py-6 flex items-center gap-2.5">
-        <img
-          src={profile?.logoUrl || '/logo.png'}
-          alt="Logo"
-          className="object-contain h-10 w-auto flex-shrink-0"
-        />
+        {(profile ? profile.logoUrl : '/logo.png') && (
+          <img
+            src={profile ? profile.logoUrl : '/logo.png'}
+            alt="Logo"
+            className="object-contain h-10 w-auto flex-shrink-0"
+          />
+        )}
         <span className="text-xl font-medium tracking-tight text-white/90">
-          {profile?.brandName || 'CodeVirtox'}
+          {profile?.brandName ?? 'CodeVirtox'}
         </span>
       </div>
 

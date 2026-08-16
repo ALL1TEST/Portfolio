@@ -26,8 +26,31 @@ export function NotificationBell() {
   const [messages, setMessages] = useState<NotificationMessage[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [selectedMessage, setSelectedMessage] = useState<NotificationMessage | null>(null);
-  const dismissedIds = useRef(new Set<string>());
+  const dismissedIds = useRef<Set<string>>(new Set());
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Initialize dismissedIds from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('dismissedNotificationIds');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          dismissedIds.current = new Set(parsed);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const saveDismissedIds = () => {
+    try {
+      localStorage.setItem('dismissedNotificationIds', JSON.stringify(Array.from(dismissedIds.current)));
+    } catch {
+      // ignore
+    }
+  };
 
   // Fetch on mount and poll every 30s
   useEffect(() => {
@@ -36,14 +59,15 @@ export function NotificationBell() {
 
     const fetchNotifications = async (attempt = 0) => {
       try {
-        const res = await fetch('/api/contact?limit=5');
+        const res = await fetch('/api/contact?limit=10'); // Fetch 10 to ensure we get some unread if old ones are dismissed
         if (res.ok && mounted) {
           const data = await res.json();
+          // Filter out dismissed AND already read messages from the bell
           const msgs = (Array.isArray(data) ? data : []).filter(
-            (m: NotificationMessage) => !dismissedIds.current.has(m.id)
+            (m: NotificationMessage) => !m.read && !dismissedIds.current.has(m.id)
           );
           setMessages(msgs);
-          setUnreadCount(msgs.filter((m: NotificationMessage) => !m.read).length);
+          setUnreadCount(msgs.length);
           return; // success — stop retrying
         }
         if (res.status === 401 && mounted) {
@@ -91,21 +115,18 @@ export function NotificationBell() {
   const handleMessageClick = async (msg: NotificationMessage) => {
     // Dismiss from bell list
     dismissedIds.current.add(msg.id);
+    saveDismissedIds();
     setMessages((prev) => prev.filter((m) => m.id !== msg.id));
-    if (!msg.read) {
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    }
+    setUnreadCount((prev) => Math.max(0, prev - 1));
     // Mark as read in DB
-    if (!msg.read) {
-      try {
-        await fetch('/api/contact', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: msg.id, read: true }),
-        });
-      } catch {
-        // silently fail
-      }
+    try {
+      await fetch('/api/contact', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: msg.id, read: true }),
+      });
+    } catch {
+      // silently fail
     }
     // Show message inline — do NOT navigate
     setSelectedMessage(msg);
@@ -128,7 +149,10 @@ export function NotificationBell() {
           })
         )
       );
-      setMessages((prev) => prev.map((m) => ({ ...m, read: true })));
+      // Remove from list since they are read now
+      messages.forEach((m) => dismissedIds.current.add(m.id));
+      saveDismissedIds();
+      setMessages([]);
       setUnreadCount(0);
     } catch {
       // silently fail
@@ -138,6 +162,7 @@ export function NotificationBell() {
   // Clear all — remove all notifications from the bell
   const handleClearAll = () => {
     messages.forEach((m) => dismissedIds.current.add(m.id));
+    saveDismissedIds();
     setMessages([]);
     setUnreadCount(0);
   };

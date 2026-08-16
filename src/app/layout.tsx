@@ -24,9 +24,11 @@ export async function generateMetadata(): Promise<Metadata> {
     console.error("Failed to fetch profile for metadata:", error);
   }
 
-  const logoUrl = profile?.logoUrl || "/logo.png";
-  const title = profile?.brandName ? `${profile.fullName || 'Abdellah Ait-Si'} | ${profile.brandName}` : "Abdellah Ait-Si | Full Stack Developer & AI Automation";
-  const description = profile?.shortBio || "Full Stack Developer specializing in React, Laravel, modern web applications, AI tools, and workflow automation.";
+  const logoUrl = profile ? (profile.logoUrl || undefined) : "/logo.png";
+  const fullName = profile?.fullName ?? 'Abdellah Ait-Si';
+  const brandName = profile?.brandName ?? 'CodeVirtox';
+  const title = profile?.brandName ? `${fullName} | ${brandName}` : "Abdellah Ait-Si | Full Stack Developer & AI Automation";
+  const description = profile?.shortBio ?? "Full Stack Developer specializing in React, Laravel, modern web applications, AI tools, and workflow automation.";
 
   return {
     title,
@@ -42,23 +44,21 @@ export async function generateMetadata(): Promise<Metadata> {
       "Web Developer",
       "Morocco",
     ],
-    authors: [{ name: profile?.fullName || "Abdellah Ait-Si" }],
-    icons: {
-      icon: logoUrl,
-    },
+    authors: [{ name: fullName }],
+    ...(logoUrl && { icons: { icon: logoUrl } }),
     openGraph: {
       title,
       description,
-      siteName: profile?.brandName || "CodeVirtox",
+      siteName: brandName,
       type: "website",
       locale: "en_US",
-      images: [logoUrl],
+      ...(logoUrl && { images: [logoUrl] }),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [logoUrl],
+      ...(logoUrl && { images: [logoUrl] }),
     },
     robots: {
       index: true,

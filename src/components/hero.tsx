@@ -46,7 +46,7 @@ export function Hero() {
   const { profile, loading } = useData();
   const router = useRouter();
 
-  const fullName = profile?.fullName || 'ABDELLAH AIT-SI';
+  const fullName = profile?.fullName ?? 'ABDELLAH AIT-SI';
   const parts = fullName.split(' ');
   const firstName = parts[0] || '';
   const lastName = parts.slice(1).join(' ');
@@ -106,7 +106,7 @@ export function Hero() {
           animate={mounted && !loading ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 1.2 }}
         >
-          {profile?.shortBio || 'I build modern web applications, scalable backend systems, and automation solutions that help turn ideas into reliable digital products.'}
+          {profile?.shortBio ?? 'I build modern web applications, scalable backend systems, and automation solutions that help turn ideas into reliable digital products.'}
         </motion.p>
 
         <motion.div
