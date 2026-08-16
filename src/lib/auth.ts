@@ -2,6 +2,7 @@ import { compare } from 'bcryptjs';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
+import { sendAdminLoginNotification } from '@/lib/email';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -52,6 +53,10 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        // Fire admin login notification (fire-and-forget)
+        sendAdminLoginNotification({
+          email: user.email || '',
+        }).catch(() => {});
       }
       return token;
     },

@@ -1,6 +1,7 @@
 import { withAuth, publicRoute } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { sendContactEmail } from '@/lib/email';
 
 // GET - list messages (admin)
 export const GET = withAuth(async () => {
@@ -15,10 +16,19 @@ export const POST = publicRoute(async (req: Request) => {
   if (!name || !email || !subject || !message) {
     return NextResponse.json({ error: 'All fields required' }, { status: 400 });
   }
+  // Validate email format
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+  }
   if (message.length < 10) {
     return NextResponse.json({ error: 'Message too short' }, { status: 400 });
   }
+
   const msg = await db.contactMessage.create({ data: { name, email, subject, message } });
+
+  // Send email notification (fire-and-forget, don't block response)
+  sendContactEmail({ name, email, subject, message, createdAt: msg.createdAt }).catch(() => {});
+
   return NextResponse.json(msg);
 });
 

@@ -159,3 +159,20 @@ model ContactMessage {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+model AppSettings {
+  id                       String   @id @default("singleton")
+  smtpHost                 String   @default("")
+  smtpPort                 Int      @default(587)
+  smtpUser                 String   @default("")
+  smtpPass                 String   @default("")
+  smtpSecure               Boolean  @default(true)
+  fromName                 String   @default("")
+  fromEmail                String   @default("")
+  replyToEmail             String   @default("")
+  contactReceiverEmail     String   @default("")
+  contactEmailEnabled      Boolean  @default(false)
+  adminLoginEmailEnabled   Boolean  @default(false)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}

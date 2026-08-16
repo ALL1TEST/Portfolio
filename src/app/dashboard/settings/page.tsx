@@ -3,13 +3,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X, Mail, Lock, KeyRound } from 'lucide-react';
+import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X, Mail, Lock, KeyRound, Server, Send, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 
 interface Profile {
   id?: string;
@@ -137,6 +138,129 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [savingPassword, setSavingPassword] = useState(false);
+
+  // SMTP settings state
+  const [smtpSettings, setSmtpSettings] = useState({
+    smtpHost: '',
+    smtpPort: 587,
+    smtpUser: '',
+    smtpPass: '',
+    smtpSecure: true,
+    fromName: '',
+    fromEmail: '',
+    replyToEmail: '',
+    contactReceiverEmail: '',
+    hasPassword: false,
+  });
+  const [savingSmtp, setSavingSmtp] = useState(false);
+  const [sendingTest, setSendingTest] = useState(false);
+
+  // Notification settings state
+  const [notifSettings, setNotifSettings] = useState({
+    contactEmailEnabled: false,
+    adminLoginEmailEnabled: false,
+  });
+  const [savingNotif, setSavingNotif] = useState(false);
+
+  // Fetch SMTP settings
+  useEffect(() => {
+    const fetchSmtp = async () => {
+      try {
+        const res = await fetch('/api/settings/smtp');
+        if (res.ok) {
+          const data = await res.json();
+          setSmtpSettings({
+            smtpHost: data.smtpHost || '',
+            smtpPort: data.smtpPort || 587,
+            smtpUser: data.smtpUser || '',
+            smtpPass: '',
+            smtpSecure: data.smtpSecure ?? true,
+            fromName: data.fromName || '',
+            fromEmail: data.fromEmail || '',
+            replyToEmail: data.replyToEmail || '',
+            contactReceiverEmail: data.contactReceiverEmail || '',
+            hasPassword: data.hasPassword || false,
+          });
+        }
+      } catch {
+        // silently fail
+      }
+    };
+    fetchSmtp();
+  }, []);
+
+  // Fetch notification settings
+  useEffect(() => {
+    const fetchNotif = async () => {
+      try {
+        const res = await fetch('/api/settings/notifications');
+        if (res.ok) {
+          const data = await res.json();
+          setNotifSettings({
+            contactEmailEnabled: data.contactEmailEnabled || false,
+            adminLoginEmailEnabled: data.adminLoginEmailEnabled || false,
+          });
+        }
+      } catch {
+        // silently fail
+      }
+    };
+    fetchNotif();
+  }, []);
+
+  const handleSaveSmtp = async () => {
+    setSavingSmtp(true);
+    try {
+      const res = await fetch('/api/settings/smtp', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(smtpSettings),
+      });
+      if (res.ok) {
+        toast.success('SMTP settings saved successfully');
+      } else {
+        toast.error('Failed to save SMTP settings');
+      }
+    } catch {
+      toast.error('Failed to save SMTP settings');
+    }
+    finally { setSavingSmtp(false); }
+  };
+
+  const handleSendTestEmail = async () => {
+    setSendingTest(true);
+    try {
+      const res = await fetch('/api/settings/test-email', { method: 'POST' });
+      if (res.ok) {
+        toast.success('Test email sent successfully!');
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Failed to send test email');
+      }
+    } catch {
+      toast.error('Failed to send test email');
+    }
+    finally { setSendingTest(false); }
+  };
+
+  const handleSaveNotif = async () => {
+    setSavingNotif(true);
+    try {
+      const res = await fetch('/api/settings/notifications', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(notifSettings),
+      });
+      if (res.ok) {
+        toast.success('Notification settings saved successfully');
+      } else {
+        toast.error('Failed to save notification settings');
+      }
+    } catch {
+      toast.error('Failed to save notification settings');
+    }
+    finally { setSavingNotif(false); }
+  };
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const cvInputRef = useRef<HTMLInputElement>(null);
@@ -331,6 +455,8 @@ export default function SettingsPage() {
     { id: 'resume-page', category: 'Pages', title: 'Resume Page', children: null },
     { id: 'contact-page', category: 'Pages', title: 'Contact Page', children: null },
     { id: 'social-links', category: 'Social', title: 'Social Links', children: null },
+    { id: 'smtp-config', category: 'All', title: 'SMTP Configuration', children: null },
+    { id: 'email-notifications', category: 'All', title: 'Email Notifications', children: null },
   ];
 
   const hasVisibleCards = () => {
@@ -982,6 +1108,176 @@ export default function SettingsPage() {
             </div>
           </div>
           <p className="text-xs text-muted-text">Leave a social link empty to hide its icon from the frontend.</p>
+        </div>
+      </Card>
+      </FilterableCard>
+
+      {/* SMTP Configuration */}
+      <FilterableCard category="All" title="SMTP Configuration" searchQuery={searchQuery} activeFilter={activeFilter}>
+      <Card className="bg-surface border-stroke p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Server className="w-4 h-4 text-brand" />
+          <h3 className="text-sm font-semibold text-white">SMTP Configuration</h3>
+        </div>
+        <p className="text-xs text-muted-text mb-6">Configure your SMTP server to send emails for contact notifications and admin alerts.</p>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label className="text-xs text-white/70">SMTP Host</Label>
+              <Input
+                value={smtpSettings.smtpHost}
+                onChange={(e) => setSmtpSettings((prev) => ({ ...prev, smtpHost: e.target.value }))}
+                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                placeholder="smtp.gmail.com"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-white/70">SMTP Port</Label>
+              <Input
+                type="number"
+                value={smtpSettings.smtpPort}
+                onChange={(e) => setSmtpSettings((prev) => ({ ...prev, smtpPort: parseInt(e.target.value) || 587 }))}
+                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                placeholder="587"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label className="text-xs text-white/70">SMTP Username</Label>
+              <Input
+                value={smtpSettings.smtpUser}
+                onChange={(e) => setSmtpSettings((prev) => ({ ...prev, smtpUser: e.target.value }))}
+                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                placeholder="user@gmail.com"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-white/70">SMTP Password</Label>
+              <Input
+                type="password"
+                value={smtpSettings.smtpPass}
+                onChange={(e) => setSmtpSettings((prev) => ({ ...prev, smtpPass: e.target.value }))}
+                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                placeholder={smtpSettings.hasPassword ? '••••••••••••' : 'Enter new password'}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Switch
+              checked={smtpSettings.smtpSecure}
+              onCheckedChange={(checked) => setSmtpSettings((prev) => ({ ...prev, smtpSecure: checked }))}
+            />
+            <Label className="text-sm text-white">Use Secure Connection (TLS/SSL)</Label>
+          </div>
+          <div className="border-t border-stroke/30 pt-4">
+            <p className="text-xs text-muted-text mb-4">Email identity settings</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">From Name</Label>
+                  <Input
+                    value={smtpSettings.fromName}
+                    onChange={(e) => setSmtpSettings((prev) => ({ ...prev, fromName: e.target.value }))}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="CodeVirtox Portfolio"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">From Email</Label>
+                  <Input
+                    value={smtpSettings.fromEmail}
+                    onChange={(e) => setSmtpSettings((prev) => ({ ...prev, fromEmail: e.target.value }))}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="noreply@codevirtox.com"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">Reply-To Email</Label>
+                  <Input
+                    value={smtpSettings.replyToEmail}
+                    onChange={(e) => setSmtpSettings((prev) => ({ ...prev, replyToEmail: e.target.value }))}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="reply@codevirtox.com"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">Contact Receiver Email</Label>
+                  <Input
+                    value={smtpSettings.contactReceiverEmail}
+                    onChange={(e) => setSmtpSettings((prev) => ({ ...prev, contactReceiverEmail: e.target.value }))}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="admin@codevirtox.com"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 pt-2">
+            <Button
+              onClick={handleSaveSmtp}
+              disabled={savingSmtp}
+              className="bg-brand hover:bg-brand-light text-white gap-2 disabled:opacity-40"
+            >
+              {savingSmtp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save SMTP Settings
+            </Button>
+            <Button
+              onClick={handleSendTestEmail}
+              disabled={sendingTest}
+              variant="outline"
+              className="border-stroke text-white hover:bg-dark gap-2 disabled:opacity-40"
+            >
+              {sendingTest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              Send Test Email
+            </Button>
+          </div>
+        </div>
+      </Card>
+      </FilterableCard>
+
+      {/* Email Notifications */}
+      <FilterableCard category="All" title="Email Notifications" searchQuery={searchQuery} activeFilter={activeFilter}>
+      <Card className="bg-surface border-stroke p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <ShieldCheck className="w-4 h-4 text-brand" />
+          <h3 className="text-sm font-semibold text-white">Email Notifications</h3>
+        </div>
+        <p className="text-xs text-muted-text mb-6">Choose which events trigger email notifications. SMTP must be configured above.</p>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label className="text-sm text-white">Contact Form Notifications</Label>
+              <p className="text-xs text-muted-text">Receive an email whenever someone submits the contact form.</p>
+            </div>
+            <Switch
+              checked={notifSettings.contactEmailEnabled}
+              onCheckedChange={(checked) => setNotifSettings((prev) => ({ ...prev, contactEmailEnabled: checked }))}
+            />
+          </div>
+          <div className="border-t border-stroke/30" />
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label className="text-sm text-white">Admin Login Notifications</Label>
+              <p className="text-xs text-muted-text">Receive an email whenever an admin successfully logs in.</p>
+            </div>
+            <Switch
+              checked={notifSettings.adminLoginEmailEnabled}
+              onCheckedChange={(checked) => setNotifSettings((prev) => ({ ...prev, adminLoginEmailEnabled: checked }))}
+            />
+          </div>
+        </div>
+        <div className="pt-4">
+          <Button
+            onClick={handleSaveNotif}
+            disabled={savingNotif}
+            className="bg-brand hover:bg-brand-light text-white gap-2 disabled:opacity-40"
+          >
+            {savingNotif ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Save Notifications
+          </Button>
         </div>
       </Card>
       </FilterableCard>

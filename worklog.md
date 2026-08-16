@@ -1180,3 +1180,45 @@ Stage Summary:
 - Glass panel at card bottom with blur/glassmorphism effect
 - Contains title, metadata (skill · issuer · date), and "View Certificate →" link
 - Agent browser verified all 6 checks pass: positioning, visibility, glass effect, content, styling, no errors
+
+---
+Task ID: 1
+Agent: full-stack-developer
+Task: Implement complete email configuration and notification system
+
+Work Log:
+- Added AppSettings model to Prisma schema with SMTP + notification fields
+- Ran db:push to apply schema
+- Installed nodemailer + @types/nodemailer
+- Created src/lib/email.ts (sendEmail, sendContactEmail, sendAdminLoginNotification, sendTestEmail)
+- Created src/app/api/settings/smtp/route.ts (GET/PUT)
+- Created src/app/api/settings/notifications/route.ts (GET/PUT)
+- Created src/app/api/settings/test-email/route.ts (POST)
+- Updated src/app/api/contact/route.ts (added email sending on POST)
+- Updated src/lib/auth.ts (added admin login notification on successful auth)
+- Updated src/app/dashboard/settings/page.tsx (added SMTP + notification settings UI)
+
+Stage Summary:
+- Complete email system implemented with dynamic SMTP configuration
+- Dashboard settings page includes SMTP config and notification toggles
+- Contact form sends email notifications when enabled
+- Admin login sends notifications when enabled
+- SMTP password never exposed to frontend
+- All settings persisted in SQLite database
+---
+Task ID: 2
+Agent: Main Agent (verification)
+Task: Verify email settings UI and full system
+
+Work Log:
+- Verified SMTP Configuration card with all 10 fields, Save + Test buttons
+- Verified Email Notifications card with 2 toggles, Save button
+- All inputs and toggles interactive, no console errors
+- Lint clean, dev server compiled without errors
+
+Stage Summary:
+- Complete email system implemented and verified
+- SMTP config + notification toggles in Dashboard Settings
+- Contact form sends email on submission (fire-and-forget)
+- Admin login sends email on successful auth (fire-and-forget)
+- SMTP password never exposed to frontend
