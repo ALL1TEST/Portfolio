@@ -38,6 +38,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [profile, setProfile] = useState<{ logoUrl?: string; brandName?: string } | null>(null);
 
   useEffect(() => {
     const fetchUnread = async () => {
@@ -56,6 +57,21 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const data = await res.json();
+          setProfile(data);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchProfile();
+  }, [pathname]);
+
   const handleNav = useCallback(
     (href: string) => {
       router.push(href);
@@ -68,11 +84,13 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex flex-col h-full">
       {/* Brand */}
       <div className="px-4 py-6 flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center flex-shrink-0">
-          <Zap className="w-4 h-4 text-white" />
-        </div>
-        <span className="text-lg font-bold text-white tracking-tight">
-          CodeVirtox
+        <img
+          src={profile?.logoUrl || '/logo.png'}
+          alt="Logo"
+          className="object-contain h-10 w-auto flex-shrink-0"
+        />
+        <span className="text-xl font-medium tracking-tight text-white/90">
+          {profile?.brandName || 'CodeVirtox'}
         </span>
       </div>
 

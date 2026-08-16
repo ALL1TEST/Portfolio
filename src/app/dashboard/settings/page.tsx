@@ -466,7 +466,7 @@ export default function SettingsPage() {
               className="bg-dark border-stroke text-white placeholder:text-muted-text"
               placeholder="© 2026 ABDELLAH AIT-SI. All rights reserved."
             />
-            <p className="text-xs text-muted-text">Leave empty to use the default: © {year} {fullName}. All rights reserved.</p>
+            <p className="text-xs text-muted-text">Leave empty to use the default: © {new Date().getFullYear()} {profile.fullName}. All rights reserved.</p>
           </div>
           <div className="space-y-2">
             <Label className="text-sm text-white">Credit Text</Label>
@@ -476,7 +476,7 @@ export default function SettingsPage() {
               className="bg-dark border-stroke text-white placeholder:text-muted-text"
               placeholder="Designed & Built by CodeVirtox"
             />
-            <p className="text-xs text-muted-text">Leave empty to use the default: Designed & Built by {brandName}.</p>
+            <p className="text-xs text-muted-text">Leave empty to use the default: Designed & Built by {profile.brandName}.</p>
           </div>
         </div>
       </Card>

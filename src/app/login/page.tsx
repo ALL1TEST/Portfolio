@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -15,6 +15,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [profile, setProfile] = useState<{ logoUrl?: string; brandName?: string } | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const data = await res.json();
+          setProfile(data);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,12 +72,14 @@ export default function LoginPage() {
       >
         {/* Brand header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-brand flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-white">
-              CodeVirtox
+          <div className="inline-flex items-center gap-2.5 mb-4">
+            <img
+              src={profile?.logoUrl || '/logo.png'}
+              alt="Logo"
+              className="object-contain h-10 w-auto"
+            />
+            <span className="text-2xl font-medium tracking-tight text-white/90">
+              {profile?.brandName || 'CodeVirtox'}
             </span>
           </div>
           <h1 className="text-xl font-semibold text-white mb-1">
