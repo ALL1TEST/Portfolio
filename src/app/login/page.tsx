@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Zap } from 'lucide-react';
+import { Loader2, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -70,24 +70,16 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="relative z-10 w-full max-w-md"
       >
-        {/* Brand header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2.5 mb-4">
-            <img
-              src={profile?.logoUrl || '/logo.png'}
-              alt="Logo"
-              className="object-contain h-10 w-auto"
-            />
-            <span className="text-2xl font-medium tracking-tight text-white/90">
-              {profile?.brandName || 'CodeVirtox'}
-            </span>
-          </div>
-          <h1 className="text-xl font-semibold text-white mb-1">
-            Admin Dashboard
-          </h1>
-          <p className="text-muted-text text-sm">
-            Sign in to manage your portfolio
-          </p>
+        {/* Brand header — centered logo */}
+        <div className="flex justify-center mb-8">
+          <motion.img
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            src={profile?.logoUrl || '/logo.png'}
+            alt="Logo"
+            className="object-contain h-16 w-auto"
+          />
         </div>
 
         {/* Login card */}
@@ -125,20 +117,38 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-brand hover:bg-brand-light text-white font-medium h-11 transition-colors"
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                'Sign In'
-              )}
-            </Button>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-brand hover:bg-brand-light text-white font-medium h-11 relative overflow-hidden transition-all duration-300 group/btn"
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    <>
+                      Sign In
+                      <motion.span
+                        initial={{ x: 0, opacity: 1 }}
+                        whileHover={{ x: 4, opacity: 1 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </motion.span>
+                    </>
+                  )}
+                </span>
+                <span className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/10 transition-colors duration-300" />
+              </Button>
+            </motion.div>
           </form>
         </div>
 
