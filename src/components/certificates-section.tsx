@@ -6,6 +6,7 @@ import { ScrollReveal } from './scroll-reveal';
 import FocusReveal from './focus-reveal';
 import { useData } from '@/lib/data-provider';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import type { Certificate } from '@/lib/types';
 
 function parseSkills(skillsJson: string): string[] {
@@ -194,12 +195,23 @@ export function CertificatesSection() {
             </motion.div>
 
             {hasMore && (
-              <div className="flex justify-center mt-10">
+              <div className="mt-12 lg:mt-16 text-center">
                 <button
                   onClick={() => setShowAll(!showAll)}
-                  className="px-6 py-2.5 text-xs font-semibold tracking-wider uppercase rounded-full border border-stroke/40 bg-surface/50 text-muted-text hover:text-white hover:border-brand/40 transition-all duration-300"
+                  className="group/toggle relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white/80 bg-surface border border-stroke/50 rounded-full overflow-hidden transition-all duration-300 hover:text-white hover:border-brand/40 hover:shadow-lg hover:shadow-brand/15 hover:scale-105 active:scale-95"
                 >
-                  {showAll ? 'Show Less' : 'Show More'}
+                  <span className="absolute inset-0 bg-brand/0 group-hover/toggle:bg-brand/10 transition-colors duration-300" />
+                  {showAll ? (
+                    <>
+                      <ChevronUp className="relative w-4 h-4 transition-transform duration-300 group-hover/toggle:-translate-y-0.5" />
+                      <span className="relative">Show Less</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="relative w-4 h-4 transition-transform duration-300 group-hover/toggle:translate-y-0.5" />
+                      <span className="relative">Show More</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
