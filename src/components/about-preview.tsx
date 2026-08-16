@@ -55,14 +55,20 @@ export function AboutPreview() {
           {/* ── Profile Image ── */}
           <ScrollReveal direction="left">
             <div className="relative aspect-square max-w-md mx-auto">
-              <div className="absolute inset-0 bg-surface rounded-2xl border border-stroke/50 overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.5),inset_0_0_20px_rgba(0,0,0,0.3)]">
-                <Image
-                  src={profile?.profileImage || '/uploads/ABDELLAH.png'}
-                  alt={profile?.fullName || 'Abdellah Ait-Si'}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+              <div className="absolute inset-0 bg-surface rounded-2xl border border-stroke/50 overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.5),inset_0_0_20px_rgba(0,0,0,0.3)] flex items-center justify-center">
+                {profile?.profileImage ? (
+                  <Image
+                    src={profile.profileImage}
+                    alt={profile?.fullName || 'Abdellah Ait-Si'}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-dark/50 text-muted-text">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="opacity-50"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                )}
                 <div className="absolute inset-0 rounded-2xl shadow-[inset_0_0_80px_rgba(0,0,0,0.6),inset_0_0_30px_rgba(0,0,0,0.4),inset_0_-20px_40px_rgba(255,57,0,0.08)] pointer-events-none" />
               </div>
             </div>
