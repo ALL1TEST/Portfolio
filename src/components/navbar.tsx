@@ -75,9 +75,13 @@ export function Navbar() {
 
   const handleNavClick = useCallback((href: string) => {
     closeMobileMenu();
-    // Use router.push for client-side navigation after menu closes
-    router.push(href);
-  }, [closeMobileMenu, router]);
+    if (pathname === href) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Use router.push for client-side navigation after menu closes
+      router.push(href);
+    }
+  }, [closeMobileMenu, router, pathname]);
 
   const overlayVariants = {
     hidden: { opacity: 0 },
@@ -120,7 +124,13 @@ export function Navbar() {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Brand */}
-            <Link href="/" className="relative z-10 group/logo" onClick={closeMobileMenu}>
+            <Link href="/" className="relative z-10 group/logo" onClick={(e) => {
+              if (pathname === '/') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+              closeMobileMenu();
+            }}>
               <motion.div
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -144,6 +154,12 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    onClick={(e) => {
+                      if (pathname === link.href) {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
                     className={`relative px-4 py-2 text-sm font-medium transition-colors duration-300 rounded-lg ${
                       isActive
                         ? 'text-white'

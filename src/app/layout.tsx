@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Abdellah Ait-Si" }],
   icons: {
-    icon: "/favicon.ico",
+    icon: "/logo.png",
   },
   openGraph: {
     title: "Abdellah Ait-Si | Full Stack Developer & AI Automation",

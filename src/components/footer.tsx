@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowUp, Github, Linkedin, Instagram, Twitter } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
@@ -16,6 +17,7 @@ const navLinks = [
 
 export function Footer() {
   const { profile } = useData();
+  const pathname = usePathname();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -36,6 +38,12 @@ export function Footer() {
             <div>
               <Link
                 href="/"
+                onClick={(e) => {
+                  if (pathname === '/') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
                 className="flex items-center gap-2.5 mb-4 group/flogo min-w-0"
               >
                 <img
@@ -83,6 +91,12 @@ export function Footer() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    onClick={(e) => {
+                      if (pathname === link.href) {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
                     className="block text-sm text-muted-text hover:text-white transition-colors"
                   >
                     {link.label}
