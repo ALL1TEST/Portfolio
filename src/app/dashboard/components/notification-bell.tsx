@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
-import { Bell, Mail, MailOpen, ExternalLink, X } from 'lucide-react';
+import { Bell, Mail, MailOpen, ExternalLink, X, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
@@ -22,6 +22,7 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<NotificationMessage[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const dismissedIds = useRef(new Set<string>());
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Fetch on mount and poll every 30s
@@ -34,7 +35,9 @@ export function NotificationBell() {
         const res = await fetch('/api/contact?limit=5');
         if (res.ok && mounted) {
           const data = await res.json();
-          const msgs = Array.isArray(data) ? data : [];
+          const msgs = (Array.isArray(data) ? data : []).filter(
+            (m: NotificationMessage) => !dismissedIds.current.has(m.id)
+          );
           setMessages(msgs);
           setUnreadCount(msgs.filter((m: NotificationMessage) => !m.read).length);
           return; // success — stop retrying
@@ -78,8 +81,15 @@ export function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Mark as read when clicking a message
+  // Mark as read and remove from notification list
   const handleMessageClick = async (msg: NotificationMessage) => {
+    // Dismiss from bell — remove from local list
+    dismissedIds.current.add(msg.id);
+    setMessages((prev) => prev.filter((m) => m.id !== msg.id));
+    if (!msg.read) {
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    }
+    // Mark as read in DB
     if (!msg.read) {
       try {
         await fetch('/api/contact', {
@@ -87,10 +97,6 @@ export function NotificationBell() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: msg.id, read: true }),
         });
-        setMessages((prev) =>
-          prev.map((m) => (m.id === msg.id ? { ...m, read: true } : m))
-        );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
       } catch {
         // silently fail
       }
@@ -114,6 +120,13 @@ export function NotificationBell() {
     } catch {
       // silently fail
     }
+  };
+
+  // Clear all — remove all notifications from the bell
+  const handleClearAll = () => {
+    messages.forEach((m) => dismissedIds.current.add(m.id));
+    setMessages([]);
+    setUnreadCount(0);
   };
 
   return (
@@ -161,13 +174,23 @@ export function NotificationBell() {
                 )}
               </div>
               <div className="flex items-center gap-1">
-                {unreadCount > 0 && (
-                  <button
-                    onClick={handleMarkAllRead}
-                    className="text-[11px] text-brand hover:text-brand/80 font-medium transition-colors px-2 py-1 rounded hover:bg-brand/10"
-                  >
-                    Mark all read
-                  </button>
+                {messages.length > 0 && (
+                  <>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={handleMarkAllRead}
+                        className="text-[11px] text-brand hover:text-brand/80 font-medium transition-colors px-2 py-1 rounded hover:bg-brand/10"
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                    <button
+                      onClick={handleClearAll}
+                      className="text-[11px] text-red-400 hover:text-red-300 font-medium transition-colors px-2 py-1 rounded hover:bg-red-400/10"
+                    >
+                      Clear all
+                    </button>
+                  </>
                 )}
                 <button
                   onClick={() => setOpen(false)}
