@@ -86,9 +86,12 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
 
 const CERT_TITLE_CLASSES = 'text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight';
 
+const VISIBLE_LIMIT = 2;
+
 export function CertificatesSection() {
   const { profile, certificates, loading } = useData();
   const [activeFilter, setActiveFilter] = useState('All');
+  const [showAll, setShowAll] = useState(false);
 
   // Dynamically derive filter categories from actual certificate data
   const categories = useMemo(() => {
@@ -104,6 +107,10 @@ export function CertificatesSection() {
     if (activeFilter === 'All') return certificates;
     return certificates.filter((cert) => cert.category === activeFilter);
   }, [certificates, activeFilter]);
+
+  // Show More / Show Less
+  const visibleCerts = showAll ? filteredCerts : filteredCerts.slice(0, VISIBLE_LIMIT);
+  const hasMore = filteredCerts.length > VISIBLE_LIMIT;
 
   return (
     <section id="certificates" className="relative py-24 lg:py-32 bg-gradient-dark">
@@ -177,13 +184,26 @@ export function CertificatesSection() {
             </p>
           </div>
         ) : (
-          <motion.div layout className="certificates-grid">
-            <AnimatePresence mode="popLayout">
-              {filteredCerts.map((cert, index) => (
-                <CertificateCard key={cert.id} cert={cert} index={index} />
-              ))}
-            </AnimatePresence>
-          </motion.div>
+          <>
+            <motion.div layout className="certificates-grid">
+              <AnimatePresence mode="popLayout">
+                {visibleCerts.map((cert, index) => (
+                  <CertificateCard key={cert.id} cert={cert} index={index} />
+                ))}
+              </AnimatePresence>
+            </motion.div>
+
+            {hasMore && (
+              <div className="flex justify-center mt-10">
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="px-6 py-2.5 text-xs font-semibold tracking-wider uppercase rounded-full border border-stroke/40 bg-surface/50 text-muted-text hover:text-white hover:border-brand/40 transition-all duration-300"
+                >
+                  {showAll ? 'Show Less' : 'Show More'}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>
