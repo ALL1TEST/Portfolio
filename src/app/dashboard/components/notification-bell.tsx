@@ -27,7 +27,9 @@ export function NotificationBell() {
   // Fetch on mount and poll every 30s
   useEffect(() => {
     let mounted = true;
-    const fetch = async () => {
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const fetchNotifications = async (attempt = 0) => {
       try {
         const res = await fetch('/api/contact?limit=5');
         if (res.ok && mounted) {
@@ -35,16 +37,33 @@ export function NotificationBell() {
           const msgs = Array.isArray(data) ? data : [];
           setMessages(msgs);
           setUnreadCount(msgs.filter((m: NotificationMessage) => !m.read).length);
+          return; // success — stop retrying
+        }
+        if (res.status === 401 && mounted) {
+          // Session not ready yet — retry in 2s (up to 5 times)
+          if (attempt < 5) {
+            retryTimer = setTimeout(() => fetchNotifications(attempt + 1), 2000);
+          }
         }
       } catch {
-        // silently fail
+        // Network error — retry once after 3s
+        if (attempt < 2 && mounted) {
+          retryTimer = setTimeout(() => fetchNotifications(attempt + 1), 3000);
+        }
       }
     };
-    fetch();
-    const interval = setInterval(fetch, 30000);
+
+    fetchNotifications();
+
+    // After initial success, poll every 30s
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 30000);
+
     return () => {
       mounted = false;
       clearInterval(interval);
+      if (retryTimer) clearTimeout(retryTimer);
     };
   }, []);
 
