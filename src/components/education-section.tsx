@@ -29,7 +29,9 @@ export function EducationSection() {
         <div className="education-header">
           <div className="education-header-left">
             <span className="inline-block px-5 py-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-muted-text bg-surface border border-stroke rounded-sm mb-5">EDUCATION</span>
-            <h2 className="education-heading">{profile?.educationPageTitle || "My Educational Journey"}</h2>
+            {profile?.educationPageTitle && (
+              <h2 className="education-heading">{profile.educationPageTitle}</h2>
+            )}
             {profile?.educationPageDescription && (
               <p className="education-description">{profile.educationPageDescription}</p>
             )}

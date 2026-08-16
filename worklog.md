@@ -1051,3 +1051,22 @@ Stage Summary:
 - Clearing a field in Settings hides it from the frontend (no fallback to hardcoded default)
 - Contact Information section confirmed removed from Settings
 - No lint errors, no console errors
+---
+Task ID: 2
+Agent: Main Agent
+Task: Fix `||` fallback bug — clearing Section Titles in Settings still showed defaults in frontend
+
+Work Log:
+- Identified root cause: `profile?.projectsPageTitle || "Selected Projects"` treats empty string `""` as falsy, always falling back to default
+- Fixed `projects-section.tsx`: computed `sectionTitle = profile ? profile.projectsPageTitle : "Selected Projects"` and conditionally render SectionHeading
+- Fixed `certificates-section.tsx`: wrapped FocusReveal in `{profile?.certificatesPageTitle && (...)}` conditional
+- Fixed `education-section.tsx`: wrapped h2 in `{profile?.educationPageTitle && (...)}` conditional
+- Fixed `resume-section.tsx`: wrapped both resumeTechTitle and resumeExpTitle FocusReveal in conditionals
+- Fixed `contact-section.tsx`: wrapped SectionHeading in conditional with computed title
+- Verified via browser: cleared titles are hidden, non-empty titles render correctly
+- Lint passes with no errors
+
+Stage Summary:
+- All 6 titles (Projects, Certificates, Education, Resume Tech, Resume Exp, Contact) now correctly hide when cleared in Settings
+- Pattern: when profile exists, use its value directly (empty = hide); when no profile, use default
+- No `||` fallback on title fields anymore

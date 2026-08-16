@@ -88,8 +88,9 @@ export function ResumeSection() {
               {/* Left side */}
               <div className="skills-faq-header">
                 <div className="skills-label">TECHNICAL SKILLS</div>
+                {profile?.resumeTechTitle && (
                 <FocusReveal
-                  text={profile?.resumeTechTitle || "Technologies I work with"}
+                  text={profile.resumeTechTitle}
                   as="h2"
                   className="journey-title"
                   blur={20}
@@ -102,6 +103,7 @@ export function ResumeSection() {
                     staggerChildren: 0.035,
                   }}
                 />
+                )}
               </div>
 
               {/* Right side */}
@@ -130,8 +132,9 @@ export function ResumeSection() {
                 {/* LEFT SIDE — Sticky heading */}
                 <div className="journey-intro">
                   <div className="skills-label">MY JOURNEY</div>
+                  {profile?.resumeExpTitle && (
                   <FocusReveal
-                    text={profile?.resumeExpTitle || "Experience & Projects"}
+                    text={profile.resumeExpTitle}
                     as="h2"
                     className="journey-title"
                     blur={20}
@@ -144,6 +147,7 @@ export function ResumeSection() {
                       staggerChildren: 0.035,
                     }}
                   />
+                  )}
                 </div>
 
                 {/* RIGHT SIDE — Stacked cards */}

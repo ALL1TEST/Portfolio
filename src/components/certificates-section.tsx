@@ -115,8 +115,9 @@ export function CertificatesSection() {
               Certificates
             </span>
           </ScrollReveal>
+          {profile?.certificatesPageTitle && (
           <FocusReveal
-            text={profile?.certificatesPageTitle || "Certificates & Credentials"}
+            text={profile.certificatesPageTitle}
             as="h2"
             className={CERT_TITLE_CLASSES}
             blur={20}
@@ -129,6 +130,7 @@ export function CertificatesSection() {
               staggerChildren: 0.035,
             }}
           />
+          )}
           {profile?.certificatesPageDescription && (
             <ScrollReveal delay={0.3}>
               <p className="mt-4 text-muted-text max-w-2xl mx-auto text-base leading-relaxed">

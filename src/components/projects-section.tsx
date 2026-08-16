@@ -117,15 +117,20 @@ export function ProjectsSection() {
   const hasMore = projects.length > INITIAL_SHOW;
   const visibleProjects = showAll ? projects : projects.slice(0, INITIAL_SHOW);
 
+  const sectionTitle = profile ? profile.projectsPageTitle : "Selected Projects";
+  const sectionDescription = profile ? profile.projectsPageDescription : "A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving.";
+
   return (
     <section id="projects" className="relative py-24 lg:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          label="Projects"
-          labelStyle="skills"
-          title={profile?.projectsPageTitle || "Selected Projects"}
-          description={profile?.projectsPageDescription || undefined}
-        />
+        {sectionTitle && (
+          <SectionHeading
+            label="Projects"
+            labelStyle="skills"
+            title={sectionTitle}
+            description={sectionDescription || undefined}
+          />
+        )}
 
         {loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
