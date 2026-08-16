@@ -643,7 +643,7 @@ export default function SettingsPage() {
                   {savingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
                   Update Password
                 </Button>
-                {newPassword && confirmPassword && newPassword !== confirmPassword && (
+                {newPassword && confirmNewPassword && newPassword !== confirmNewPassword && (
                   <p className="text-xs text-red-400">Passwords do not match</p>
                 )}
               </div>
