@@ -1,0 +1,851 @@
+   455→    { id: 'resume-page', category: 'Pages', title: 'Resume Page', children: null },
+   456→    { id: 'contact-page', category: 'Pages', title: 'Contact Page', children: null },
+   457→    { id: 'social-links', category: 'Social', title: 'Social Links', children: null },
+   458→    { id: 'smtp-config', category: 'All', title: 'SMTP Configuration', children: null },
+   459→    { id: 'email-notifications', category: 'All', title: 'Email Notifications', children: null },
+   460→  ];
+   461→
+   462→  const hasVisibleCards = () => {
+   463→    const q = searchQuery.toLowerCase();
+   464→    return cardList.some(
+   465→      (card) =>
+   466→        (activeFilter === 'All' || card.category === activeFilter) &&
+   467→        (q === '' || card.title.toLowerCase().includes(q))
+   468→    );
+   469→  };
+   470→
+   471→  return (
+   472→    <motion.div
+   473→      initial={{ opacity: 0, y: 20 }}
+   474→      animate={{ opacity: 1, y: 0 }}
+   475→      transition={{ duration: 0.4 }}
+   476→      className="space-y-6 max-w-3xl"
+   477→    >
+   478→      {/* Header with save button */}
+   479→      <div className="flex items-center justify-between">
+   480→        <div className="flex items-center gap-3">
+   481→          <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center">
+   482→            <User className="w-5 h-5 text-brand" />
+   483→          </div>
+   484→          <div>
+   485→            <h2 className="text-base font-semibold text-white">Profile Information</h2>
+   486→            <p className="text-sm text-muted-text">Update your personal and professional details</p>
+   487→          </div>
+   488→        </div>
+   489→        <Button
+   490→          onClick={handleSave}
+   491→          disabled={saving || !hasChanges}
+   492→          className="bg-brand hover:bg-brand-light text-white gap-2 disabled:opacity-40"
+   493→        >
+   494→          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+   495→          Save Changes
+   496→        </Button>
+   497→      </div>
+   498→
+   499→      {/* Search bar */}
+   500→      <div className="relative">
+   501→        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-text" />
+   502→        <Input
+   503→          value={searchQuery}
+   504→          onChange={(e) => setSearchQuery(e.target.value)}
+   505→          className="bg-surface border-stroke text-white placeholder:text-muted-text pl-9 pr-9"
+   506→          placeholder="Search settings..."
+   507→        />
+   508→        {searchQuery && (
+   509→          <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-white">
+   510→            <X className="w-4 h-4" />
+   511→          </button>
+   512→        )}
+   513→      </div>
+   514→
+   515→      {/* Category filter buttons */}
+   516→      <div className="flex flex-wrap gap-2">
+   517→        {filterCategories.map((cat) => (
+   518→          <button
+   519→            key={cat}
+   520→            onClick={() => setActiveFilter(cat)}
+   521→            className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 ${
+   522→              activeFilter === cat
+   523→                ? 'bg-brand text-white border-brand'
+   524→                : 'bg-surface border-stroke/50 text-muted-text hover:text-white hover:border-stroke'
+   525→            }`}
+   526→          >
+   527→            {cat}
+   528→          </button>
+   529→        ))}
+   530→      </div>
+   531→
+   532→      {/* Account — Change Email & Password */}
+   533→      <FilterableCard category="Personal" title="Account" searchQuery={searchQuery} activeFilter={activeFilter}>
+   534→      <Card className="bg-surface border-stroke p-6">
+   535→        <h3 className="text-sm font-semibold text-white mb-4">Account Settings</h3>
+   536→        <p className="text-xs text-muted-text mb-6">Change your login email and password.</p>
+   537→
+   538→        <div className="space-y-6">
+   539→          {/* Change Email */}
+   540→          <div className="relative">
+   541→            <div className="flex items-center gap-2 mb-3">
+   542→              <Mail className="w-4 h-4 text-brand" />
+   543→              <span className="text-sm font-medium text-white">Change Email</span>
+   544→            </div>
+   545→            <form onSubmit={handleChangeEmail} className="space-y-3">
+   546→              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+   547→                <div className="space-y-1">
+   548→                  <Label className="text-xs text-white/70">Current Email</Label>
+   549→                  <Input
+   550→                    type="email"
+   551→                    value={currentEmail}
+   552→                    onChange={(e) => setCurrentEmail(e.target.value)}
+   553→                    required
+   554→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   555→                    placeholder="admin@codevirtox.com"
+   556→                    disabled={savingEmail}
+   557→                  />
+   558→                </div>
+   559→                <div className="space-y-1">
+   560→                  <Label className="text-xs text-white/70">New Email</Label>
+   561→                  <Input
+   562→                    type="email"
+   563→                    value={newEmail}
+   564→                    onChange={(e) => setNewEmail(e.target.value)}
+   565→                    required
+   566→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   567→                    placeholder="new@example.com"
+   568→                    disabled={savingEmail}
+   569→                  />
+   570→                </div>
+   571→              </div>
+   572→              <Button
+   573→                type="submit"
+   574→                disabled={savingEmail || !newEmail.trim() || newEmail === currentEmail}
+   575→                variant="outline"
+   576→                size="sm"
+   577→                className="border-stroke text-white hover:bg-dark gap-2 disabled:opacity-40"
+   578→              >
+   579→                {savingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+   580→                Update Email
+   581→              </Button>
+   582→            </form>
+   583→          </div>
+   584→
+   585→          {/* Divider */}
+   586→          <div className="border-t border-stroke/30" />
+   587→
+   588→          {/* Change Password */}
+   589→          <div className="relative">
+   590→            <div className="flex items-center gap-2 mb-3">
+   591→              <KeyRound className="w-4 h-4 text-brand" />
+   592→              <span className="text-sm font-medium text-white">Change Password</span>
+   593→            </div>
+   594→            <form onSubmit={handleChangePassword} className="space-y-3">
+   595→              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+   596→                <div className="space-y-1">
+   597→                  <Label className="text-xs text-white/70">Current Password</Label>
+   598→                  <Input
+   599→                    type="password"
+   600→                    value={currentPassword}
+   601→                    onChange={(e) => setCurrentPassword(e.target.value)}
+   602→                    required
+   603→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   604→                    placeholder="••••••••"
+   605→                    disabled={savingPassword}
+   606→                  />
+   607→                </div>
+   608→                <div className="space-y-1">
+   609→                  <Label className="text-xs text-white/70">New Password</Label>
+   610→                  <Input
+   611→                    type="password"
+   612→                    value={newPassword}
+   613→                    onChange={(e) => setNewPassword(e.target.value)}
+   614→                    required
+   615→                    minLength={6}
+   616→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   617→                    placeholder="••••••••"
+   618→                    disabled={savingPassword}
+   619→                  />
+   620→                </div>
+   621→                <div className="space-y-1">
+   622→                  <Label className="text-xs text-white/70">Confirm Password</Label>
+   623→                  <Input
+   624→                    type="password"
+   625→                    value={confirmNewPassword}
+   626→                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+   627→                    required
+   628→                    minLength={6}
+   629→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   630→                    placeholder="••••••••"
+   631→                    disabled={savingPassword}
+   632→                  />
+   633→                </div>
+   634→              </div>
+   635→              <div className="flex items-center gap-3">
+   636→                <Button
+   637→                  type="submit"
+   638→                  disabled={savingPassword || !currentPassword || !newPassword || newPassword !== confirmNewPassword}
+   639→                  variant="outline"
+   640→                  size="sm"
+   641→                  className="border-stroke text-white hover:bg-dark gap-2 disabled:opacity-40"
+   642→                >
+   643→                  {savingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+   644→                  Update Password
+   645→                </Button>
+   646→                {newPassword && confirmPassword && newPassword !== confirmPassword && (
+   647→                  <p className="text-xs text-red-400">Passwords do not match</p>
+   648→                )}
+   649→              </div>
+   650→            </form>
+   651→          </div>
+   652→        </div>
+   653→      </Card>
+   654→      </FilterableCard>
+   655→
+   656→      {/* Profile Image */}
+   657→      <FilterableCard category="Media" title="Profile Image" searchQuery={searchQuery} activeFilter={activeFilter}>
+   658→      <Card className="bg-surface border-stroke p-6">
+   659→        <h3 className="text-sm font-semibold text-white mb-4">Profile Image</h3>
+   660→        <div className="flex items-center gap-6">
+   661→          <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-stroke/50 bg-dark flex-shrink-0">
+   662→            {profile.profileImage ? (
+   663→              <img src={profile.profileImage} alt="Profile" className="w-full h-full object-cover" />
+   664→            ) : (
+   665→              <div className="w-full h-full flex items-center justify-center text-muted-text"><User className="w-8 h-8" /></div>
+   666→            )}
+   667→          </div>
+   668→          <div className="flex-1 space-y-3">
+   669→            <div className="flex items-center gap-2">
+   670→              <Button type="button" variant="outline" size="sm" onClick={() => imageInputRef.current?.click()} disabled={uploading === 'profile'} className="border-stroke text-white hover:bg-dark gap-2">
+   671→                {uploading === 'profile' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+   672→                {uploading === 'profile' ? 'Uploading...' : 'Upload Image'}
+   673→              </Button>
+   674→              {profile.profileImage && (
+   675→                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('profileImage', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+   676→                  <Trash2 className="w-3.5 h-3.5" /> Remove
+   677→                </Button>
+   678→              )}
+   679→            </div>
+   680→            <p className="text-xs text-muted-text">Recommended: Square image, min 300×300px. Max 5MB.</p>
+   681→            <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+   682→          </div>
+   683→        </div>
+   684→      </Card>
+   685→      </FilterableCard>
+   686→
+   687→      {/* CV Upload */}
+   688→      <FilterableCard category="Media" title="CV Resume" searchQuery={searchQuery} activeFilter={activeFilter}>
+   689→      <Card className="bg-surface border-stroke p-6">
+   690→        <h3 className="text-sm font-semibold text-white mb-4">CV / Resume</h3>
+   691→        <div className="flex items-center gap-6">
+   692→          <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-stroke/50 bg-dark flex-shrink-0 flex items-center justify-center">
+   693→            {profile.cvFile ? (
+   694→              <a href={profile.cvFile} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1 text-muted-text hover:text-brand transition-colors">
+   695→                <FileText className="w-8 h-8" />
+   696→                <span className="text-[10px]">View CV</span>
+   697→              </a>
+   698→            ) : (
+   699→              <div className="flex flex-col items-center gap-1 text-muted-text/40">
+   700→                <FileText className="w-8 h-8" />
+   701→                <span className="text-[10px]">No CV</span>
+   702→              </div>
+   703→            )}
+   704→          </div>
+   705→          <div className="flex-1 space-y-3">
+   706→            <div className="flex items-center gap-2">
+   707→              <Button type="button" variant="outline" size="sm" onClick={() => cvInputRef.current?.click()} disabled={uploading === 'cv'} className="border-stroke text-white hover:bg-dark gap-2">
+   708→                {uploading === 'cv' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+   709→                {uploading === 'cv' ? 'Uploading...' : 'Upload CV'}
+   710→              </Button>
+   711→              {profile.cvFile && (
+   712→                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('cvFile', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+   713→                  <Trash2 className="w-3.5 h-3.5" /> Remove
+   714→                </Button>
+   715→              )}
+   716→            </div>
+   717→            <p className="text-xs text-muted-text">PDF format only. Max 10MB.</p>
+   718→            <input ref={cvInputRef} type="file" accept=".pdf" onChange={handleCvUpload} className="hidden" />
+   719→          </div>
+   720→        </div>
+   721→      </Card>
+   722→      </FilterableCard>
+   723→
+   724→      {/* Logo */}
+   725→      <FilterableCard category="Media" title="Logo" searchQuery={searchQuery} activeFilter={activeFilter}>
+   726→      <Card className="bg-surface border-stroke p-6">
+   727→        <h3 className="text-sm font-semibold text-white mb-4">Logo</h3>
+   728→        <div className="flex items-center gap-6">
+   729→          <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-stroke/50 bg-dark flex-shrink-0">
+   730→            {profile.logoUrl ? (
+   731→              <img src={profile.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+   732→            ) : (
+   733→              <div className="w-full h-full flex items-center justify-center text-muted-text/40">
+   734→                <img src="/logo.png" alt="Current logo" className="w-12 h-12 object-contain opacity-50" />
+   735→              </div>
+   736→            )}
+   737→          </div>
+   738→          <div className="flex-1 space-y-3">
+   739→            <div className="flex items-center gap-2">
+   740→              <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploading === 'logo'} className="border-stroke text-white hover:bg-dark gap-2">
+   741→                {uploading === 'logo' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+   742→                {uploading === 'logo' ? 'Uploading...' : 'Upload Logo'}
+   743→              </Button>
+   744→              {profile.logoUrl && (
+   745→                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('logoUrl', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+   746→                  <Trash2 className="w-3.5 h-3.5" /> Remove
+   747→                </Button>
+   748→              )}
+   749→            </div>
+   750→            <p className="text-xs text-muted-text">Recommended: Square PNG with transparent background, min 200×200px. Max 5MB.</p>
+   751→            <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+   752→          </div>
+   753→        </div>
+   754→      </Card>
+   755→      </FilterableCard>
+   756→
+   757→      {/* Personal Information */}
+   758→      <FilterableCard category="Personal" title="Personal Information" searchQuery={searchQuery} activeFilter={activeFilter}>
+   759→      <Card className="bg-surface border-stroke p-6">
+   760→        <h3 className="text-sm font-semibold text-white mb-4">Personal Information</h3>
+   761→        <div className="space-y-4">
+   762→          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   763→            <div className="space-y-2">
+   764→              <Label className="text-sm text-white">Full Name</Label>
+   765→              <Input value={profile.fullName} onChange={(e) => updateField('fullName', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="ABDELLAH AIT-SI" />
+   766→            </div>
+   767→            <div className="space-y-2">
+   768→              <Label className="text-sm text-white">Brand Name</Label>
+   769→              <Input value={profile.brandName} onChange={(e) => updateField('brandName', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="CodeVirtox" />
+   770→            </div>
+   771→          </div>
+   772→          <div className="space-y-2">
+   773→            <Label className="text-sm text-white">Professional Title</Label>
+   774→            <Input value={profile.professionalTitle} onChange={(e) => updateField('professionalTitle', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="Full Stack Developer | AI & Automation" />
+   775→          </div>
+   776→          <div className="space-y-2">
+   777→            <Label className="text-sm text-white">Short Bio</Label>
+   778→            <Input value={profile.shortBio} onChange={(e) => updateField('shortBio', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="I build modern web applications..." />
+   779→          </div>
+   780→        </div>
+   781→      </Card>
+   782→      </FilterableCard>
+   783→
+   784→      {/* About Text */}
+   785→      <FilterableCard category="Personal" title="About" searchQuery={searchQuery} activeFilter={activeFilter}>
+   786→      <Card className="bg-surface border-stroke p-6">
+   787→        <h3 className="text-sm font-semibold text-white mb-4">About</h3>
+   788→        <div className="space-y-2">
+   789→          <Label className="text-sm text-white">About Text</Label>
+   790→          <Textarea value={profile.aboutText} onChange={(e) => updateField('aboutText', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[200px]" placeholder="Tell visitors about yourself..." />
+   791→          <p className="text-xs text-muted-text">This appears on the About section of your portfolio.</p>
+   792→        </div>
+   793→      </Card>
+   794→      </FilterableCard>
+   795→
+   796→      {/* About Cards */}
+   797→      <FilterableCard category="Personal" title="About Cards" searchQuery={searchQuery} activeFilter={activeFilter}>
+   798→      <Card className="bg-surface border-stroke p-6">
+   799→        <h3 className="text-sm font-semibold text-white mb-4">About Cards</h3>
+   800→        <p className="text-xs text-muted-text mb-4">Edit the 3 value cards displayed in the About section.</p>
+   801→        <div className="space-y-6">
+   802→          {(['1', '2', '3'] as const).map((num) => (
+   803→            <div key={num} className="space-y-3">
+   804→              <div className="flex items-center gap-2">
+   805→                <span className="w-7 h-7 rounded-md bg-brand/10 text-brand font-bold text-xs flex items-center justify-center flex-shrink-0">0{num}</span>
+   806→                <span className="text-xs font-medium text-muted-text">Card {num}</span>
+   807→              </div>
+   808→              <div className="space-y-2">
+   809→                <div className="space-y-1">
+   810→                  <Label className="text-xs text-white/70">Title</Label>
+   811→                  <Input
+   812→                    value={profile[`aboutCard${num}Title` as keyof Profile] as string}
+   813→                    onChange={(e) => updateField(`aboutCard${num}Title` as keyof Profile, e.target.value)}
+   814→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   815→                    placeholder={`Card ${num} title...`}
+   816→                  />
+   817→                </div>
+   818→                <div className="space-y-1">
+   819→                  <Label className="text-xs text-white/70">Description</Label>
+   820→                  <Textarea
+   821→                    value={profile[`aboutCard${num}Description` as keyof Profile] as string}
+   822→                    onChange={(e) => updateField(`aboutCard${num}Description` as keyof Profile, e.target.value)}
+   823→                    className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[80px]"
+   824→                    placeholder={`Card ${num} description...`}
+   825→                  />
+   826→                </div>
+   827→              </div>
+   828→              {num !== '3' && <div className="border-b border-stroke/20" />}
+   829→            </div>
+   830→          ))}
+   831→        </div>
+   832→      </Card>
+   833→      </FilterableCard>
+   834→
+   835→      {/* Featured Projects Section */}
+   836→      <FilterableCard category="Pages" title="Featured Projects Section" searchQuery={searchQuery} activeFilter={activeFilter}>
+   837→      <Card className="bg-surface border-stroke p-6">
+   838→        <h3 className="text-sm font-semibold text-white mb-4">Featured Projects Section</h3>
+   839→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Featured Projects section.</p>
+   840→        <div className="space-y-4">
+   841→          <div className="space-y-2">
+   842→            <Label className="text-sm text-white">Section Title</Label>
+   843→            <Input
+   844→              value={profile.featuredProjectsTitle}
+   845→              onChange={(e) => updateField('featuredProjectsTitle', e.target.value)}
+   846→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   847→              placeholder="Featured Projects"
+   848→            />
+   849→          </div>
+   850→          <div className="space-y-2">
+   851→            <Label className="text-sm text-white">Section Description</Label>
+   852→            <Textarea
+   853→              value={profile.featuredProjectsDescription}
+   854→              onChange={(e) => updateField('featuredProjectsDescription', e.target.value)}
+   855→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   856→              placeholder="A selection of projects showcasing..."
+   857→            />
+   858→          </div>
+   859→        </div>
+   860→      </Card>
+   861→      </FilterableCard>
+   862→
+   863→      {/* Footer Bio */}
+   864→      <FilterableCard category="Footer" title="Footer" searchQuery={searchQuery} activeFilter={activeFilter}>
+   865→      <Card className="bg-surface border-stroke p-6">
+   866→        <h3 className="text-sm font-semibold text-white mb-4">Footer</h3>
+   867→        <div className="space-y-2">
+   868→          <Label className="text-sm text-white">Footer Bio</Label>
+   869→          <Textarea value={profile.footerBio} onChange={(e) => updateField('footerBio', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]" placeholder="A short bio or tagline that appears in the footer..." />
+   870→          <p className="text-xs text-muted-text">This appears in the footer section of your website.</p>
+   871→        </div>
+   872→        <div className="mt-4 space-y-4">
+   873→          <div className="space-y-2">
+   874→            <Label className="text-sm text-white">Copyright Text</Label>
+   875→            <Input
+   876→              value={profile.footerCopyright}
+   877→              onChange={(e) => updateField('footerCopyright', e.target.value)}
+   878→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   879→              placeholder="© 2026 ABDELLAH AIT-SI. All rights reserved."
+   880→            />
+   881→            <p className="text-xs text-muted-text">Leave empty to use the default: © {new Date().getFullYear()} {profile.fullName}. All rights reserved.</p>
+   882→          </div>
+   883→          <div className="space-y-2">
+   884→            <Label className="text-sm text-white">Credit Text</Label>
+   885→            <Input
+   886→              value={profile.footerCredit}
+   887→              onChange={(e) => updateField('footerCredit', e.target.value)}
+   888→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   889→              placeholder="Designed & Built by CodeVirtox"
+   890→            />
+   891→            <p className="text-xs text-muted-text">Leave empty to use the default: Designed & Built by {profile.brandName}.</p>
+   892→          </div>
+   893→        </div>
+   894→      </Card>
+   895→      </FilterableCard>
+   896→
+   897→      {/* Achievement Stats */}
+   898→      <FilterableCard category="Personal" title="Achievement Stats" searchQuery={searchQuery} activeFilter={activeFilter}>
+   899→      <Card className="bg-surface border-stroke p-6">
+   900→        <h3 className="text-sm font-semibold text-white mb-4">Achievement Stats</h3>
+   901→        <p className="text-xs text-muted-text mb-4">Edit the 3 stats displayed in the stats section of your site.</p>
+   902→        <div className="space-y-6">
+   903→          {(['1', '2', '3'] as const).map((num) => (
+   904→            <div key={num} className="space-y-3">
+   905→              <div className="flex items-center gap-2">
+   906→                <span className="w-7 h-7 rounded-md bg-brand/10 text-brand font-bold text-xs flex items-center justify-center flex-shrink-0">#{num}</span>
+   907→                <span className="text-xs font-medium text-muted-text">Stat {num}</span>
+   908→              </div>
+   909→              <div className="grid grid-cols-2 gap-3">
+   910→                <div className="space-y-1">
+   911→                  <Label className="text-xs text-white/70">Value</Label>
+   912→                  <Input
+   913→                    value={profile[`stat${num}Value` as keyof Profile] as string}
+   914→                    onChange={(e) => updateField(`stat${num}Value` as keyof Profile, e.target.value)}
+   915→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   916→                    placeholder="e.g. 6+"
+   917→                  />
+   918→                </div>
+   919→                <div className="space-y-1">
+   920→                  <Label className="text-xs text-white/70">Label</Label>
+   921→                  <Input
+   922→                    value={profile[`stat${num}Label` as keyof Profile] as string}
+   923→                    onChange={(e) => updateField(`stat${num}Label` as keyof Profile, e.target.value)}
+   924→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   925→                    placeholder="e.g. Certificates"
+   926→                  />
+   927→                </div>
+   928→              </div>
+   929→              {num !== '3' && <div className="border-b border-stroke/20" />}
+   930→            </div>
+   931→          ))}
+   932→        </div>
+   933→      </Card>
+   934→      </FilterableCard>
+   935→
+   936→      {/* Projects Page Section */}
+   937→      <FilterableCard category="Pages" title="Projects Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+   938→      <Card className="bg-surface border-stroke p-6">
+   939→        <h3 className="text-sm font-semibold text-white mb-4">Projects Page</h3>
+   940→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Projects section on your portfolio.</p>
+   941→        <div className="space-y-4">
+   942→          <div className="space-y-2">
+   943→            <Label className="text-sm text-white">Section Title</Label>
+   944→            <Input
+   945→              value={profile.projectsPageTitle}
+   946→              onChange={(e) => updateField('projectsPageTitle', e.target.value)}
+   947→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   948→              placeholder="Selected Projects"
+   949→            />
+   950→          </div>
+   951→          <div className="space-y-2">
+   952→            <Label className="text-sm text-white">Section Description</Label>
+   953→            <Textarea
+   954→              value={profile.projectsPageDescription}
+   955→              onChange={(e) => updateField('projectsPageDescription', e.target.value)}
+   956→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   957→              placeholder="A selection of projects showcasing..."
+   958→            />
+   959→          </div>
+   960→        </div>
+   961→      </Card>
+   962→      </FilterableCard>
+   963→
+   964→      {/* Certificates Page Section */}
+   965→      <FilterableCard category="Pages" title="Certificates Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+   966→      <Card className="bg-surface border-stroke p-6">
+   967→        <h3 className="text-sm font-semibold text-white mb-4">Certificates Page</h3>
+   968→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Certificates section on your portfolio.</p>
+   969→        <div className="space-y-4">
+   970→          <div className="space-y-2">
+   971→            <Label className="text-sm text-white">Section Title</Label>
+   972→            <Input
+   973→              value={profile.certificatesPageTitle}
+   974→              onChange={(e) => updateField('certificatesPageTitle', e.target.value)}
+   975→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   976→              placeholder="Certificates & Credentials"
+   977→            />
+   978→          </div>
+   979→          <div className="space-y-2">
+   980→            <Label className="text-sm text-white">Section Description</Label>
+   981→            <Textarea
+   982→              value={profile.certificatesPageDescription}
+   983→              onChange={(e) => updateField('certificatesPageDescription', e.target.value)}
+   984→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   985→              placeholder="A collection of certifications..."
+   986→            />
+   987→          </div>
+   988→        </div>
+   989→      </Card>
+   990→      </FilterableCard>
+   991→
+   992→      {/* Education Page Section */}
+   993→      <FilterableCard category="Pages" title="Education Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+   994→      <Card className="bg-surface border-stroke p-6">
+   995→        <h3 className="text-sm font-semibold text-white mb-4">Education Page</h3>
+   996→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Education section on your portfolio.</p>
+   997→        <div className="space-y-4">
+   998→          <div className="space-y-2">
+   999→            <Label className="text-sm text-white">Section Title</Label>
+  1000→            <Input
+  1001→              value={profile.educationPageTitle}
+  1002→              onChange={(e) => updateField('educationPageTitle', e.target.value)}
+  1003→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1004→              placeholder="My Educational Journey"
+  1005→            />
+  1006→          </div>
+  1007→          <div className="space-y-2">
+  1008→            <Label className="text-sm text-white">Section Description</Label>
+  1009→            <Textarea
+  1010→              value={profile.educationPageDescription}
+  1011→              onChange={(e) => updateField('educationPageDescription', e.target.value)}
+  1012→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+  1013→              placeholder="My academic background..."
+  1014→            />
+  1015→          </div>
+  1016→        </div>
+  1017→      </Card>
+  1018→      </FilterableCard>
+  1019→
+  1020→      {/* Resume Page Section */}
+  1021→      <FilterableCard category="Pages" title="Resume Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+  1022→      <Card className="bg-surface border-stroke p-6">
+  1023→        <h3 className="text-sm font-semibold text-white mb-4">Resume Page</h3>
+  1024→        <p className="text-xs text-muted-text mb-4">Edit the texts displayed in the Resume section of your portfolio.</p>
+  1025→        <div className="space-y-4">
+  1026→          <div className="space-y-2">
+  1027→            <Label className="text-sm text-white">Resume Intro</Label>
+  1028→            <Textarea
+  1029→              value={profile.resumeIntro}
+  1030→              onChange={(e) => updateField('resumeIntro', e.target.value)}
+  1031→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+  1032→              placeholder="Full-stack developer with hands-on experience..."
+  1033→            />
+  1034→          </div>
+  1035→          <div className="space-y-2">
+  1036→            <Label className="text-sm text-white">Technologies Section Title</Label>
+  1037→            <Input
+  1038→              value={profile.resumeTechTitle}
+  1039→              onChange={(e) => updateField('resumeTechTitle', e.target.value)}
+  1040→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1041→              placeholder="Technologies I work with"
+  1042→            />
+  1043→          </div>
+  1044→          <div className="space-y-2">
+  1045→            <Label className="text-sm text-white">Experience Section Title</Label>
+  1046→            <Input
+  1047→              value={profile.resumeExpTitle}
+  1048→              onChange={(e) => updateField('resumeExpTitle', e.target.value)}
+  1049→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1050→              placeholder="Experience & Projects"
+  1051→            />
+  1052→          </div>
+  1053→        </div>
+  1054→      </Card>
+  1055→      </FilterableCard>
+  1056→
+  1057→      {/* Contact Page Section */}
+  1058→      <FilterableCard category="Pages" title="Contact Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+  1059→      <Card className="bg-surface border-stroke p-6">
+  1060→        <h3 className="text-sm font-semibold text-white mb-4">Contact Page</h3>
+  1061→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Contact section on your portfolio.</p>
+  1062→        <div className="space-y-4">
+  1063→          <div className="space-y-2">
+  1064→            <Label className="text-sm text-white">Section Title</Label>
+  1065→            <Input
+  1066→              value={profile.contactPageTitle}
+  1067→              onChange={(e) => updateField('contactPageTitle', e.target.value)}
+  1068→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1069→              placeholder="Let's Build Something Great Together."
+  1070→            />
+  1071→          </div>
+  1072→          <div className="space-y-2">
+  1073→            <Label className="text-sm text-white">Section Description</Label>
+  1074→            <Textarea
+  1075→              value={profile.contactPageDescription}
+  1076→              onChange={(e) => updateField('contactPageDescription', e.target.value)}
+  1077→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+  1078→              placeholder="Have a project, a role, or just want to connect?..."
+  1079→            />
+  1080→          </div>
+  1081→        </div>
+  1082→      </Card>
+  1083→      </FilterableCard>
+  1084→
+  1085→      {/* Social Links */}
+  1086→      <FilterableCard category="Social" title="Social Links" searchQuery={searchQuery} activeFilter={activeFilter}>
+  1087→      <Card className="bg-surface border-stroke p-6">
+  1088→        <h3 className="text-sm font-semibold text-white mb-4">Social Links</h3>
+  1089→        <div className="space-y-4">
+  1090→          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  1091→            <div className="space-y-2">
+  1092→              <Label className="text-sm text-white">GitHub URL</Label>
+  1093→              <Input value={profile.githubUrl} onChange={(e) => updateField('githubUrl', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="https://github.com/username" />
+  1094→            </div>
+  1095→            <div className="space-y-2">
+  1096→              <Label className="text-sm text-white">LinkedIn URL</Label>
+  1097→              <Input value={profile.linkedinUrl} onChange={(e) => updateField('linkedinUrl', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="https://linkedin.com/in/username" />
+  1098→            </div>
+  1099→          </div>
+  1100→          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  1101→            <div className="space-y-2">
+  1102→              <Label className="text-sm text-white">Instagram URL</Label>
+  1103→              <Input value={profile.instagramUrl} onChange={(e) => updateField('instagramUrl', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="https://instagram.com/username" />
+  1104→            </div>
+  1105→            <div className="space-y-2">
+  1106→              <Label className="text-sm text-white">Twitter URL</Label>
+  1107→              <Input value={profile.twitterUrl} onChange={(e) => updateField('twitterUrl', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="https://twitter.com/username" />
+  1108→            </div>
+  1109→          </div>
+  1110→          <p className="text-xs text-muted-text">Leave a social link empty to hide its icon from the frontend.</p>
+  1111→        </div>
+  1112→      </Card>
+  1113→      </FilterableCard>
+  1114→
+  1115→      {/* SMTP Configuration */}
+  1116→      <FilterableCard category="All" title="SMTP Configuration" searchQuery={searchQuery} activeFilter={activeFilter}>
+  1117→      <Card className="bg-surface border-stroke p-6">
+  1118→        <div className="flex items-center gap-2 mb-4">
+  1119→          <Server className="w-4 h-4 text-brand" />
+  1120→          <h3 className="text-sm font-semibold text-white">SMTP Configuration</h3>
+  1121→        </div>
+  1122→        <p className="text-xs text-muted-text mb-6">Configure your SMTP server to send emails for contact notifications and admin alerts.</p>
+  1123→        <div className="space-y-4">
+  1124→          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  1125→            <div className="space-y-1">
+  1126→              <Label className="text-xs text-white/70">SMTP Host</Label>
+  1127→              <Input
+  1128→                value={smtpSettings.smtpHost}
+  1129→                onChange={(e) => setSmtpSettings((prev) => ({ ...prev, smtpHost: e.target.value }))}
+  1130→                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1131→                placeholder="smtp.gmail.com"
+  1132→              />
+  1133→            </div>
+  1134→            <div className="space-y-1">
+  1135→              <Label className="text-xs text-white/70">SMTP Port</Label>
+  1136→              <Input
+  1137→                type="number"
+  1138→                value={smtpSettings.smtpPort}
+  1139→                onChange={(e) => setSmtpSettings((prev) => ({ ...prev, smtpPort: parseInt(e.target.value) || 587 }))}
+  1140→                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1141→                placeholder="587"
+  1142→              />
+  1143→            </div>
+  1144→          </div>
+  1145→          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  1146→            <div className="space-y-1">
+  1147→              <Label className="text-xs text-white/70">SMTP Username</Label>
+  1148→              <Input
+  1149→                value={smtpSettings.smtpUser}
+  1150→                onChange={(e) => setSmtpSettings((prev) => ({ ...prev, smtpUser: e.target.value }))}
+  1151→                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1152→                placeholder="user@gmail.com"
+  1153→              />
+  1154→            </div>
+  1155→            <div className="space-y-1">
+  1156→              <Label className="text-xs text-white/70">SMTP Password</Label>
+  1157→              <Input
+  1158→                type="password"
+  1159→                value={smtpSettings.smtpPass}
+  1160→                onChange={(e) => setSmtpSettings((prev) => ({ ...prev, smtpPass: e.target.value }))}
+  1161→                className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1162→                placeholder={smtpSettings.hasPassword ? '••••••••••••' : 'Enter new password'}
+  1163→              />
+  1164→            </div>
+  1165→          </div>
+  1166→          <div className="flex items-center gap-3">
+  1167→            <Switch
+  1168→              checked={smtpSettings.smtpSecure}
+  1169→              onCheckedChange={(checked) => setSmtpSettings((prev) => ({ ...prev, smtpSecure: checked }))}
+  1170→            />
+  1171→            <Label className="text-sm text-white">Use Secure Connection (TLS/SSL)</Label>
+  1172→          </div>
+  1173→          <div className="border-t border-stroke/30 pt-4">
+  1174→            <p className="text-xs text-muted-text mb-4">Email identity settings</p>
+  1175→            <div className="space-y-4">
+  1176→              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  1177→                <div className="space-y-1">
+  1178→                  <Label className="text-xs text-white/70">From Name</Label>
+  1179→                  <Input
+  1180→                    value={smtpSettings.fromName}
+  1181→                    onChange={(e) => setSmtpSettings((prev) => ({ ...prev, fromName: e.target.value }))}
+  1182→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1183→                    placeholder="CodeVirtox Portfolio"
+  1184→                  />
+  1185→                </div>
+  1186→                <div className="space-y-1">
+  1187→                  <Label className="text-xs text-white/70">From Email</Label>
+  1188→                  <Input
+  1189→                    value={smtpSettings.fromEmail}
+  1190→                    onChange={(e) => setSmtpSettings((prev) => ({ ...prev, fromEmail: e.target.value }))}
+  1191→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1192→                    placeholder="noreply@codevirtox.com"
+  1193→                  />
+  1194→                </div>
+  1195→              </div>
+  1196→              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  1197→                <div className="space-y-1">
+  1198→                  <Label className="text-xs text-white/70">Reply-To Email</Label>
+  1199→                  <Input
+  1200→                    value={smtpSettings.replyToEmail}
+  1201→                    onChange={(e) => setSmtpSettings((prev) => ({ ...prev, replyToEmail: e.target.value }))}
+  1202→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1203→                    placeholder="reply@codevirtox.com"
+  1204→                  />
+  1205→                </div>
+  1206→                <div className="space-y-1">
+  1207→                  <Label className="text-xs text-white/70">Contact Receiver Email</Label>
+  1208→                  <Input
+  1209→                    value={smtpSettings.contactReceiverEmail}
+  1210→                    onChange={(e) => setSmtpSettings((prev) => ({ ...prev, contactReceiverEmail: e.target.value }))}
+  1211→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+  1212→                    placeholder="admin@codevirtox.com"
+  1213→                  />
+  1214→                </div>
+  1215→              </div>
+  1216→            </div>
+  1217→          </div>
+  1218→          <div className="flex items-center gap-3 pt-2">
+  1219→            <Button
+  1220→              onClick={handleSaveSmtp}
+  1221→              disabled={savingSmtp}
+  1222→              className="bg-brand hover:bg-brand-light text-white gap-2 disabled:opacity-40"
+  1223→            >
+  1224→              {savingSmtp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+  1225→              Save SMTP Settings
+  1226→            </Button>
+  1227→            <Button
+  1228→              onClick={handleSendTestEmail}
+  1229→              disabled={sendingTest}
+  1230→              variant="outline"
+  1231→              className="border-stroke text-white hover:bg-dark gap-2 disabled:opacity-40"
+  1232→            >
+  1233→              {sendingTest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+  1234→              Send Test Email
+  1235→            </Button>
+  1236→          </div>
+  1237→        </div>
+  1238→      </Card>
+  1239→      </FilterableCard>
+  1240→
+  1241→      {/* Email Notifications */}
+  1242→      <FilterableCard category="All" title="Email Notifications" searchQuery={searchQuery} activeFilter={activeFilter}>
+  1243→      <Card className="bg-surface border-stroke p-6">
+  1244→        <div className="flex items-center gap-2 mb-4">
+  1245→          <ShieldCheck className="w-4 h-4 text-brand" />
+  1246→          <h3 className="text-sm font-semibold text-white">Email Notifications</h3>
+  1247→        </div>
+  1248→        <p className="text-xs text-muted-text mb-6">Choose which events trigger email notifications. SMTP must be configured above.</p>
+  1249→        <div className="space-y-6">
+  1250→          <div className="flex items-center justify-between">
+  1251→            <div className="space-y-1">
+  1252→              <Label className="text-sm text-white">Contact Form Notifications</Label>
+  1253→              <p className="text-xs text-muted-text">Receive an email whenever someone submits the contact form.</p>
+  1254→            </div>
+  1255→            <Switch
+  1256→              checked={notifSettings.contactEmailEnabled}
+  1257→              onCheckedChange={(checked) => setNotifSettings((prev) => ({ ...prev, contactEmailEnabled: checked }))}
+  1258→            />
+  1259→          </div>
+  1260→          <div className="border-t border-stroke/30" />
+  1261→          <div className="flex items-center justify-between">
+  1262→            <div className="space-y-1">
+  1263→              <Label className="text-sm text-white">Admin Login Notifications</Label>
+  1264→              <p className="text-xs text-muted-text">Receive an email whenever an admin successfully logs in.</p>
+  1265→            </div>
+  1266→            <Switch
+  1267→              checked={notifSettings.adminLoginEmailEnabled}
+  1268→              onCheckedChange={(checked) => setNotifSettings((prev) => ({ ...prev, adminLoginEmailEnabled: checked }))}
+  1269→            />
+  1270→          </div>
+  1271→        </div>
+  1272→        <div className="pt-4">
+  1273→          <Button
+  1274→            onClick={handleSaveNotif}
+  1275→            disabled={savingNotif}
+  1276→            className="bg-brand hover:bg-brand-light text-white gap-2 disabled:opacity-40"
+  1277→          >
+  1278→            {savingNotif ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+  1279→            Save Notifications
+  1280→          </Button>
+  1281→        </div>
+  1282→      </Card>
+  1283→      </FilterableCard>
+  1284→
+  1285→      {/* Empty state when no cards match */}
+  1286→      {!hasVisibleCards() && (
+  1287→        <div className="text-center py-16">
+  1288→          <p className="text-muted-text mb-2">No settings match your search.</p>
+  1289→          <button onClick={() => { setSearchQuery(''); setActiveFilter('All'); }} className="text-xs text-brand hover:underline">
+  1290→            Clear filters
+  1291→          </button>
+  1292→        </div>
+  1293→      )}
+  1294→
+  1295→      {/* Unsaved changes indicator */}
+  1296→      {hasChanges && (
+  1297→        <div className="flex items-center gap-2 text-xs text-brand">
+  1298→          <div className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
+  1299→          Unsaved changes
+  1300→        </div>
+  1301→      )}
+  1302→    </motion.div>
+  1303→  );
+  1304→}
+  1305→

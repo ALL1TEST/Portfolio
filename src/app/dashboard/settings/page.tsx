@@ -115,7 +115,7 @@ interface CardItem {
 }
 
 function FilterableCard({ category, title, searchQuery, activeFilter, children }: { category: string; title: string; searchQuery: string; activeFilter: string; children: React.ReactNode }) {
-  const matchesCategory = activeFilter === 'All' || category === activeFilter;
+  const matchesCategory = activeFilter === 'All' || category === activeFilter || category === 'All';
   const q = searchQuery.toLowerCase();
   const matchesSearch = q === '' || title.toLowerCase().includes(q);
   if (!matchesCategory || !matchesSearch) return null;
@@ -463,7 +463,7 @@ export default function SettingsPage() {
     const q = searchQuery.toLowerCase();
     return cardList.some(
       (card) =>
-        (activeFilter === 'All' || card.category === activeFilter) &&
+        (activeFilter === 'All' || card.category === activeFilter || card.category === 'All') &&
         (q === '' || card.title.toLowerCase().includes(q))
     );
   };
