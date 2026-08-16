@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import RadialRevealButton from '@/components/ui/radial-reveal-button';
 import { Loader2, ArrowRight, ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
 
 type View = 'login' | 'forgot-email' | 'forgot-reset';
@@ -207,16 +208,6 @@ export default function LoginPage() {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 className="p-6"
               >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center">
-                    <ShieldCheck className="w-5 h-5 text-brand" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-white">Welcome Back</h2>
-                    <p className="text-xs text-muted-text">Sign in to your dashboard</p>
-                  </div>
-                </div>
-
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-medium text-white">
@@ -259,38 +250,36 @@ export default function LoginPage() {
                     />
                   </div>
 
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full"
-                  >
-                    <Button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full bg-brand hover:bg-brand-light text-white font-medium h-11 relative overflow-hidden transition-all duration-300 group/btn"
-                    >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        {loading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Signing in...
-                          </>
-                        ) : (
-                          <>
-                            Sign In
-                            <motion.span
-                              initial={{ x: 0, opacity: 1 }}
-                              whileHover={{ x: 4, opacity: 1 }}
-                              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                            >
-                              <ArrowRight className="w-4 h-4" />
-                            </motion.span>
-                          </>
-                        )}
-                      </span>
-                      <span className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/10 transition-colors duration-300" />
-                    </Button>
-                  </motion.div>
+                  <div className="w-full flex justify-center pt-2">
+                    {loading ? (
+                      <div className="flex items-center gap-2 text-white/60 text-sm">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Signing in...
+                      </div>
+                    ) : (
+                      <RadialRevealButton
+                        type="submit"
+                        label="Sign In"
+                        font={{
+                          fontFamily: 'Inter',
+                          fontWeight: 100,
+                          fontSize: 16,
+                          lineHeight: '1.5em',
+                          letterSpacing: '0.05em',
+                          textAlign: 'center',
+                        }}
+                        padding="12px 48px 12px 48px"
+                        rounded={100}
+                        style={{ width: '100%' }}
+                        transition={{
+                          type: 'tween',
+                          ease: [0.6, -0.28, 0.735, 0.045],
+                          delay: 0.45,
+                          duration: 0.4,
+                        }}
+                      />
+                    )}
+                  </div>
                 </form>
               </motion.div>
             )}
