@@ -1135,3 +1135,25 @@ Stage Summary:
   - `src/app/api/auth/forgot-password/route.ts` (new)
   - `src/app/api/auth/reset-password/route.ts` (new)
   - `src/app/login/page.tsx` (modified)
+---
+Task ID: 3
+Agent: Main Agent
+Task: Modify notification bell to show messages inline instead of navigating to Messages page
+
+Work Log:
+- Read current `notification-bell.tsx` and `messages/page.tsx` to understand existing behavior
+- Modified `notification-bell.tsx`: Added `selectedMessage` state to track inline-viewed message
+- Changed `handleMessageClick` to NOT navigate — instead sets `selectedMessage` and shows detail inline
+- Added detail view with: back button (ChevronLeft), subject, sender info (name · email · date), full message body
+- Added "View all messages" button at bottom of detail view for navigation
+- Only "View all messages" footer link navigates to `/dashboard/messages`
+- Outside click resets to list view
+- Cleaned up `messages/page.tsx`: removed unused `useSearchParams`, `useRef`, auto-open `?view=` logic, unused `Loader2` import
+- Ran lint — clean, no errors
+
+Stage Summary:
+- Notification bell now shows full message content inline in the dropdown when clicked
+- Back arrow returns to the notification list
+- Clicked messages are dismissed from the bell list and marked as read in DB
+- "View all messages" is the only path to navigate to the Messages page
+- Agent browser verified: all 5 steps passed, no console errors
