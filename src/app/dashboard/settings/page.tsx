@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X } from 'lucide-react';
+import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X, Mail, Lock, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -129,6 +129,15 @@ export default function SettingsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   const [uploading, setUploading] = useState<'profile' | 'cv' | 'logo' | null>(null);
+  // Account change states
+  const [currentEmail, setCurrentEmail] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [savingPassword, setSavingPassword] = useState(false);
+
   const imageInputRef = useRef<HTMLInputElement>(null);
   const cvInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -235,6 +244,63 @@ export default function SettingsPage() {
     finally { setSaving(false); }
   };
 
+  // Fetch user email for account settings
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/profile');
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentEmail(data.email || '');
+        }
+      } catch {
+        // silently fail
+      }
+    };
+    if (currentEmail === '' && !loading) fetchUser();
+  }, [currentEmail, loading]);
+
+  const handleChangeEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmail.trim()) { toast.error('New email is required'); return; }
+    setSavingEmail(true);
+    try {
+      const res = await fetch('/api/auth/change-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentEmail, newEmail: newEmail.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error || 'Failed to change email'); return; }
+      setCurrentEmail(data.email);
+      setNewEmail('');
+      toast.success('Email changed successfully');
+    } catch { toast.error('Failed to change email'); }
+    finally { setSavingEmail(false); }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword) { toast.error('All fields are required'); return; }
+    if (newPassword.length < 6) { toast.error('New password must be at least 6 characters'); return; }
+    if (newPassword !== confirmNewPassword) { toast.error('Passwords do not match'); return; }
+    setSavingPassword(true);
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error || 'Failed to change password'); return; }
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      toast.success('Password changed successfully');
+    } catch { toast.error('Failed to change password'); }
+    finally { setSavingPassword(false); }
+  };
+
   const hasChanges = JSON.stringify(profile) !== JSON.stringify(original);
 
   if (loading) {
@@ -249,6 +315,7 @@ export default function SettingsPage() {
 
   // Build card list with categories
   const cardList: CardItem[] = [
+    { id: 'account', category: 'Personal', title: 'Account', children: null },
     { id: 'profile-image', category: 'Media', title: 'Profile Image', children: null },
     { id: 'cv-upload', category: 'Media', title: 'CV Resume', children: null },
     { id: 'logo', category: 'Media', title: 'Logo', children: null },
@@ -335,6 +402,130 @@ export default function SettingsPage() {
           </button>
         ))}
       </div>
+
+      {/* Account — Change Email & Password */}
+      <FilterableCard category="Personal" title="Account" searchQuery={searchQuery} activeFilter={activeFilter}>
+      <Card className="bg-surface border-stroke p-6">
+        <h3 className="text-sm font-semibold text-white mb-4">Account Settings</h3>
+        <p className="text-xs text-muted-text mb-6">Change your login email and password.</p>
+
+        <div className="space-y-6">
+          {/* Change Email */}
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <Mail className="w-4 h-4 text-brand" />
+              <span className="text-sm font-medium text-white">Change Email</span>
+            </div>
+            <form onSubmit={handleChangeEmail} className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">Current Email</Label>
+                  <Input
+                    type="email"
+                    value={currentEmail}
+                    onChange={(e) => setCurrentEmail(e.target.value)}
+                    required
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="admin@codevirtox.com"
+                    disabled={savingEmail}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">New Email</Label>
+                  <Input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    required
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="new@example.com"
+                    disabled={savingEmail}
+                  />
+                </div>
+              </div>
+              <Button
+                type="submit"
+                disabled={savingEmail || !newEmail.trim() || newEmail === currentEmail}
+                variant="outline"
+                size="sm"
+                className="border-stroke text-white hover:bg-dark gap-2 disabled:opacity-40"
+              >
+                {savingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                Update Email
+              </Button>
+            </form>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-stroke/30" />
+
+          {/* Change Password */}
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <KeyRound className="w-4 h-4 text-brand" />
+              <span className="text-sm font-medium text-white">Change Password</span>
+            </div>
+            <form onSubmit={handleChangePassword} className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">Current Password</Label>
+                  <Input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="••••••••"
+                    disabled={savingPassword}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">New Password</Label>
+                  <Input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="••••••••"
+                    disabled={savingPassword}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-white/70">Confirm Password</Label>
+                  <Input
+                    type="password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+                    placeholder="••••••••"
+                    disabled={savingPassword}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="submit"
+                  disabled={savingPassword || !currentPassword || !newPassword || newPassword !== confirmNewPassword}
+                  variant="outline"
+                  size="sm"
+                  className="border-stroke text-white hover:bg-dark gap-2 disabled:opacity-40"
+                >
+                  {savingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+                  Update Password
+                </Button>
+                {newPassword && confirmPassword && newPassword !== confirmPassword && (
+                  <p className="text-xs text-red-400">Passwords do not match</p>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      </Card>
+      </FilterableCard>
 
       {/* Profile Image */}
       <FilterableCard category="Media" title="Profile Image" searchQuery={searchQuery} activeFilter={activeFilter}>

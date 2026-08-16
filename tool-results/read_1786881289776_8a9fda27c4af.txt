@@ -1,0 +1,818 @@
+     1→'use client';
+     2→
+     3→import { useEffect, useState, useRef } from 'react';
+     4→import { motion } from 'framer-motion';
+     5→import { toast } from 'sonner';
+     6→import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X } from 'lucide-react';
+     7→import { Button } from '@/components/ui/button';
+     8→import { Input } from '@/components/ui/input';
+     9→import { Label } from '@/components/ui/label';
+    10→import { Textarea } from '@/components/ui/textarea';
+    11→import { Card } from '@/components/ui/card';
+    12→import { Skeleton } from '@/components/ui/skeleton';
+    13→
+    14→interface Profile {
+    15→  id?: string;
+    16→  fullName: string;
+    17→  brandName: string;
+    18→  professionalTitle: string;
+    19→  shortBio: string;
+    20→  aboutText: string;
+    21→  footerBio: string;
+    22→  email: string;
+    23→  phone: string;
+    24→  location: string;
+    25→  githubUrl: string;
+    26→  linkedinUrl: string;
+    27→  instagramUrl: string;
+    28→  twitterUrl: string;
+    29→  featuredProjectsTitle: string;
+    30→  featuredProjectsDescription: string;
+    31→  aboutCard1Title: string;
+    32→  aboutCard1Description: string;
+    33→  aboutCard2Title: string;
+    34→  aboutCard2Description: string;
+    35→  aboutCard3Title: string;
+    36→  aboutCard3Description: string;
+    37→  logoUrl: string;
+    38→  profileImage: string;
+    39→  cvFile: string;
+    40→  stat1Value: string;
+    41→  stat1Label: string;
+    42→  stat2Value: string;
+    43→  stat2Label: string;
+    44→  stat3Value: string;
+    45→  stat3Label: string;
+    46→  projectsPageTitle: string;
+    47→  projectsPageDescription: string;
+    48→  certificatesPageTitle: string;
+    49→  certificatesPageDescription: string;
+    50→  educationPageTitle: string;
+    51→  educationPageDescription: string;
+    52→  resumeIntro: string;
+    53→  resumeTechTitle: string;
+    54→  resumeExpTitle: string;
+    55→  contactPageTitle: string;
+    56→  contactPageDescription: string;
+    57→  footerCopyright: string;
+    58→  footerCredit: string;
+    59→}
+    60→
+    61→const emptyProfile: Profile = {
+    62→  fullName: '',
+    63→  brandName: '',
+    64→  professionalTitle: '',
+    65→  shortBio: '',
+    66→  aboutText: '',
+    67→  footerBio: '',
+    68→  email: '',
+    69→  phone: '',
+    70→  location: '',
+    71→  githubUrl: '',
+    72→  linkedinUrl: '',
+    73→  instagramUrl: '',
+    74→  twitterUrl: '',
+    75→  featuredProjectsTitle: '',
+    76→  featuredProjectsDescription: '',
+    77→  aboutCard1Title: '',
+    78→  aboutCard1Description: '',
+    79→  aboutCard2Title: '',
+    80→  aboutCard2Description: '',
+    81→  aboutCard3Title: '',
+    82→  aboutCard3Description: '',
+    83→  logoUrl: '',
+    84→  profileImage: '',
+    85→  cvFile: '',
+    86→  stat1Value: '',
+    87→  stat1Label: '',
+    88→  stat2Value: '',
+    89→  stat2Label: '',
+    90→  stat3Value: '',
+    91→  stat3Label: '',
+    92→  projectsPageTitle: '',
+    93→  projectsPageDescription: '',
+    94→  certificatesPageTitle: '',
+    95→  certificatesPageDescription: '',
+    96→  educationPageTitle: '',
+    97→  educationPageDescription: '',
+    98→  resumeIntro: '',
+    99→  resumeTechTitle: '',
+   100→  resumeExpTitle: '',
+   101→  contactPageTitle: '',
+   102→  contactPageDescription: '',
+   103→  footerCopyright: '',
+   104→  footerCredit: '',
+   105→};
+   106→
+   107→const filterCategories = ['All', 'Media', 'Personal', 'Pages', 'Footer', 'Social'];
+   108→
+   109→interface CardItem {
+   110→  id: string;
+   111→  category: string;
+   112→  title: string;
+   113→  children: React.ReactNode;
+   114→}
+   115→
+   116→function FilterableCard({ category, title, searchQuery, activeFilter, children }: { category: string; title: string; searchQuery: string; activeFilter: string; children: React.ReactNode }) {
+   117→  const matchesCategory = activeFilter === 'All' || category === activeFilter;
+   118→  const q = searchQuery.toLowerCase();
+   119→  const matchesSearch = q === '' || title.toLowerCase().includes(q);
+   120→  if (!matchesCategory || !matchesSearch) return null;
+   121→  return <>{children}</>;
+   122→}
+   123→
+   124→export default function SettingsPage() {
+   125→  const [profile, setProfile] = useState<Profile>(emptyProfile);
+   126→  const [original, setOriginal] = useState<Profile>(emptyProfile);
+   127→  const [loading, setLoading] = useState(true);
+   128→  const [saving, setSaving] = useState(false);
+   129→  const [searchQuery, setSearchQuery] = useState('');
+   130→  const [activeFilter, setActiveFilter] = useState('All');
+   131→  const [uploading, setUploading] = useState<'profile' | 'cv' | 'logo' | null>(null);
+   132→  const imageInputRef = useRef<HTMLInputElement>(null);
+   133→  const cvInputRef = useRef<HTMLInputElement>(null);
+   134→  const logoInputRef = useRef<HTMLInputElement>(null);
+   135→
+   136→  useEffect(() => {
+   137→    const fetchProfile = async () => {
+   138→      try {
+   139→        const res = await fetch('/api/profile');
+   140→        if (res.ok) {
+   141→          const data = await res.json();
+   142→          setProfile(data);
+   143→          setOriginal(data);
+   144→        }
+   145→      } catch {
+   146→        toast.error('Failed to load profile');
+   147→      } finally {
+   148→        setLoading(false);
+   149→      }
+   150→    };
+   151→    fetchProfile();
+   152→  }, []);
+   153→
+   154→  const updateField = (field: keyof Profile, value: string) => {
+   155→    setProfile((prev) => ({ ...prev, [field]: value }));
+   156→  };
+   157→
+   158→  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+   159→    const file = e.target.files?.[0];
+   160→    if (!file) return;
+   161→    if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
+   162→    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return; }
+   163→
+   164→    setUploading('profile');
+   165→    try {
+   166→      const formData = new FormData();
+   167→      formData.append('file', file);
+   168→      formData.append('category', 'profile');
+   169→      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+   170→      if (res.ok) {
+   171→        const data = await res.json();
+   172→        updateField('profileImage', data.url);
+   173→        toast.success('Image uploaded successfully');
+   174→      } else { toast.error('Failed to upload image'); }
+   175→    } catch { toast.error('Failed to upload image'); }
+   176→    finally { setUploading(null); if (imageInputRef.current) imageInputRef.current.value = ''; }
+   177→  };
+   178→
+   179→  const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+   180→    const file = e.target.files?.[0];
+   181→    if (!file) return;
+   182→    if (file.type !== 'application/pdf') { toast.error('Only PDF files are allowed'); return; }
+   183→    if (file.size > 10 * 1024 * 1024) { toast.error('File must be under 10MB'); return; }
+   184→
+   185→    setUploading('cv');
+   186→    try {
+   187→      const formData = new FormData();
+   188→      formData.append('file', file);
+   189→      formData.append('category', 'cv');
+   190→      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+   191→      if (res.ok) {
+   192→        const data = await res.json();
+   193→        updateField('cvFile', data.url);
+   194→        toast.success('CV uploaded successfully');
+   195→      } else { toast.error('Failed to upload CV'); }
+   196→    } catch { toast.error('Failed to upload CV'); }
+   197→    finally { setUploading(null); if (cvInputRef.current) cvInputRef.current.value = ''; }
+   198→  };
+   199→
+   200→  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+   201→    const file = e.target.files?.[0];
+   202→    if (!file) return;
+   203→    if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
+   204→    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return; }
+   205→
+   206→    setUploading('logo');
+   207→    try {
+   208→      const formData = new FormData();
+   209→      formData.append('file', file);
+   210→      formData.append('category', 'profile');
+   211→      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+   212→      if (res.ok) {
+   213→        const data = await res.json();
+   214→        updateField('logoUrl', data.url);
+   215→        toast.success('Logo uploaded successfully');
+   216→      } else { toast.error('Failed to upload logo'); }
+   217→    } catch { toast.error('Failed to upload logo'); }
+   218→    finally { setUploading(null); if (logoInputRef.current) logoInputRef.current.value = ''; }
+   219→  };
+   220→
+   221→  const handleSave = async () => {
+   222→    setSaving(true);
+   223→    try {
+   224→      const res = await fetch('/api/profile', {
+   225→        method: 'PUT',
+   226→        headers: { 'Content-Type': 'application/json' },
+   227→        body: JSON.stringify(profile),
+   228→      });
+   229→      if (res.ok) {
+   230→        const data = await res.json();
+   231→        setOriginal(data);
+   232→        toast.success('Profile saved successfully');
+   233→      } else { toast.error('Failed to save profile'); }
+   234→    } catch { toast.error('Failed to save profile'); }
+   235→    finally { setSaving(false); }
+   236→  };
+   237→
+   238→  const hasChanges = JSON.stringify(profile) !== JSON.stringify(original);
+   239→
+   240→  if (loading) {
+   241→    return (
+   242→      <div className="space-y-4">
+   243→        {[1, 2, 3, 4, 5].map((i) => (
+   244→          <Skeleton key={i} className="h-12 w-full bg-surface rounded-xl" />
+   245→        ))}
+   246→      </div>
+   247→    );
+   248→  }
+   249→
+   250→  // Build card list with categories
+   251→  const cardList: CardItem[] = [
+   252→    { id: 'profile-image', category: 'Media', title: 'Profile Image', children: null },
+   253→    { id: 'cv-upload', category: 'Media', title: 'CV Resume', children: null },
+   254→    { id: 'logo', category: 'Media', title: 'Logo', children: null },
+   255→    { id: 'personal-info', category: 'Personal', title: 'Personal Information', children: null },
+   256→    { id: 'about-text', category: 'Personal', title: 'About', children: null },
+   257→    { id: 'about-cards', category: 'Personal', title: 'About Cards', children: null },
+   258→    { id: 'featured-projects', category: 'Pages', title: 'Featured Projects Section', children: null },
+   259→    { id: 'footer', category: 'Footer', title: 'Footer', children: null },
+   260→    { id: 'achievement-stats', category: 'Personal', title: 'Achievement Stats', children: null },
+   261→    { id: 'projects-page', category: 'Pages', title: 'Projects Page', children: null },
+   262→    { id: 'certificates-page', category: 'Pages', title: 'Certificates Page', children: null },
+   263→    { id: 'education-page', category: 'Pages', title: 'Education Page', children: null },
+   264→    { id: 'resume-page', category: 'Pages', title: 'Resume Page', children: null },
+   265→    { id: 'contact-page', category: 'Pages', title: 'Contact Page', children: null },
+   266→    { id: 'social-links', category: 'Social', title: 'Social Links', children: null },
+   267→  ];
+   268→
+   269→  const hasVisibleCards = () => {
+   270→    const q = searchQuery.toLowerCase();
+   271→    return cardList.some(
+   272→      (card) =>
+   273→        (activeFilter === 'All' || card.category === activeFilter) &&
+   274→        (q === '' || card.title.toLowerCase().includes(q))
+   275→    );
+   276→  };
+   277→
+   278→  return (
+   279→    <motion.div
+   280→      initial={{ opacity: 0, y: 20 }}
+   281→      animate={{ opacity: 1, y: 0 }}
+   282→      transition={{ duration: 0.4 }}
+   283→      className="space-y-6 max-w-3xl"
+   284→    >
+   285→      {/* Header with save button */}
+   286→      <div className="flex items-center justify-between">
+   287→        <div className="flex items-center gap-3">
+   288→          <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center">
+   289→            <User className="w-5 h-5 text-brand" />
+   290→          </div>
+   291→          <div>
+   292→            <h2 className="text-base font-semibold text-white">Profile Information</h2>
+   293→            <p className="text-sm text-muted-text">Update your personal and professional details</p>
+   294→          </div>
+   295→        </div>
+   296→        <Button
+   297→          onClick={handleSave}
+   298→          disabled={saving || !hasChanges}
+   299→          className="bg-brand hover:bg-brand-light text-white gap-2 disabled:opacity-40"
+   300→        >
+   301→          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+   302→          Save Changes
+   303→        </Button>
+   304→      </div>
+   305→
+   306→      {/* Search bar */}
+   307→      <div className="relative">
+   308→        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-text" />
+   309→        <Input
+   310→          value={searchQuery}
+   311→          onChange={(e) => setSearchQuery(e.target.value)}
+   312→          className="bg-surface border-stroke text-white placeholder:text-muted-text pl-9 pr-9"
+   313→          placeholder="Search settings..."
+   314→        />
+   315→        {searchQuery && (
+   316→          <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-white">
+   317→            <X className="w-4 h-4" />
+   318→          </button>
+   319→        )}
+   320→      </div>
+   321→
+   322→      {/* Category filter buttons */}
+   323→      <div className="flex flex-wrap gap-2">
+   324→        {filterCategories.map((cat) => (
+   325→          <button
+   326→            key={cat}
+   327→            onClick={() => setActiveFilter(cat)}
+   328→            className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 ${
+   329→              activeFilter === cat
+   330→                ? 'bg-brand text-white border-brand'
+   331→                : 'bg-surface border-stroke/50 text-muted-text hover:text-white hover:border-stroke'
+   332→            }`}
+   333→          >
+   334→            {cat}
+   335→          </button>
+   336→        ))}
+   337→      </div>
+   338→
+   339→      {/* Profile Image */}
+   340→      <FilterableCard category="Media" title="Profile Image" searchQuery={searchQuery} activeFilter={activeFilter}>
+   341→      <Card className="bg-surface border-stroke p-6">
+   342→        <h3 className="text-sm font-semibold text-white mb-4">Profile Image</h3>
+   343→        <div className="flex items-center gap-6">
+   344→          <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-stroke/50 bg-dark flex-shrink-0">
+   345→            {profile.profileImage ? (
+   346→              <img src={profile.profileImage} alt="Profile" className="w-full h-full object-cover" />
+   347→            ) : (
+   348→              <div className="w-full h-full flex items-center justify-center text-muted-text"><User className="w-8 h-8" /></div>
+   349→            )}
+   350→          </div>
+   351→          <div className="flex-1 space-y-3">
+   352→            <div className="flex items-center gap-2">
+   353→              <Button type="button" variant="outline" size="sm" onClick={() => imageInputRef.current?.click()} disabled={uploading === 'profile'} className="border-stroke text-white hover:bg-dark gap-2">
+   354→                {uploading === 'profile' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+   355→                {uploading === 'profile' ? 'Uploading...' : 'Upload Image'}
+   356→              </Button>
+   357→              {profile.profileImage && (
+   358→                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('profileImage', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+   359→                  <Trash2 className="w-3.5 h-3.5" /> Remove
+   360→                </Button>
+   361→              )}
+   362→            </div>
+   363→            <p className="text-xs text-muted-text">Recommended: Square image, min 300×300px. Max 5MB.</p>
+   364→            <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+   365→          </div>
+   366→        </div>
+   367→      </Card>
+   368→      </FilterableCard>
+   369→
+   370→      {/* CV Upload */}
+   371→      <FilterableCard category="Media" title="CV Resume" searchQuery={searchQuery} activeFilter={activeFilter}>
+   372→      <Card className="bg-surface border-stroke p-6">
+   373→        <h3 className="text-sm font-semibold text-white mb-4">CV / Resume</h3>
+   374→        <div className="flex items-center gap-6">
+   375→          <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-stroke/50 bg-dark flex-shrink-0 flex items-center justify-center">
+   376→            {profile.cvFile ? (
+   377→              <a href={profile.cvFile} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1 text-muted-text hover:text-brand transition-colors">
+   378→                <FileText className="w-8 h-8" />
+   379→                <span className="text-[10px]">View CV</span>
+   380→              </a>
+   381→            ) : (
+   382→              <div className="flex flex-col items-center gap-1 text-muted-text/40">
+   383→                <FileText className="w-8 h-8" />
+   384→                <span className="text-[10px]">No CV</span>
+   385→              </div>
+   386→            )}
+   387→          </div>
+   388→          <div className="flex-1 space-y-3">
+   389→            <div className="flex items-center gap-2">
+   390→              <Button type="button" variant="outline" size="sm" onClick={() => cvInputRef.current?.click()} disabled={uploading === 'cv'} className="border-stroke text-white hover:bg-dark gap-2">
+   391→                {uploading === 'cv' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+   392→                {uploading === 'cv' ? 'Uploading...' : 'Upload CV'}
+   393→              </Button>
+   394→              {profile.cvFile && (
+   395→                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('cvFile', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+   396→                  <Trash2 className="w-3.5 h-3.5" /> Remove
+   397→                </Button>
+   398→              )}
+   399→            </div>
+   400→            <p className="text-xs text-muted-text">PDF format only. Max 10MB.</p>
+   401→            <input ref={cvInputRef} type="file" accept=".pdf" onChange={handleCvUpload} className="hidden" />
+   402→          </div>
+   403→        </div>
+   404→      </Card>
+   405→      </FilterableCard>
+   406→
+   407→      {/* Logo */}
+   408→      <FilterableCard category="Media" title="Logo" searchQuery={searchQuery} activeFilter={activeFilter}>
+   409→      <Card className="bg-surface border-stroke p-6">
+   410→        <h3 className="text-sm font-semibold text-white mb-4">Logo</h3>
+   411→        <div className="flex items-center gap-6">
+   412→          <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-stroke/50 bg-dark flex-shrink-0">
+   413→            {profile.logoUrl ? (
+   414→              <img src={profile.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+   415→            ) : (
+   416→              <div className="w-full h-full flex items-center justify-center text-muted-text/40">
+   417→                <img src="/logo.png" alt="Current logo" className="w-12 h-12 object-contain opacity-50" />
+   418→              </div>
+   419→            )}
+   420→          </div>
+   421→          <div className="flex-1 space-y-3">
+   422→            <div className="flex items-center gap-2">
+   423→              <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploading === 'logo'} className="border-stroke text-white hover:bg-dark gap-2">
+   424→                {uploading === 'logo' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+   425→                {uploading === 'logo' ? 'Uploading...' : 'Upload Logo'}
+   426→              </Button>
+   427→              {profile.logoUrl && (
+   428→                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('logoUrl', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+   429→                  <Trash2 className="w-3.5 h-3.5" /> Remove
+   430→                </Button>
+   431→              )}
+   432→            </div>
+   433→            <p className="text-xs text-muted-text">Recommended: Square PNG with transparent background, min 200×200px. Max 5MB.</p>
+   434→            <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+   435→          </div>
+   436→        </div>
+   437→      </Card>
+   438→      </FilterableCard>
+   439→
+   440→      {/* Personal Information */}
+   441→      <FilterableCard category="Personal" title="Personal Information" searchQuery={searchQuery} activeFilter={activeFilter}>
+   442→      <Card className="bg-surface border-stroke p-6">
+   443→        <h3 className="text-sm font-semibold text-white mb-4">Personal Information</h3>
+   444→        <div className="space-y-4">
+   445→          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   446→            <div className="space-y-2">
+   447→              <Label className="text-sm text-white">Full Name</Label>
+   448→              <Input value={profile.fullName} onChange={(e) => updateField('fullName', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="ABDELLAH AIT-SI" />
+   449→            </div>
+   450→            <div className="space-y-2">
+   451→              <Label className="text-sm text-white">Brand Name</Label>
+   452→              <Input value={profile.brandName} onChange={(e) => updateField('brandName', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="CodeVirtox" />
+   453→            </div>
+   454→          </div>
+   455→          <div className="space-y-2">
+   456→            <Label className="text-sm text-white">Professional Title</Label>
+   457→            <Input value={profile.professionalTitle} onChange={(e) => updateField('professionalTitle', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="Full Stack Developer | AI & Automation" />
+   458→          </div>
+   459→          <div className="space-y-2">
+   460→            <Label className="text-sm text-white">Short Bio</Label>
+   461→            <Input value={profile.shortBio} onChange={(e) => updateField('shortBio', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="I build modern web applications..." />
+   462→          </div>
+   463→        </div>
+   464→      </Card>
+   465→      </FilterableCard>
+   466→
+   467→      {/* About Text */}
+   468→      <FilterableCard category="Personal" title="About" searchQuery={searchQuery} activeFilter={activeFilter}>
+   469→      <Card className="bg-surface border-stroke p-6">
+   470→        <h3 className="text-sm font-semibold text-white mb-4">About</h3>
+   471→        <div className="space-y-2">
+   472→          <Label className="text-sm text-white">About Text</Label>
+   473→          <Textarea value={profile.aboutText} onChange={(e) => updateField('aboutText', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[200px]" placeholder="Tell visitors about yourself..." />
+   474→          <p className="text-xs text-muted-text">This appears on the About section of your portfolio.</p>
+   475→        </div>
+   476→      </Card>
+   477→      </FilterableCard>
+   478→
+   479→      {/* About Cards */}
+   480→      <FilterableCard category="Personal" title="About Cards" searchQuery={searchQuery} activeFilter={activeFilter}>
+   481→      <Card className="bg-surface border-stroke p-6">
+   482→        <h3 className="text-sm font-semibold text-white mb-4">About Cards</h3>
+   483→        <p className="text-xs text-muted-text mb-4">Edit the 3 value cards displayed in the About section.</p>
+   484→        <div className="space-y-6">
+   485→          {(['1', '2', '3'] as const).map((num) => (
+   486→            <div key={num} className="space-y-3">
+   487→              <div className="flex items-center gap-2">
+   488→                <span className="w-7 h-7 rounded-md bg-brand/10 text-brand font-bold text-xs flex items-center justify-center flex-shrink-0">0{num}</span>
+   489→                <span className="text-xs font-medium text-muted-text">Card {num}</span>
+   490→              </div>
+   491→              <div className="space-y-2">
+   492→                <div className="space-y-1">
+   493→                  <Label className="text-xs text-white/70">Title</Label>
+   494→                  <Input
+   495→                    value={profile[`aboutCard${num}Title` as keyof Profile] as string}
+   496→                    onChange={(e) => updateField(`aboutCard${num}Title` as keyof Profile, e.target.value)}
+   497→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   498→                    placeholder={`Card ${num} title...`}
+   499→                  />
+   500→                </div>
+   501→                <div className="space-y-1">
+   502→                  <Label className="text-xs text-white/70">Description</Label>
+   503→                  <Textarea
+   504→                    value={profile[`aboutCard${num}Description` as keyof Profile] as string}
+   505→                    onChange={(e) => updateField(`aboutCard${num}Description` as keyof Profile, e.target.value)}
+   506→                    className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[80px]"
+   507→                    placeholder={`Card ${num} description...`}
+   508→                  />
+   509→                </div>
+   510→              </div>
+   511→              {num !== '3' && <div className="border-b border-stroke/20" />}
+   512→            </div>
+   513→          ))}
+   514→        </div>
+   515→      </Card>
+   516→      </FilterableCard>
+   517→
+   518→      {/* Featured Projects Section */}
+   519→      <FilterableCard category="Pages" title="Featured Projects Section" searchQuery={searchQuery} activeFilter={activeFilter}>
+   520→      <Card className="bg-surface border-stroke p-6">
+   521→        <h3 className="text-sm font-semibold text-white mb-4">Featured Projects Section</h3>
+   522→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Featured Projects section.</p>
+   523→        <div className="space-y-4">
+   524→          <div className="space-y-2">
+   525→            <Label className="text-sm text-white">Section Title</Label>
+   526→            <Input
+   527→              value={profile.featuredProjectsTitle}
+   528→              onChange={(e) => updateField('featuredProjectsTitle', e.target.value)}
+   529→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   530→              placeholder="Featured Projects"
+   531→            />
+   532→          </div>
+   533→          <div className="space-y-2">
+   534→            <Label className="text-sm text-white">Section Description</Label>
+   535→            <Textarea
+   536→              value={profile.featuredProjectsDescription}
+   537→              onChange={(e) => updateField('featuredProjectsDescription', e.target.value)}
+   538→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   539→              placeholder="A selection of projects showcasing..."
+   540→            />
+   541→          </div>
+   542→        </div>
+   543→      </Card>
+   544→      </FilterableCard>
+   545→
+   546→      {/* Footer Bio */}
+   547→      <FilterableCard category="Footer" title="Footer" searchQuery={searchQuery} activeFilter={activeFilter}>
+   548→      <Card className="bg-surface border-stroke p-6">
+   549→        <h3 className="text-sm font-semibold text-white mb-4">Footer</h3>
+   550→        <div className="space-y-2">
+   551→          <Label className="text-sm text-white">Footer Bio</Label>
+   552→          <Textarea value={profile.footerBio} onChange={(e) => updateField('footerBio', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]" placeholder="A short bio or tagline that appears in the footer..." />
+   553→          <p className="text-xs text-muted-text">This appears in the footer section of your website.</p>
+   554→        </div>
+   555→        <div className="mt-4 space-y-4">
+   556→          <div className="space-y-2">
+   557→            <Label className="text-sm text-white">Copyright Text</Label>
+   558→            <Input
+   559→              value={profile.footerCopyright}
+   560→              onChange={(e) => updateField('footerCopyright', e.target.value)}
+   561→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   562→              placeholder="© 2026 ABDELLAH AIT-SI. All rights reserved."
+   563→            />
+   564→            <p className="text-xs text-muted-text">Leave empty to use the default: © {new Date().getFullYear()} {profile.fullName}. All rights reserved.</p>
+   565→          </div>
+   566→          <div className="space-y-2">
+   567→            <Label className="text-sm text-white">Credit Text</Label>
+   568→            <Input
+   569→              value={profile.footerCredit}
+   570→              onChange={(e) => updateField('footerCredit', e.target.value)}
+   571→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   572→              placeholder="Designed & Built by CodeVirtox"
+   573→            />
+   574→            <p className="text-xs text-muted-text">Leave empty to use the default: Designed & Built by {profile.brandName}.</p>
+   575→          </div>
+   576→        </div>
+   577→      </Card>
+   578→      </FilterableCard>
+   579→
+   580→      {/* Achievement Stats */}
+   581→      <FilterableCard category="Personal" title="Achievement Stats" searchQuery={searchQuery} activeFilter={activeFilter}>
+   582→      <Card className="bg-surface border-stroke p-6">
+   583→        <h3 className="text-sm font-semibold text-white mb-4">Achievement Stats</h3>
+   584→        <p className="text-xs text-muted-text mb-4">Edit the 3 stats displayed in the stats section of your site.</p>
+   585→        <div className="space-y-6">
+   586→          {(['1', '2', '3'] as const).map((num) => (
+   587→            <div key={num} className="space-y-3">
+   588→              <div className="flex items-center gap-2">
+   589→                <span className="w-7 h-7 rounded-md bg-brand/10 text-brand font-bold text-xs flex items-center justify-center flex-shrink-0">#{num}</span>
+   590→                <span className="text-xs font-medium text-muted-text">Stat {num}</span>
+   591→              </div>
+   592→              <div className="grid grid-cols-2 gap-3">
+   593→                <div className="space-y-1">
+   594→                  <Label className="text-xs text-white/70">Value</Label>
+   595→                  <Input
+   596→                    value={profile[`stat${num}Value` as keyof Profile] as string}
+   597→                    onChange={(e) => updateField(`stat${num}Value` as keyof Profile, e.target.value)}
+   598→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   599→                    placeholder="e.g. 6+"
+   600→                  />
+   601→                </div>
+   602→                <div className="space-y-1">
+   603→                  <Label className="text-xs text-white/70">Label</Label>
+   604→                  <Input
+   605→                    value={profile[`stat${num}Label` as keyof Profile] as string}
+   606→                    onChange={(e) => updateField(`stat${num}Label` as keyof Profile, e.target.value)}
+   607→                    className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   608→                    placeholder="e.g. Certificates"
+   609→                  />
+   610→                </div>
+   611→              </div>
+   612→              {num !== '3' && <div className="border-b border-stroke/20" />}
+   613→            </div>
+   614→          ))}
+   615→        </div>
+   616→      </Card>
+   617→      </FilterableCard>
+   618→
+   619→      {/* Projects Page Section */}
+   620→      <FilterableCard category="Pages" title="Projects Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+   621→      <Card className="bg-surface border-stroke p-6">
+   622→        <h3 className="text-sm font-semibold text-white mb-4">Projects Page</h3>
+   623→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Projects section on your portfolio.</p>
+   624→        <div className="space-y-4">
+   625→          <div className="space-y-2">
+   626→            <Label className="text-sm text-white">Section Title</Label>
+   627→            <Input
+   628→              value={profile.projectsPageTitle}
+   629→              onChange={(e) => updateField('projectsPageTitle', e.target.value)}
+   630→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   631→              placeholder="Selected Projects"
+   632→            />
+   633→          </div>
+   634→          <div className="space-y-2">
+   635→            <Label className="text-sm text-white">Section Description</Label>
+   636→            <Textarea
+   637→              value={profile.projectsPageDescription}
+   638→              onChange={(e) => updateField('projectsPageDescription', e.target.value)}
+   639→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   640→              placeholder="A selection of projects showcasing..."
+   641→            />
+   642→          </div>
+   643→        </div>
+   644→      </Card>
+   645→      </FilterableCard>
+   646→
+   647→      {/* Certificates Page Section */}
+   648→      <FilterableCard category="Pages" title="Certificates Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+   649→      <Card className="bg-surface border-stroke p-6">
+   650→        <h3 className="text-sm font-semibold text-white mb-4">Certificates Page</h3>
+   651→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Certificates section on your portfolio.</p>
+   652→        <div className="space-y-4">
+   653→          <div className="space-y-2">
+   654→            <Label className="text-sm text-white">Section Title</Label>
+   655→            <Input
+   656→              value={profile.certificatesPageTitle}
+   657→              onChange={(e) => updateField('certificatesPageTitle', e.target.value)}
+   658→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   659→              placeholder="Certificates & Credentials"
+   660→            />
+   661→          </div>
+   662→          <div className="space-y-2">
+   663→            <Label className="text-sm text-white">Section Description</Label>
+   664→            <Textarea
+   665→              value={profile.certificatesPageDescription}
+   666→              onChange={(e) => updateField('certificatesPageDescription', e.target.value)}
+   667→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   668→              placeholder="A collection of certifications..."
+   669→            />
+   670→          </div>
+   671→        </div>
+   672→      </Card>
+   673→      </FilterableCard>
+   674→
+   675→      {/* Education Page Section */}
+   676→      <FilterableCard category="Pages" title="Education Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+   677→      <Card className="bg-surface border-stroke p-6">
+   678→        <h3 className="text-sm font-semibold text-white mb-4">Education Page</h3>
+   679→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Education section on your portfolio.</p>
+   680→        <div className="space-y-4">
+   681→          <div className="space-y-2">
+   682→            <Label className="text-sm text-white">Section Title</Label>
+   683→            <Input
+   684→              value={profile.educationPageTitle}
+   685→              onChange={(e) => updateField('educationPageTitle', e.target.value)}
+   686→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   687→              placeholder="My Educational Journey"
+   688→            />
+   689→          </div>
+   690→          <div className="space-y-2">
+   691→            <Label className="text-sm text-white">Section Description</Label>
+   692→            <Textarea
+   693→              value={profile.educationPageDescription}
+   694→              onChange={(e) => updateField('educationPageDescription', e.target.value)}
+   695→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   696→              placeholder="My academic background..."
+   697→            />
+   698→          </div>
+   699→        </div>
+   700→      </Card>
+   701→      </FilterableCard>
+   702→
+   703→      {/* Resume Page Section */}
+   704→      <FilterableCard category="Pages" title="Resume Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+   705→      <Card className="bg-surface border-stroke p-6">
+   706→        <h3 className="text-sm font-semibold text-white mb-4">Resume Page</h3>
+   707→        <p className="text-xs text-muted-text mb-4">Edit the texts displayed in the Resume section of your portfolio.</p>
+   708→        <div className="space-y-4">
+   709→          <div className="space-y-2">
+   710→            <Label className="text-sm text-white">Resume Intro</Label>
+   711→            <Textarea
+   712→              value={profile.resumeIntro}
+   713→              onChange={(e) => updateField('resumeIntro', e.target.value)}
+   714→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   715→              placeholder="Full-stack developer with hands-on experience..."
+   716→            />
+   717→          </div>
+   718→          <div className="space-y-2">
+   719→            <Label className="text-sm text-white">Technologies Section Title</Label>
+   720→            <Input
+   721→              value={profile.resumeTechTitle}
+   722→              onChange={(e) => updateField('resumeTechTitle', e.target.value)}
+   723→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   724→              placeholder="Technologies I work with"
+   725→            />
+   726→          </div>
+   727→          <div className="space-y-2">
+   728→            <Label className="text-sm text-white">Experience Section Title</Label>
+   729→            <Input
+   730→              value={profile.resumeExpTitle}
+   731→              onChange={(e) => updateField('resumeExpTitle', e.target.value)}
+   732→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   733→              placeholder="Experience & Projects"
+   734→            />
+   735→          </div>
+   736→        </div>
+   737→      </Card>
+   738→      </FilterableCard>
+   739→
+   740→      {/* Contact Page Section */}
+   741→      <FilterableCard category="Pages" title="Contact Page" searchQuery={searchQuery} activeFilter={activeFilter}>
+   742→      <Card className="bg-surface border-stroke p-6">
+   743→        <h3 className="text-sm font-semibold text-white mb-4">Contact Page</h3>
+   744→        <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Contact section on your portfolio.</p>
+   745→        <div className="space-y-4">
+   746→          <div className="space-y-2">
+   747→            <Label className="text-sm text-white">Section Title</Label>
+   748→            <Input
+   749→              value={profile.contactPageTitle}
+   750→              onChange={(e) => updateField('contactPageTitle', e.target.value)}
+   751→              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+   752→              placeholder="Let's Build Something Great Together."
+   753→            />
+   754→          </div>
+   755→          <div className="space-y-2">
+   756→            <Label className="text-sm text-white">Section Description</Label>
+   757→            <Textarea
+   758→              value={profile.contactPageDescription}
+   759→              onChange={(e) => updateField('contactPageDescription', e.target.value)}
+   760→              className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]"
+   761→              placeholder="Have a project, a role, or just want to connect?..."
+   762→            />
+   763→          </div>
+   764→        </div>
+   765→      </Card>
+   766→      </FilterableCard>
+   767→
+   768→      {/* Social Links */}
+   769→      <FilterableCard category="Social" title="Social Links" searchQuery={searchQuery} activeFilter={activeFilter}>
+   770→      <Card className="bg-surface border-stroke p-6">
+   771→        <h3 className="text-sm font-semibold text-white mb-4">Social Links</h3>
+   772→        <div className="space-y-4">
+   773→          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   774→            <div className="space-y-2">
+   775→              <Label className="text-sm text-white">GitHub URL</Label>
+   776→              <Input value={profile.githubUrl} onChange={(e) => updateField('githubUrl', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="https://github.com/username" />
+   777→            </div>
+   778→            <div className="space-y-2">
+   779→              <Label className="text-sm text-white">LinkedIn URL</Label>
+   780→              <Input value={profile.linkedinUrl} onChange={(e) => updateField('linkedinUrl', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="https://linkedin.com/in/username" />
+   781→            </div>
+   782→          </div>
+   783→          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+   784→            <div className="space-y-2">
+   785→              <Label className="text-sm text-white">Instagram URL</Label>
+   786→              <Input value={profile.instagramUrl} onChange={(e) => updateField('instagramUrl', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="https://instagram.com/username" />
+   787→            </div>
+   788→            <div className="space-y-2">
+   789→              <Label className="text-sm text-white">Twitter URL</Label>
+   790→              <Input value={profile.twitterUrl} onChange={(e) => updateField('twitterUrl', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text" placeholder="https://twitter.com/username" />
+   791→            </div>
+   792→          </div>
+   793→          <p className="text-xs text-muted-text">Leave a social link empty to hide its icon from the frontend.</p>
+   794→        </div>
+   795→      </Card>
+   796→      </FilterableCard>
+   797→
+   798→      {/* Empty state when no cards match */}
+   799→      {!hasVisibleCards() && (
+   800→        <div className="text-center py-16">
+   801→          <p className="text-muted-text mb-2">No settings match your search.</p>
+   802→          <button onClick={() => { setSearchQuery(''); setActiveFilter('All'); }} className="text-xs text-brand hover:underline">
+   803→            Clear filters
+   804→          </button>
+   805→        </div>
+   806→      )}
+   807→
+   808→      {/* Unsaved changes indicator */}
+   809→      {hasChanges && (
+   810→        <div className="flex items-center gap-2 text-xs text-brand">
+   811→          <div className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
+   812→          Unsaved changes
+   813→        </div>
+   814→      )}
+   815→    </motion.div>
+   816→  );
+   817→}
+   818→
