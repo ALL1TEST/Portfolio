@@ -77,6 +77,18 @@ export default function LoginPage() {
     }
   };
 
+  // Check for reset token in URL on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+      if (token) {
+        setResetToken(token);
+        setView('forgot-reset');
+      }
+    }
+  }, []);
+
   const handleForgotEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -95,14 +107,15 @@ export default function LoginPage() {
         return;
       }
 
-      if (data.token) {
-        // Email found — token generated
-        setResetToken(data.token);
-        setView('forgot-reset');
-        toast.success('Email verified. Set your new password.');
+      if (data.success || data.message) {
+        // Email sent successfully
+        toast.success('If an account exists, a reset link has been sent to your email.');
+        // Don't transition immediately, clear email and switch to login view
+        setTimeout(() => {
+          switchView('login');
+        }, 3000);
       } else {
-        // Email not found
-        toast.error('No account found with this email address.');
+        toast.error('Failed to send reset link.');
       }
     } catch {
       toast.error('Something went wrong. Please try again.');
