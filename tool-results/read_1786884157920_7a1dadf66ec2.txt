@@ -1,0 +1,1166 @@
+     1→@import "tailwindcss";
+     2→@import "tw-animate-css";
+     3→
+     4→@custom-variant dark (&:is(.dark *));
+     5→
+     6→@theme inline {
+     7→  --color-background: var(--background);
+     8→  --color-foreground: var(--foreground);
+     9→  --font-sans: var(--font-geist-sans);
+    10→  --font-mono: var(--font-geist-mono);
+    11→  --color-sidebar-ring: var(--sidebar-ring);
+    12→  --color-sidebar-border: var(--sidebar-border);
+    13→  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    14→  --color-sidebar-accent: var(--sidebar-accent);
+    15→  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    16→  --color-sidebar-primary: var(--sidebar-primary);
+    17→  --color-sidebar-foreground: var(--sidebar-foreground);
+    18→  --color-sidebar: var(--sidebar);
+    19→  --color-chart-5: var(--chart-5);
+    20→  --color-chart-4: var(--chart-4);
+    21→  --color-chart-3: var(--chart-3);
+    22→  --color-chart-2: var(--chart-2);
+    23→  --color-chart-1: var(--chart-1);
+    24→  --color-ring: var(--ring);
+    25→  --color-input: var(--input);
+    26→  --color-border: var(--border);
+    27→  --color-destructive: var(--destructive);
+    28→  --color-accent-foreground: var(--accent-foreground);
+    29→  --color-accent: var(--accent);
+    30→  --color-muted-foreground: var(--muted-foreground);
+    31→  --color-muted: var(--muted);
+    32→  --color-secondary-foreground: var(--secondary-foreground);
+    33→  --color-secondary: var(--secondary);
+    34→  --color-primary-foreground: var(--primary-foreground);
+    35→  --color-primary: var(--primary);
+    36→  --color-popover-foreground: var(--popover-foreground);
+    37→  --color-popover: var(--popover);
+    38→  --color-card-foreground: var(--card-foreground);
+    39→  --color-card: var(--card);
+    40→  --radius-sm: calc(var(--radius) - 4px);
+    41→  --radius-md: calc(var(--radius) - 2px);
+    42→  --radius-lg: var(--radius);
+    43→  --radius-xl: calc(var(--radius) + 4px);
+    44→  --color-brand: #FF3900;
+    45→  --color-brand-light: #FF5A2B;
+    46→  --color-dark: #030303;
+    47→  --color-surface: #1A1A1A;
+    48→  --color-stroke: #353535;
+    49→  --color-gradient-dark: #151517;
+    50→  --color-muted-text: #9A9A9A;
+    51→}
+    52→
+    53→:root {
+    54→  --radius: 0.625rem;
+    55→  --background: #030303;
+    56→  --foreground: #FFFFFF;
+    57→  --card: #1A1A1A;
+    58→  --card-foreground: #FFFFFF;
+    59→  --popover: #1A1A1A;
+    60→  --popover-foreground: #FFFFFF;
+    61→  --primary: #FF3900;
+    62→  --primary-foreground: #FFFFFF;
+    63→  --secondary: #151517;
+    64→  --secondary-foreground: #FFFFFF;
+    65→  --muted: #1A1A1A;
+    66→  --muted-foreground: #9A9A9A;
+    67→  --accent: #1A1A1A;
+    68→  --accent-foreground: #FFFFFF;
+    69→  --destructive: #FF3900;
+    70→  --border: #353535;
+    71→  --input: #353535;
+    72→  --ring: #FF3900;
+    73→  --chart-1: #FF3900;
+    74→  --chart-2: #FF5A2B;
+    75→  --chart-3: #9A9A9A;
+    76→  --chart-4: #1A1A1A;
+    77→  --chart-5: #353535;
+    78→  --sidebar: #151517;
+    79→  --sidebar-foreground: #FFFFFF;
+    80→  --sidebar-primary: #FF3900;
+    81→  --sidebar-primary-foreground: #FFFFFF;
+    82→  --sidebar-accent: #1A1A1A;
+    83→  --sidebar-accent-foreground: #FFFFFF;
+    84→  --sidebar-border: #353535;
+    85→  --sidebar-ring: #FF3900;
+    86→}
+    87→
+    88→@layer base {
+    89→  * {
+    90→    @apply border-border outline-ring/50;
+    91→  }
+    92→  body {
+    93→    @apply bg-background text-foreground;
+    94→  }
+    95→  html {
+    96→    scroll-behavior: smooth;
+    97→    scrollbar-width: thin;
+    98→    scrollbar-color: #353535 #030303;
+    99→  }
+   100→  ::-webkit-scrollbar {
+   101→    width: 6px;
+   102→  }
+   103→  ::-webkit-scrollbar-track {
+   104→    background: #030303;
+   105→  }
+   106→  ::-webkit-scrollbar-thumb {
+   107→    background: #353535;
+   108→    border-radius: 3px;
+   109→  }
+   110→  ::-webkit-scrollbar-thumb:hover {
+   111→    background: #FF3900;
+   112→  }
+   113→  ::selection {
+   114→    background: #FF3900;
+   115→    color: #FFFFFF;
+   116→  }
+   117→}
+   118→
+   119→/* Noise texture overlay */
+   120→.noise-bg::before {
+   121→  content: '';
+   122→  position: fixed;
+   123→  top: 0;
+   124→  left: 0;
+   125→  width: 100%;
+   126→  height: 100%;
+   127→  opacity: 0.03;
+   128→  z-index: 0;
+   129→  pointer-events: none;
+   130→  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+   131→}
+   132→
+   133→/* Gradient text */
+   134→.gradient-text {
+   135→  background: linear-gradient(135deg, #FFFFFF 0%, #9A9A9A 100%);
+   136→  -webkit-background-clip: text;
+   137→  -webkit-text-fill-color: transparent;
+   138→  background-clip: text;
+   139→}
+   140→
+   141→/* Animated gradient border */
+   142→@property --angle {
+   143→  syntax: '<angle>';
+   144→  initial-value: 0deg;
+   145→  inherits: false;
+   146→}
+   147→
+   148→.animated-border {
+   149→  --angle: 0deg;
+   150→  border-image: conic-gradient(from var(--angle), #FF3900, #353535, #FF3900) 1;
+   151→  animation: rotate-border 4s linear infinite;
+   152→}
+   153→
+   154→@keyframes rotate-border {
+   155→  to { --angle: 360deg; }
+   156→}
+   157→
+   158→/* Glow effect */
+   159→.glow-brand {
+   160→  box-shadow: 0 0 20px rgba(255, 57, 0, 0.15), 0 0 60px rgba(255, 57, 0, 0.05);
+   161→}
+   162→
+   163→.glow-brand-strong {
+   164→  box-shadow: 0 0 30px rgba(255, 57, 0, 0.3), 0 0 80px rgba(255, 57, 0, 0.1);
+   165→}
+   166→
+   167→/* Tech ticker animation */
+   168→.tech-ticker {
+   169→  width: 100%;
+   170→  overflow: hidden;
+   171→  white-space: nowrap;
+   172→}
+   173→
+   174→.tech-ticker-track {
+   175→  display: flex;
+   176→  width: max-content;
+   177→  will-change: transform;
+   178→  animation: technologyTicker 25s linear infinite !important;
+   179→}
+   180→
+   181→.tech-ticker-group {
+   182→  display: flex;
+   183→  align-items: center;
+   184→  flex-shrink: 0;
+   185→}
+   186→
+   187→.tech-item {
+   188→  display: flex;
+   189→  align-items: center;
+   190→  gap: 12px;
+   191→  padding-right: 28px;
+   192→  color: #9a9a9a;
+   193→  font-size: 16px;
+   194→  font-weight: 500;
+   195→  flex-shrink: 0;
+   196→}
+   197→
+   198→.tech-item i,
+   199→.tech-item svg {
+   200→  color: #9a9a9a;
+   201→  fill: currentColor;
+   202→}
+   203→
+   204→.tech-item b {
+   205→  color: #555;
+   206→  margin-left: 8px;
+   207→  font-weight: normal;
+   208→}
+   209→
+   210→@keyframes technologyTicker {
+   211→  from {
+   212→    transform: translate3d(0, 0, 0);
+   213→  }
+   214→  to {
+   215→    transform: translate3d(-50%, 0, 0);
+   216→  }
+   217→}
+   218→
+   219→/* Pulse glow */
+   220→@keyframes pulse-glow {
+   221→  0%, 100% { opacity: 0.4; }
+   222→  50% { opacity: 0.8; }
+   223→}
+   224→
+   225→.animate-pulse-glow {
+   226→  animation: pulse-glow 3s ease-in-out infinite;
+   227→}
+   228→
+   229→/* Grid background */
+   230→.grid-bg {
+   231→  background-image: 
+   232→    linear-gradient(rgba(53, 53, 53, 0.3) 1px, transparent 1px),
+   233→    linear-gradient(90deg, rgba(53, 53, 53, 0.3) 1px, transparent 1px);
+   234→  background-size: 60px 60px;
+   235→}
+   236→
+   237→/* Reduced motion */
+   238→@media (prefers-reduced-motion: reduce) {
+   239→  .tech-ticker-track {
+   240→    animation: none;
+   241→  }
+   242→  .animate-pulse-glow {
+   243→    animation: none;
+   244→  }
+   245→  .animated-border {
+   246→    animation: none;
+   247→  }
+   248→  html {
+   249→    scroll-behavior: auto;
+   250→  }
+   251→  .certificate-card:hover .certificate-card-image {
+   252→    transform: none;
+   253→  }
+   254→  .certificate-view-button {
+   255→    opacity: 1;
+   256→    transform: translate(-50%, -50%) scale(1);
+   257→  }
+   258→}
+   259→
+   260→/* ─── Glow Card (Cursor-Following Border Effect) ─── */
+   261→.glow-card {
+   262→  position: relative;
+   263→  padding: 2px;
+   264→  border-radius: 14px;
+   265→  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+   266→}
+   267→
+   268→.glow-card:hover {
+   269→  transform: translateY(-6px);
+   270→}
+   271→
+   272→/* Bright glow visible in the border area */
+   273→.glow-border-glow {
+   274→  position: absolute;
+   275→  inset: 0;
+   276→  z-index: 0;
+   277→  border-radius: inherit;
+   278→  opacity: 0;
+   279→  transition: opacity 0.5s ease;
+   280→  background: radial-gradient(
+   281→    350px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+   282→    rgba(255, 255, 255, 0.65) 0%,
+   283→    rgba(255, 57, 0, 0.6) 8%,
+   284→    rgba(255, 80, 30, 0.35) 22%,
+   285→    rgba(255, 57, 0, 0.12) 40%,
+   286→    transparent 60%
+   287→  );
+   288→  pointer-events: none;
+   289→}
+   290→
+   291→.glow-card:hover .glow-border-glow {
+   292→  opacity: 1;
+   293→}
+   294→
+   295→/* Subtle spotlight wash on card content */
+   296→.glow-spotlight {
+   297→  position: absolute;
+   298→  inset: 2px;
+   299→  z-index: 2;
+   300→  border-radius: 12px;
+   301→  opacity: 0;
+   302→  transition: opacity 0.5s ease;
+   303→  background: radial-gradient(
+   304→    500px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+   305→    rgba(255, 57, 0, 0.06),
+   306→    rgba(255, 255, 255, 0.02) 30%,
+   307→    transparent 55%
+   308→  );
+   309→  pointer-events: none;
+   310→}
+   311→
+   312→.glow-card:hover .glow-spotlight {
+   313→  opacity: 1;
+   314→}
+   315→
+   316→/* Card content sits between border glow and spotlight */
+   317→.glow-card-content {
+   318→  position: relative;
+   319→  z-index: 1;
+   320→}
+   321→
+   322→/* ─── Certificate Cards ─── */
+   323→.certificates-grid {
+   324→  display: grid;
+   325→  grid-template-columns: repeat(2, minmax(0, 1fr));
+   326→  gap: 24px;
+   327→}
+   328→
+   329→.certificate-card {
+   330→  position: relative;
+   331→  aspect-ratio: 16 / 9;
+   332→  overflow: hidden;
+   333→  border-radius: 12px;
+   334→  background: #1a1a1a;
+   335→  cursor: pointer;
+   336→}
+   337→
+   338→.certificate-card-image {
+   339→  position: absolute;
+   340→  inset: 0;
+   341→  width: 100%;
+   342→  height: 100%;
+   343→  object-fit: contain;
+   344→  background: #0a0a0a;
+   345→  transition: transform 0.7s cubic-bezier(.2,.8,.2,1);
+   346→}
+   347→
+   348→/* Dark gradient overlay — only the bottom band where text sits */
+   349→.certificate-card::after {
+   350→  content: "";
+   351→  position: absolute;
+   352→  inset: 0;
+   353→  background: linear-gradient(
+   354→    to bottom,
+   355→    rgba(0, 0, 0, 0) 55%,
+   356→    rgba(0, 0, 0, 0.6) 70%,
+   357→    rgba(0, 0, 0, 0.92) 85%,
+   358→    rgba(0, 0, 0, 0.97) 100%
+   359→  );
+   360→  pointer-events: none;
+   361→  z-index: 1;
+   362→}
+   363→
+   364→.certificate-card:hover .certificate-card-image {
+   365→  transform: scale(1.06);
+   366→}
+   367→
+   368→.certificate-card-content {
+   369→  position: absolute;
+   370→  inset: 0;
+   371→  z-index: 2;
+   372→  display: flex;
+   373→  flex-direction: column;
+   374→  justify-content: flex-end;
+   375→  padding: 28px;
+   376→}
+   377→
+   378→.certificate-tags {
+   379→  display: flex;
+   380→  justify-content: flex-end;
+   381→  gap: 10px;
+   382→  flex-wrap: wrap;
+   383→}
+   384→
+   385→.certificate-tag {
+   386→  padding: 10px 20px;
+   387→  border-radius: 999px;
+   388→  background: rgba(255, 255, 255, 0.95);
+   389→  color: #1a1a1a;
+   390→  font-size: 14px;
+   391→  font-weight: 600;
+   392→}
+   393→
+   394→.certificate-info {
+   395→  color: #ffffff;
+   396→}
+   397→
+   398→.certificate-title {
+   399→  margin: 0;
+   400→  font-size: clamp(20px, 2.2vw, 36px);
+   401→  line-height: 1.15;
+   402→  font-weight: 600;
+   403→}
+   404→
+   405→.certificate-meta {
+   406→  margin-top: 12px;
+   407→  color: #9a9a9a;
+   408→  font-size: 15px;
+   409→}
+   410→
+   411→.certificate-link {
+   412→  display: inline-flex;
+   413→  align-items: center;
+   414→  gap: 6px;
+   415→  margin-top: 16px;
+   416→  padding: 8px 18px;
+   417→  border-radius: 999px;
+   418→  color: #ff3900;
+   419→  font-size: 14px;
+   420→  font-weight: 600;
+   421→  text-decoration: none;
+   422→  background: rgba(255, 57, 0, 0);
+   423→  border: 1px solid transparent;
+   424→  transition:
+   425→    color 0.3s ease,
+   426→    transform 0.3s cubic-bezier(.2,.8,.2,1),
+   427→    background 0.3s ease,
+   428→    border-color 0.3s ease,
+   429→    box-shadow 0.3s ease;
+   430→}
+   431→
+   432→.certificate-link:hover {
+   433→  color: #ffffff;
+   434→  transform: translateX(6px);
+   435→  background: #ff3900;
+   436→  border-color: #ff3900;
+   437→  box-shadow: 0 4px 20px rgba(255, 57, 0, 0.35);
+   438→}
+   439→
+   440→.certificate-link::after {
+   441→  content: '→';
+   442→  display: inline-block;
+   443→  transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
+   444→}
+   445→
+   446→.certificate-link:hover::after {
+   447→  transform: translateX(4px);
+   448→}
+   449→
+   450→/* Centered View button — hidden by default, shown on hover */
+   451→.certificate-view-button {
+   452→  position: absolute;
+   453→  top: 50%;
+   454→  left: 50%;
+   455→  z-index: 3;
+   456→  transform: translate(-50%, -50%) scale(0.7);
+   457→  opacity: 0;
+   458→
+   459→  display: inline-flex;
+   460→  align-items: center;
+   461→  gap: 10px;
+   462→
+   463→  padding: 16px 26px;
+   464→  border-radius: 999px;
+   465→
+   466→  background: #ff3900;
+   467→  color: #ffffff;
+   468→
+   469→  font-size: 16px;
+   470→  font-weight: 600;
+   471→  text-decoration: none;
+   472→
+   473→  transition:
+   474→    opacity 0.35s ease,
+   475→    transform 0.35s cubic-bezier(.2,.8,.2,1),
+   476→    background 0.3s ease;
+   477→}
+   478→
+   479→.certificate-card:hover .certificate-view-button {
+   480→  opacity: 1;
+   481→  transform: translate(-50%, -50%) scale(1);
+   482→}
+   483→
+   484→.certificate-view-button:hover {
+   485→  background: #ff4a16;
+   486→}
+   487→
+   488→.certificate-view-button span:first-child {
+   489→  transition: transform 0.3s ease;
+   490→}
+   491→
+   492→.certificate-view-button:hover span:first-child {
+   493→  transform: translateX(4px);
+   494→}
+   495→
+   496→/* Responsive */
+   497→@media (max-width: 768px) {
+   498→  .certificates-grid {
+   499→    grid-template-columns: 1fr;
+   500→  }
+   501→
+   502→  .certificate-card {
+   503→    aspect-ratio: 16 / 10;
+   504→  }
+   505→
+   506→  .certificate-card-content {
+   507→    padding: 20px;
+   508→  }
+   509→
+   510→  .certificate-view-button {
+   511→    opacity: 1;
+   512→    transform: translate(-50%, -50%) scale(1);
+   513→  }
+   514→}
+   515→
+   516→
+   517→
+   518→/* ─── Experience & Projects — Journey Style ─── */
+   519→.experience-projects {
+   520→  position: relative;
+   521→  background: #030303;
+   522→  padding: 80px 0;
+   523→}
+   524→
+   525→.experience-projects-inner {
+   526→  max-width: 1320px;
+   527→  margin: 0 auto;
+   528→  display: grid;
+   529→  grid-template-columns: minmax(280px, 0.9fr) minmax(500px, 1.1fr);
+   530→  gap: 80px;
+   531→  align-items: start;
+   532→}
+   533→
+   534→/* LEFT SIDE — Sticky heading */
+   535→.journey-intro {
+   536→  position: sticky;
+   537→  top: 140px;
+   538→  align-self: start;
+   539→}
+   540→
+   541→.journey-label {
+   542→  display: inline-flex;
+   543→  align-items: center;
+   544→  padding: 9px 14px;
+   545→  margin-bottom: 28px;
+   546→  border-radius: 4px;
+   547→  background: linear-gradient(180deg, #252525, #171717);
+   548→  color: #d7d7d7;
+   549→  font-size: 11px;
+   550→  font-weight: 700;
+   551→  letter-spacing: 0.08em;
+   552→  text-transform: uppercase;
+   553→}
+   554→
+   555→.journey-title {
+   556→  margin: 0;
+   557→  max-width: 480px;
+   558→  color: #ffffff;
+   559→  font-size: clamp(42px, 4.5vw, 76px);
+   560→  font-weight: 600;
+   561→  line-height: 1.05;
+   562→  letter-spacing: -0.045em;
+   563→}
+   564→
+   565→/* RIGHT SIDE — Stacked cards */
+   566→.journey-cards {
+   567→  position: relative;
+   568→  display: flex;
+   569→  flex-direction: column;
+   570→}
+   571→
+   572→.journey-card {
+   573→  position: sticky;
+   574→  top: 120px;
+   575→  min-height: 430px;
+   576→  padding: 48px 40px;
+   577→  border-radius: 22px 22px 18px 18px;
+   578→  overflow: hidden;
+   579→  display: flex;
+   580→  flex-direction: column;
+   581→  justify-content: flex-start;
+   582→  opacity: 0;
+   583→  transform: translateY(50px);
+   584→  animation: journeyReveal 0.8s ease forwards;
+   585→  transition:
+   586→    transform 0.5s ease,
+   587→    box-shadow 0.5s ease;
+   588→}
+   589→
+   590→.journey-card:nth-child(1) { background: #ff3900; z-index: 1; }
+   591→.journey-card:nth-child(2) { background: #3d3d3d; z-index: 2; top: 150px; }
+   592→.journey-card:nth-child(3) { background: #1a1a1a; z-index: 3; top: 180px; }
+   593→.journey-card:nth-child(4) { background: #353535; z-index: 4; top: 210px; }
+   594→.journey-card:nth-child(5) { background: #1a1a1a; z-index: 5; top: 240px; }
+   595→
+   596→.journey-card:nth-child(n+6) {
+   597→  background: #1a1a1a;
+   598→}
+   599→
+   600→.journey-card + .journey-card {
+   601→  margin-top: 24px;
+   602→}
+   603→
+   604→.journey-card:hover {
+   605→  transform: translateY(-6px);
+   606→  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+   607→}
+   608→
+   609→/* DATE pill */
+   610→.journey-date {
+   611→  width: fit-content;
+   612→  display: inline-flex;
+   613→  align-items: center;
+   614→  gap: 8px;
+   615→  padding: 9px 15px;
+   616→  border-radius: 999px;
+   617→  background: rgba(255, 255, 255, 0.92);
+   618→  color: #161616;
+   619→  font-size: 14px;
+   620→  font-weight: 600;
+   621→}
+   622→
+   623→.journey-date::before {
+   624→  content: "";
+   625→  width: 6px;
+   626→  height: 6px;
+   627→  border-radius: 50%;
+   628→  background: currentColor;
+   629→}
+   630→
+   631→/* Card content */
+   632→.journey-card-content {
+   633→  margin-top: auto;
+   634→  padding-top: 100px;
+   635→}
+   636→
+   637→.journey-card-title {
+   638→  margin: 0 0 18px;
+   639→  color: #ffffff;
+   640→  font-size: clamp(28px, 3vw, 46px);
+   641→  font-weight: 600;
+   642→  line-height: 1.1;
+   643→  letter-spacing: -0.035em;
+   644→}
+   645→
+   646→.journey-card-description {
+   647→  max-width: 680px;
+   648→  margin: 0;
+   649→  color: #c5c5c5;
+   650→  font-size: 17px;
+   651→  line-height: 1.7;
+   652→}
+   653→
+   654→.journey-card-location {
+   655→  color: #9a9a9a;
+   656→}
+   657→
+   658→.journey-card-tech {
+   659→  display: flex;
+   660→  flex-wrap: wrap;
+   661→  gap: 8px;
+   662→  margin-top: 28px;
+   663→}
+   664→
+   665→.journey-tech-item {
+   666→  padding: 8px 13px;
+   667→  border: 1px solid rgba(255, 255, 255, 0.15);
+   668→  border-radius: 999px;
+   669→  color: #b5b5b5;
+   670→  font-size: 13px;
+   671→  background: rgba(0, 0, 0, 0.12);
+   672→}
+   673→
+   674→/* Skeleton variant */
+   675→.journey-card-skeleton {
+   676→  opacity: 1;
+   677→  transform: none;
+   678→  animation: none;
+   679→}
+   680→
+   681→/* Scroll reveal animation */
+   682→@keyframes journeyReveal {
+   683→  to {
+   684→    opacity: 1;
+   685→    transform: translateY(0);
+   686→  }
+   687→}
+   688→
+   689→/* MOBILE */
+   690→@media (max-width: 900px) {
+   691→  .experience-projects {
+   692→    padding: 40px 0;
+   693→  }
+   694→
+   695→  .experience-projects-inner {
+   696→    grid-template-columns: 1fr;
+   697→    gap: 40px;
+   698→  }
+   699→
+   700→  .journey-intro {
+   701→    position: relative;
+   702→    top: auto;
+   703→  }
+   704→
+   705→  .journey-card,
+   706→  .journey-card:nth-child(n) {
+   707→    position: relative;
+   708→    top: auto;
+   709→    min-height: auto;
+   710→    margin-top: 0;
+   711→    padding: 32px 24px;
+   712→  }
+   713→
+   714→  .journey-card + .journey-card {
+   715→    margin-top: 16px;
+   716→  }
+   717→
+   718→  .journey-card-content {
+   719→    margin-top: 0;
+   720→    padding-top: 70px;
+   721→  }
+   722→
+   723→  .journey-title {
+   724→    font-size: 48px;
+   725→  }
+   726→}
+   727→
+   728→/* Reduced motion */
+   729→@media (prefers-reduced-motion: reduce) {
+   730→  .journey-card {
+   731→    animation: none;
+   732→    opacity: 1;
+   733→    transform: none;
+   734→  }
+   735→}
+   736→
+   737→/* ─── Education Section — Editorial Timeline ─── */
+   738→.education-section {
+   739→  position: relative;
+   740→  background: #030303;
+   741→  padding: 100px 0 80px;
+   742→  overflow: hidden;
+   743→}
+   744→
+   745→.education-inner {
+   746→  max-width: 1320px;
+   747→  margin: 0 auto;
+   748→  padding: 0 24px;
+   749→}
+   750→
+   751→/* Header */
+   752→.education-header {
+   753→  display: flex;
+   754→  align-items: flex-start;
+   755→  justify-content: space-between;
+   756→  gap: 60px;
+   757→  margin-bottom: 64px;
+   758→  flex-wrap: wrap;
+   759→}
+   760→
+   761→.education-header-left {
+   762→  flex: 1;
+   763→  min-width: 280px;
+   764→}
+   765→
+   766→.education-header-right {
+   767→  flex: 1;
+   768→  min-width: 280px;
+   769→  max-width: 480px;
+   770→  padding-top: 12px;
+   771→}
+   772→
+   773→.section-badge {
+   774→  display: inline-flex;
+   775→  align-items: center;
+   776→  padding: 9px 14px;
+   777→  margin-bottom: 28px;
+   778→  border-radius: 4px;
+   779→  background: linear-gradient(180deg, #252525, #171717);
+   780→  color: #d7d7d7;
+   781→  font-size: 11px;
+   782→  font-weight: 700;
+   783→  letter-spacing: 0.08em;
+   784→  text-transform: uppercase;
+   785→}
+   786→
+   787→.education-heading {
+   788→  margin: 0;
+   789→  color: #ffffff;
+   790→  font-size: clamp(36px, 4vw, 64px);
+   791→  font-weight: 600;
+   792→  line-height: 1.08;
+   793→  letter-spacing: -0.04em;
+   794→}
+   795→
+   796→.education-description {
+   797→  margin: 0;
+   798→  color: #9a9a9a;
+   799→  font-size: 17px;
+   800→  line-height: 1.7;
+   801→}
+   802→
+   803→/* Education List */
+   804→.education-list {
+   805→  display: flex;
+   806→  flex-direction: column;
+   807→}
+   808→
+   809→/* Education Item — each row */
+   810→.education-item {
+   811→  display: grid;
+   812→  grid-template-columns: 80px 1fr auto;
+   813→  align-items: center;
+   814→  gap: 40px;
+   815→  padding: 36px 40px;
+   816→  border-top: 1px solid rgba(255, 255, 255, 0.06);
+   817→  cursor: pointer;
+   818→  transition:
+   819→    background-color 0.45s cubic-bezier(.25,.46,.45,.94),
+   820→    transform 0.35s ease;
+   821→  position: relative;
+   822→}
+   823→
+   824→.education-item:last-child {
+   825→  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+   826→}
+   827→
+   828→/* Active / Hovered state — orange background */
+   829→.education-item.active {
+   830→  background: #FF3900;
+   831→  color: #ffffff;
+   832→}
+   833→
+   834→.education-item:not(.active) {
+   835→  background: transparent;
+   836→}
+   837→
+   838→/* Hover lift effect */
+   839→.education-item:hover {
+   840→  transform: translateX(4px);
+   841→}
+   842→
+   843→/* Number */
+   844→.education-number {
+   845→  font-size: clamp(32px, 4vw, 56px);
+   846→  font-weight: 700;
+   847→  line-height: 1;
+   848→  letter-spacing: -0.04em;
+   849→  color: rgba(255, 255, 255, 0.08);
+   850→  transition: color 0.45s ease;
+   851→}
+   852→
+   853→.education-item.active .education-number {
+   854→  color: rgba(255, 255, 255, 0.3);
+   855→}
+   856→
+   857→/* Content */
+   858→.education-content {
+   859→  min-width: 0;
+   860→}
+   861→
+   862→.education-institution {
+   863→  margin: 0 0 8px;
+   864→  color: #ffffff;
+   865→  font-size: clamp(20px, 2.2vw, 32px);
+   866→  font-weight: 600;
+   867→  line-height: 1.2;
+   868→  letter-spacing: -0.02em;
+   869→  transition: color 0.45s ease;
+   870→}
+   871→
+   872→.education-item:not(.active) .education-institution {
+   873→  color: #e0e0e0;
+   874→}
+   875→
+   876→.education-degree {
+   877→  margin: 0;
+   878→  color: #9a9a9a;
+   879→  font-size: clamp(14px, 1.4vw, 18px);
+   880→  font-weight: 400;
+   881→  line-height: 1.5;
+   882→  transition: color 0.45s ease;
+   883→}
+   884→
+   885→.education-item.active .education-degree {
+   886→  color: rgba(255, 255, 255, 0.75);
+   887→}
+   888→
+   889→/* Date */
+   890→.education-date {
+   891→  font-size: clamp(14px, 1.3vw, 17px);
+   892→  font-weight: 500;
+   893→  color: #9a9a9a;
+   894→  white-space: nowrap;
+   895→  padding: 10px 20px;
+   896→  border-radius: 999px;
+   897→  border: 1px solid rgba(255, 255, 255, 0.08);
+   898→  background: rgba(255, 255, 255, 0.03);
+   899→  transition:
+   900→    color 0.45s ease,
+   901→    background 0.45s ease,
+   902→    border-color 0.45s ease;
+   903→}
+   904→
+   905→.education-item.active .education-date {
+   906→  color: #ffffff;
+   907→  background: rgba(255, 255, 255, 0.18);
+   908→  border-color: rgba(255, 255, 255, 0.25);
+   909→}
+   910→
+   911→/* Skeleton state */
+   912→.education-item-skeleton {
+   913→  opacity: 1 !important;
+   914→  transform: none !important;
+   915→  animation: none !important;
+   916→}
+   917→
+   918→.education-number-skeleton,
+   919→.education-content-skeleton,
+   920→.education-date-skeleton {
+   921→  display: flex;
+   922→  flex-direction: column;
+   923→}
+   924→
+   925→/* Empty state */
+   926→.education-empty {
+   927→  padding: 60px 0;
+   928→  text-align: center;
+   929→}
+   930→
+   931→.education-empty p {
+   932→  color: #9a9a9a;
+   933→  font-size: 16px;
+   934→}
+   935→
+   936→/* MOBILE */
+   937→@media (max-width: 768px) {
+   938→  .education-section {
+   939→    padding: 60px 0 40px;
+   940→  }
+   941→
+   942→  .education-inner {
+   943→    padding: 0 16px;
+   944→  }
+   945→
+   946→  .education-header {
+   947→    flex-direction: column;
+   948→    gap: 20px;
+   949→    margin-bottom: 40px;
+   950→  }
+   951→
+   952→  .education-header-right {
+   953→    max-width: 100%;
+   954→    padding-top: 0;
+   955→  }
+   956→
+   957→  .education-item {
+   958→    grid-template-columns: 48px 1fr;
+   959→    gap: 16px 20px;
+   960→    padding: 24px 20px;
+   961→  }
+   962→
+   963→  .education-number {
+   964→    font-size: 28px;
+   965→  }
+   966→
+   967→  .education-date {
+   968→    grid-column: 2;
+   969→    justify-self: start;
+   970→  }
+   971→
+   972→  .education-institution {
+   973→    font-size: 20px;
+   974→  }
+   975→
+   976→  .education-degree {
+   977→    font-size: 14px;
+   978→  }
+   979→}
+   980→
+   981→/* Reduced motion */
+   982→@media (prefers-reduced-motion: reduce) {
+   983→  .education-item {
+   984→    transition: background-color 0.2s ease;
+   985→    transform: none !important;
+   986→  }
+   987→
+   988→  .education-item:hover {
+   989→    transform: none !important;
+   990→  }
+   991→
+   992→  /* Skills Accordion */
+   993→  .skill-accordion-content {
+   994→    transition: none;
+   995→  }
+   996→}
+   997→
+   998→/* ========== Skills FAQ Accordion ========== */
+   999→
+  1000→.skills-faq-container {
+  1001→  display: grid;
+  1002→  grid-template-columns: 1fr 1.1fr;
+  1003→  gap: 100px;
+  1004→  align-items: start;
+  1005→}
+  1006→
+  1007→.skills-faq-header {
+  1008→  position: sticky;
+  1009→  top: 120px;
+  1010→}
+  1011→
+  1012→.skills-label {
+  1013→  display: inline-flex;
+  1014→  padding: 8px 14px;
+  1015→  border: 1px solid #353535;
+  1016→  border-radius: 4px;
+  1017→  color: #9A9A9A;
+  1018→  font-size: 11px;
+  1019→  font-weight: 600;
+  1020→  letter-spacing: 0.08em;
+  1021→  margin-bottom: 28px;
+  1022→}
+  1023→
+  1024→.skills-faq-title {
+  1025→  margin: 0;
+  1026→  color: #FFFFFF;
+  1027→  font-size: clamp(42px, 5vw, 72px);
+  1028→  line-height: 1.05;
+  1029→  letter-spacing: -0.04em;
+  1030→}
+  1031→
+  1032→.skills-accordion {
+  1033→  width: 100%;
+  1034→  border-top: 1px solid #353535;
+  1035→}
+  1036→
+  1037→.skill-accordion-item {
+  1038→  border-bottom: 1px solid #353535;
+  1039→}
+  1040→
+  1041→.skill-accordion-trigger {
+  1042→  width: 100%;
+  1043→  min-height: 72px;
+  1044→  padding: 16px 0;
+  1045→  display: flex;
+  1046→  align-items: center;
+  1047→  justify-content: space-between;
+  1048→  gap: 24px;
+  1049→  background: transparent;
+  1050→  border: 0;
+  1051→  color: #FFFFFF;
+  1052→  font-size: clamp(18px, 1.8vw, 24px);
+  1053→  font-weight: 600;
+  1054→  text-align: left;
+  1055→  cursor: pointer;
+  1056→  font-family: inherit;
+  1057→}
+  1058→
+  1059→.skill-accordion-trigger:hover span:first-child {
+  1060→  color: #FF3900;
+  1061→}
+  1062→
+  1063→.skill-icon {
+  1064→  width: 34px;
+  1065→  height: 34px;
+  1066→  flex: 0 0 34px;
+  1067→  display: grid;
+  1068→  place-items: center;
+  1069→  border: 1px solid #9A9A9A;
+  1070→  border-radius: 6px;
+  1071→  color: #FFFFFF;
+  1072→  font-size: 24px;
+  1073→  line-height: 1;
+  1074→  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  1075→}
+  1076→
+  1077→.skill-accordion-item.active .skill-icon {
+  1078→  transform: rotate(180deg);
+  1079→  background: #FF3900;
+  1080→  border-color: #FF3900;
+  1081→}
+  1082→
+  1083→.skill-accordion-content {
+  1084→  display: grid;
+  1085→  grid-template-rows: 0fr;
+  1086→  transition: grid-template-rows 0.45s ease, opacity 0.35s ease;
+  1087→  opacity: 0;
+  1088→}
+  1089→
+  1090→.skill-accordion-content > div {
+  1091→  overflow: hidden;
+  1092→}
+  1093→
+  1094→.skill-accordion-item.active .skill-accordion-content {
+  1095→  grid-template-rows: 1fr;
+  1096→  opacity: 1;
+  1097→}
+  1098→
+  1099→.skill-tags {
+  1100→  padding: 0 0 24px;
+  1101→  display: flex;
+  1102→  flex-wrap: wrap;
+  1103→  gap: 10px;
+  1104→}
+  1105→
+  1106→.skill-tags span {
+  1107→  padding: 10px 16px;
+  1108→  border: 1px solid #353535;
+  1109→  border-radius: 999px;
+  1110→  color: #9A9A9A;
+  1111→  font-size: 14px;
+  1112→  background: #1A1A1A;
+  1113→  transition: color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  1114→}
+  1115→
+  1116→.skill-tags span:hover {
+  1117→  color: #FFFFFF;
+  1118→  border-color: #FF3900;
+  1119→  transform: translateY(-2px);
+  1120→}
+  1121→
+  1122→/* Skills Accordion responsive */
+  1123→@media (max-width: 900px) {
+  1124→  .skills-faq-container {
+  1125→    grid-template-columns: 1fr;
+  1126→    gap: 60px;
+  1127→  }
+  1128→
+  1129→  .skills-faq-header {
+  1130→    position: static;
+  1131→  }
+  1132→}
+  1133→
+  1134→@media (max-width: 600px) {
+  1135→  .skills-faq-container {
+  1136→    gap: 40px;
+  1137→  }
+  1138→
+  1139→  .skill-accordion-trigger {
+  1140→    min-height: 60px;
+  1141→    font-size: 18px;
+  1142→    padding: 12px 0;
+  1143→  }
+  1144→
+  1145→  .skill-icon {
+  1146→    width: 28px;
+  1147→    height: 28px;
+  1148→    flex: 0 0 28px;
+  1149→    font-size: 20px;
+  1150→  }
+  1151→
+  1152→  .skill-tags span {
+  1153→    padding: 8px 14px;
+  1154→    font-size: 13px;
+  1155→  }
+  1156→}
+  1157→
+  1158→/* Site logo */
+  1159→.site-logo {
+  1160→  height: 40px;
+  1161→  width: auto;
+  1162→  max-width: 220px;
+  1163→  object-fit: contain;
+  1164→  display: block;
+  1165→}
+  1166→

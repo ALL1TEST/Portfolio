@@ -1157,3 +1157,26 @@ Stage Summary:
 - Clicked messages are dismissed from the bell list and marked as read in DB
 - "View all messages" is the only path to navigate to the Messages page
 - Agent browser verified: all 5 steps passed, no console errors
+---
+Task ID: 4
+Agent: Main Agent
+Task: Redesign certificate cards with glassmorphism panel
+
+Work Log:
+- Read current certificate card CSS and component structure
+- Removed heavy dark gradient overlay (`::after` pseudo-element) from CSS
+- Added `display: flex; flex-direction: column; justify-content: flex-end` to `.certificate-card` to push glass panel to bottom
+- Created new `.certificate-glass-panel` CSS class with glassmorphism styling
+- Changed card aspect ratio from 16/9 to 16/10, border-radius from 12px to 16px
+- Added card border, hover lift effect, orange glow on hover border
+- Updated `CertificateCard` component: replaced old `certificate-card-content` with new `certificate-glass-panel` div
+- Added Tailwind classes `backdrop-blur-2xl backdrop-saturate-[1.4]` on JSX element (workaround for Lightning CSS stripping raw backdrop-filter)
+- Removed old `.certificate-view-button`, `.certificate-tags`, `.certificate-card-content` CSS classes
+- Fixed reduced-motion media query for cards
+- Ran lint — clean
+
+Stage Summary:
+- Certificate image is fully visible with no heavy overlay
+- Glass panel at card bottom with blur/glassmorphism effect
+- Contains title, metadata (skill · issuer · date), and "View Certificate →" link
+- Agent browser verified all 6 checks pass: positioning, visibility, glass effect, content, styling, no errors

@@ -49,6 +49,7 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
       }}
       className="certificate-card"
     >
+      {/* Certificate image — fully visible background */}
       {hasImage ? (
         <img src={cert.certificateImage} alt={cert.title} className="certificate-card-image" />
       ) : (
@@ -63,8 +64,8 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
         />
       )}
 
-      <div className="certificate-card-content">
-        <div />
+      {/* Glass content panel — positioned at the bottom of the card */}
+      <div className="certificate-glass-panel backdrop-blur-2xl backdrop-saturate-[1.4]">
         <div className="certificate-info">
           <h3 className="certificate-title">{cert.title}</h3>
           {subtitleParts.length > 0 && (
