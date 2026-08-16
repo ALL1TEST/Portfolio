@@ -1,19 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, ArrowRight } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
+
+type View = 'login' | 'forgot-email' | 'forgot-reset';
 
 export default function LoginPage() {
+  const [view, setView] = useState<View>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetToken, setResetToken] = useState('');
   const router = useRouter();
   const [profile, setProfile] = useState<{ logoUrl?: string; brandName?: string } | null>(null);
 
@@ -32,7 +38,21 @@ export default function LoginPage() {
     fetchProfile();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const resetFormState = useCallback(() => {
+    setEmail('');
+    setPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setResetToken('');
+    setLoading(false);
+  }, []);
+
+  const switchView = useCallback((newView: View) => {
+    resetFormState();
+    setView(newView);
+  }, [resetFormState]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -55,6 +75,96 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const handleForgotEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || 'Something went wrong');
+        return;
+      }
+
+      if (data.token) {
+        // Email found — token generated
+        setResetToken(data.token);
+        setView('forgot-reset');
+        toast.success('Email verified. Set your new password.');
+      } else {
+        // Email not found
+        toast.error('No account found with this email address.');
+      }
+    } catch {
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: resetToken, password: newPassword }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || 'Failed to reset password.');
+        return;
+      }
+
+      toast.success('Password reset successfully! You can now sign in.');
+      switchView('login');
+    } catch {
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Animation variants
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 80 : -80,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction > 0 ? -80 : 80,
+      opacity: 0,
+    }),
+  };
+
+  const direction = view === 'forgot-reset' ? 1 : view === 'login' ? -1 : 1;
 
   return (
     <div className="min-h-screen bg-dark flex items-center justify-center px-4">
@@ -82,79 +192,314 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* Login card */}
-        <div className="bg-surface border border-stroke rounded-xl p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-white">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@codevirtox.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
-                disabled={loading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-white">
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
-                disabled={loading}
-              />
-            </div>
-
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full"
-            >
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-brand hover:bg-brand-light text-white font-medium h-11 relative overflow-hidden transition-all duration-300 group/btn"
+        {/* Animated card container */}
+        <div className="bg-surface border border-stroke rounded-xl overflow-hidden">
+          <AnimatePresence mode="wait" custom={direction}>
+            {/* ────── LOGIN VIEW ────── */}
+            {view === 'login' && (
+              <motion.div
+                key="login"
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="p-6"
               >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    <>
-                      Sign In
-                      <motion.span
-                        initial={{ x: 0, opacity: 1 }}
-                        whileHover={{ x: 4, opacity: 1 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-brand" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-white">Welcome Back</h2>
+                    <p className="text-xs text-muted-text">Sign in to your dashboard</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium text-white">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="admin@codevirtox.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password" className="text-sm font-medium text-white">
+                        Password
+                      </Label>
+                      <button
+                        type="button"
+                        onClick={() => switchView('forgot-email')}
+                        className="text-xs text-brand hover:text-brand-light transition-colors duration-200"
                       >
-                        <ArrowRight className="w-4 h-4" />
-                      </motion.span>
-                    </>
-                  )}
-                </span>
-                <span className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/10 transition-colors duration-300" />
-              </Button>
-            </motion.div>
-          </form>
+                        Forgot password?
+                      </button>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full"
+                  >
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-brand hover:bg-brand-light text-white font-medium h-11 relative overflow-hidden transition-all duration-300 group/btn"
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Signing in...
+                          </>
+                        ) : (
+                          <>
+                            Sign In
+                            <motion.span
+                              initial={{ x: 0, opacity: 1 }}
+                              whileHover={{ x: 4, opacity: 1 }}
+                              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                            >
+                              <ArrowRight className="w-4 h-4" />
+                            </motion.span>
+                          </>
+                        )}
+                      </span>
+                      <span className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/10 transition-colors duration-300" />
+                    </Button>
+                  </motion.div>
+                </form>
+              </motion.div>
+            )}
+
+            {/* ────── FORGOT PASSWORD — EMAIL STEP ────── */}
+            {view === 'forgot-email' && (
+              <motion.div
+                key="forgot-email"
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="p-6"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center">
+                    <KeyRound className="w-5 h-5 text-brand" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-white">Forgot Password</h2>
+                    <p className="text-xs text-muted-text">Enter your email to reset your password</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleForgotEmail} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email" className="text-sm font-medium text-white">
+                      Email Address
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-text" />
+                      <Input
+                        id="forgot-email"
+                        type="email"
+                        placeholder="admin@codevirtox.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20 pl-10"
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full"
+                  >
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-brand hover:bg-brand-light text-white font-medium h-11 relative overflow-hidden transition-all duration-300 group/btn"
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Verifying...
+                          </>
+                        ) : (
+                          <>
+                            Continue
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </span>
+                      <span className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/10 transition-colors duration-300" />
+                    </Button>
+                  </motion.div>
+                </form>
+
+                <button
+                  type="button"
+                  onClick={() => switchView('login')}
+                  className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-muted-text hover:text-white transition-colors duration-200"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Sign In
+                </button>
+              </motion.div>
+            )}
+
+            {/* ────── FORGOT PASSWORD — RESET STEP ────── */}
+            {view === 'forgot-reset' && (
+              <motion.div
+                key="forgot-reset"
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="p-6"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-brand" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-white">Set New Password</h2>
+                    <p className="text-xs text-muted-text">Create a strong password for your account</p>
+                  </div>
+                </div>
+
+                {/* Info banner */}
+                <div className="mb-5 p-3 rounded-lg bg-brand/5 border border-brand/20">
+                  <p className="text-xs text-brand/80 leading-relaxed">
+                    <span className="font-medium text-brand">Account verified.</span> Enter your new password below. The reset link expires in 30 minutes.
+                  </p>
+                </div>
+
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password" className="text-sm font-medium text-white">
+                      New Password
+                    </Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
+                      disabled={loading}
+                    />
+                    <p className="text-xs text-muted-text/60">Minimum 6 characters</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password" className="text-sm font-medium text-white">
+                      Confirm New Password
+                    </Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
+                      disabled={loading}
+                    />
+                    {confirmPassword && confirmPassword !== newPassword && (
+                      <p className="text-xs text-red-400">Passwords do not match</p>
+                    )}
+                  </div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full"
+                  >
+                    <Button
+                      type="submit"
+                      disabled={loading || !newPassword || !confirmPassword || newPassword !== confirmPassword}
+                      className="w-full bg-brand hover:bg-brand-light text-white font-medium h-11 relative overflow-hidden transition-all duration-300 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Resetting...
+                          </>
+                        ) : (
+                          <>
+                            Reset Password
+                            <ShieldCheck className="w-4 h-4" />
+                          </>
+                        )}
+                      </span>
+                      <span className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/10 transition-colors duration-300" />
+                    </Button>
+                  </motion.div>
+                </form>
+
+                <button
+                  type="button"
+                  onClick={() => switchView('login')}
+                  className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-muted-text hover:text-white transition-colors duration-200"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Sign In
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <p className="text-center text-muted-text text-xs mt-6">
-          Secured admin access
-        </p>
+        {/* Footer text */}
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={view}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-center text-muted-text text-xs mt-6"
+          >
+            {view === 'login' && 'Secured admin access'}
+            {view === 'forgot-email' && 'Enter your account email to proceed'}
+            {view === 'forgot-reset' && 'Set a new password for your account'}
+          </motion.p>
+        </AnimatePresence>
       </motion.div>
     </div>
   );

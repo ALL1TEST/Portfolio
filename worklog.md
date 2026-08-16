@@ -1108,3 +1108,30 @@ Stage Summary:
 - Updated files: sidebar.tsx, settings/page.tsx, login/page.tsx, prisma/db/custom.db
 - ESLint passes cleanly
 - Dev server running on port 3000
+---
+Task ID: 1
+Agent: main
+Task: Add "Forgot Password" feature to dashboard login page
+
+Work Log:
+- Updated Prisma schema: added `resetToken` (String?) and `resetTokenExpiry` (DateTime?) fields to User model
+- Ran `bun run db:push` and `bunx prisma generate` to sync DB and regenerate Prisma client
+- Created `/api/auth/forgot-password/route.ts`: accepts email, generates 32-byte hex token, stores token + 30min expiry in DB
+- Created `/api/auth/reset-password/route.ts`: validates token + expiry, hashes new password with bcryptjs, clears reset token
+- Updated `/login/page.tsx` with 3-view animated flow:
+  - View 1 (login): Sign in form with "Forgot password?" link next to Password label
+  - View 2 (forgot-email): Email entry form with "Continue" button, "Back to Sign In" link
+  - View 3 (forgot-reset): New password + confirm password form, "Reset Password" button, info banner about 30min expiry
+  - Smooth slide animations via Framer Motion AnimatePresence
+  - Password validation: min 6 chars, confirm match check
+- Ran `bun run lint` - no errors
+
+Stage Summary:
+- Forgot Password feature fully implemented with 3-step animated flow
+- API endpoints tested via curl: forgot-password returns token (200), reset-password updates password (200), login with new password succeeds (302)
+- Browser-tested all views: login → forgot email → set new password → back to login with success toast
+- Files created/modified:
+  - `prisma/schema.prisma` (modified)
+  - `src/app/api/auth/forgot-password/route.ts` (new)
+  - `src/app/api/auth/reset-password/route.ts` (new)
+  - `src/app/login/page.tsx` (modified)
