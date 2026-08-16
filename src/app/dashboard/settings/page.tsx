@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Save, Loader2, User, Upload, Trash2, Camera, FileText } from 'lucide-react';
+import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -104,11 +104,30 @@ const emptyProfile: Profile = {
   footerCredit: '',
 };
 
+const filterCategories = ['All', 'Media', 'Personal', 'Pages', 'Footer', 'Social'];
+
+interface CardItem {
+  id: string;
+  category: string;
+  title: string;
+  children: React.ReactNode;
+}
+
+function FilterableCard({ category, title, searchQuery, activeFilter, children }: { category: string; title: string; searchQuery: string; activeFilter: string; children: React.ReactNode }) {
+  const matchesCategory = activeFilter === 'All' || category === activeFilter;
+  const q = searchQuery.toLowerCase();
+  const matchesSearch = q === '' || title.toLowerCase().includes(q);
+  if (!matchesCategory || !matchesSearch) return null;
+  return <>{children}</>;
+}
+
 export default function SettingsPage() {
   const [profile, setProfile] = useState<Profile>(emptyProfile);
   const [original, setOriginal] = useState<Profile>(emptyProfile);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
   const [uploading, setUploading] = useState<'profile' | 'cv' | 'logo' | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const cvInputRef = useRef<HTMLInputElement>(null);
@@ -228,6 +247,34 @@ export default function SettingsPage() {
     );
   }
 
+  // Build card list with categories
+  const cardList: CardItem[] = [
+    { id: 'profile-image', category: 'Media', title: 'Profile Image', children: null },
+    { id: 'cv-upload', category: 'Media', title: 'CV Resume', children: null },
+    { id: 'logo', category: 'Media', title: 'Logo', children: null },
+    { id: 'personal-info', category: 'Personal', title: 'Personal Information', children: null },
+    { id: 'about-text', category: 'Personal', title: 'About', children: null },
+    { id: 'about-cards', category: 'Personal', title: 'About Cards', children: null },
+    { id: 'featured-projects', category: 'Pages', title: 'Featured Projects Section', children: null },
+    { id: 'footer', category: 'Footer', title: 'Footer', children: null },
+    { id: 'achievement-stats', category: 'Personal', title: 'Achievement Stats', children: null },
+    { id: 'projects-page', category: 'Pages', title: 'Projects Page', children: null },
+    { id: 'certificates-page', category: 'Pages', title: 'Certificates Page', children: null },
+    { id: 'education-page', category: 'Pages', title: 'Education Page', children: null },
+    { id: 'resume-page', category: 'Pages', title: 'Resume Page', children: null },
+    { id: 'contact-page', category: 'Pages', title: 'Contact Page', children: null },
+    { id: 'social-links', category: 'Social', title: 'Social Links', children: null },
+  ];
+
+  const hasVisibleCards = () => {
+    const q = searchQuery.toLowerCase();
+    return cardList.some(
+      (card) =>
+        (activeFilter === 'All' || card.category === activeFilter) &&
+        (q === '' || card.title.toLowerCase().includes(q))
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -256,7 +303,41 @@ export default function SettingsPage() {
         </Button>
       </div>
 
+      {/* Search bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-text" />
+        <Input
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="bg-surface border-stroke text-white placeholder:text-muted-text pl-9 pr-9"
+          placeholder="Search settings..."
+        />
+        {searchQuery && (
+          <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {/* Category filter buttons */}
+      <div className="flex flex-wrap gap-2">
+        {filterCategories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveFilter(cat)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 ${
+              activeFilter === cat
+                ? 'bg-brand text-white border-brand'
+                : 'bg-surface border-stroke/50 text-muted-text hover:text-white hover:border-stroke'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       {/* Profile Image */}
+      <FilterableCard category="Media" title="Profile Image" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Profile Image</h3>
         <div className="flex items-center gap-6">
@@ -284,8 +365,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* CV Upload */}
+      <FilterableCard category="Media" title="CV Resume" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">CV / Resume</h3>
         <div className="flex items-center gap-6">
@@ -319,8 +402,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Logo */}
+      <FilterableCard category="Media" title="Logo" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Logo</h3>
         <div className="flex items-center gap-6">
@@ -350,8 +435,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Personal Information */}
+      <FilterableCard category="Personal" title="Personal Information" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Personal Information</h3>
         <div className="space-y-4">
@@ -375,8 +462,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* About Text */}
+      <FilterableCard category="Personal" title="About" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">About</h3>
         <div className="space-y-2">
@@ -385,8 +474,10 @@ export default function SettingsPage() {
           <p className="text-xs text-muted-text">This appears on the About section of your portfolio.</p>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* About Cards */}
+      <FilterableCard category="Personal" title="About Cards" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">About Cards</h3>
         <p className="text-xs text-muted-text mb-4">Edit the 3 value cards displayed in the About section.</p>
@@ -422,8 +513,10 @@ export default function SettingsPage() {
           ))}
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Featured Projects Section */}
+      <FilterableCard category="Pages" title="Featured Projects Section" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Featured Projects Section</h3>
         <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Featured Projects section.</p>
@@ -448,8 +541,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Footer Bio */}
+      <FilterableCard category="Footer" title="Footer" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Footer</h3>
         <div className="space-y-2">
@@ -480,8 +575,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Achievement Stats */}
+      <FilterableCard category="Personal" title="Achievement Stats" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Achievement Stats</h3>
         <p className="text-xs text-muted-text mb-4">Edit the 3 stats displayed in the stats section of your site.</p>
@@ -517,8 +614,10 @@ export default function SettingsPage() {
           ))}
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Projects Page Section */}
+      <FilterableCard category="Pages" title="Projects Page" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Projects Page</h3>
         <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Projects section on your portfolio.</p>
@@ -543,8 +642,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Certificates Page Section */}
+      <FilterableCard category="Pages" title="Certificates Page" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Certificates Page</h3>
         <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Certificates section on your portfolio.</p>
@@ -569,8 +670,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Education Page Section */}
+      <FilterableCard category="Pages" title="Education Page" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Education Page</h3>
         <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Education section on your portfolio.</p>
@@ -595,8 +698,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Resume Page Section */}
+      <FilterableCard category="Pages" title="Resume Page" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Resume Page</h3>
         <p className="text-xs text-muted-text mb-4">Edit the texts displayed in the Resume section of your portfolio.</p>
@@ -630,8 +735,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Contact Page Section */}
+      <FilterableCard category="Pages" title="Contact Page" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Contact Page</h3>
         <p className="text-xs text-muted-text mb-4">Edit the heading and description of the Contact section on your portfolio.</p>
@@ -656,8 +763,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </FilterableCard>
 
       {/* Social Links */}
+      <FilterableCard category="Social" title="Social Links" searchQuery={searchQuery} activeFilter={activeFilter}>
       <Card className="bg-surface border-stroke p-6">
         <h3 className="text-sm font-semibold text-white mb-4">Social Links</h3>
         <div className="space-y-4">
@@ -684,6 +793,17 @@ export default function SettingsPage() {
           <p className="text-xs text-muted-text">Leave a social link empty to hide its icon from the frontend.</p>
         </div>
       </Card>
+      </FilterableCard>
+
+      {/* Empty state when no cards match */}
+      {!hasVisibleCards() && (
+        <div className="text-center py-16">
+          <p className="text-muted-text mb-2">No settings match your search.</p>
+          <button onClick={() => { setSearchQuery(''); setActiveFilter('All'); }} className="text-xs text-brand hover:underline">
+            Clear filters
+          </button>
+        </div>
+      )}
 
       {/* Unsaved changes indicator */}
       {hasChanges && (
