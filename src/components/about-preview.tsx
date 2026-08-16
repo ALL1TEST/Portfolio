@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Code2, Bot, BookOpen } from 'lucide-react';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { SectionHeading } from './section-heading';
 import { ScrollReveal } from './scroll-reveal';
@@ -15,21 +14,18 @@ const DEFAULT_CARDS = [
     title: 'Build & Develop',
     description:
       'Creating modern, responsive, and scalable web applications using technologies such as React, Laravel, Next.js, and MySQL.',
-    icon: Code2,
   },
   {
     number: '02',
     title: 'AI & Automation',
     description:
       'Building intelligent workflows and automation solutions that simplify repetitive tasks and improve productivity.',
-    icon: Bot,
   },
   {
     number: '03',
     title: 'Learn & Improve',
     description:
       'Continuously exploring new technologies, improving my skills, and building better digital products.',
-    icon: BookOpen,
   },
 ] as const;
 
@@ -41,9 +37,9 @@ export function AboutPreview() {
   // when no profile exists use hardcoded defaults
   const allCards = profile
     ? [
-        { number: '01', title: profile.aboutCard1Title || '', description: profile.aboutCard1Description || '', icon: Code2 },
-        { number: '02', title: profile.aboutCard2Title || '', description: profile.aboutCard2Description || '', icon: Bot },
-        { number: '03', title: profile.aboutCard3Title || '', description: profile.aboutCard3Description || '', icon: BookOpen },
+        { number: '01', title: profile.aboutCard1Title || '', description: profile.aboutCard1Description || '' },
+        { number: '02', title: profile.aboutCard2Title || '', description: profile.aboutCard2Description || '' },
+        { number: '03', title: profile.aboutCard3Title || '', description: profile.aboutCard3Description || '' },
       ].filter((c) => c.title.trim() !== '')
     : DEFAULT_CARDS.map((c) => ({ ...c }));
 
@@ -105,12 +101,9 @@ export function AboutPreview() {
 
                     {/* Content */}
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <card.icon className="w-4 h-4 text-brand/70 flex-shrink-0" />
-                        <h3 className="text-sm font-semibold text-white">
-                          {card.title}
-                        </h3>
-                      </div>
+                      <h3 className="text-sm font-semibold text-white">
+                        {card.title}
+                      </h3>
                       <p className="mt-1.5 text-xs leading-relaxed text-muted-text/80">
                         {card.description}
                       </p>
