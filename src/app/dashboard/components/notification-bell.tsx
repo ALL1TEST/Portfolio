@@ -81,7 +81,7 @@ export function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Mark as read and remove from notification list
+  // Mark as read, remove from bell, and navigate to Messages page
   const handleMessageClick = async (msg: NotificationMessage) => {
     // Dismiss from bell — remove from local list
     dismissedIds.current.add(msg.id);
@@ -101,6 +101,9 @@ export function NotificationBell() {
         // silently fail
       }
     }
+    // Navigate to Messages page
+    setOpen(false);
+    router.push('/dashboard/messages');
   };
 
   const handleMarkAllRead = async () => {
