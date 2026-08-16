@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     // Determine the base URL for the reset link
     const baseUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000';
-    const resetUrl = `${baseUrl}/reset-password?token=${rawToken}`;
+    const resetUrl = `${baseUrl}/login?token=${rawToken}`;
 
     // Send the email containing the raw token
     await sendPasswordResetEmail(userEmail, resetUrl);
