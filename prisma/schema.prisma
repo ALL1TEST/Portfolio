@@ -56,6 +56,8 @@ model Profile {
   resumeExpTitle  String @default("Experience & Projects")
   contactPageTitle       String @default("Let's Build Something Great Together.")
   contactPageDescription String @default("Have a project, a role,or just want to connect? I usually reply within 24 hours.")
+  footerCopyright String @default("")
+  footerCredit    String @default("")
   logoUrl           String   @default("")
   profileImage     String   @default("")
   cvFile           String   @default("")

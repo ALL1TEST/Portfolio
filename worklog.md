@@ -1070,3 +1070,22 @@ Stage Summary:
 - All 6 titles (Projects, Certificates, Education, Resume Tech, Resume Exp, Contact) now correctly hide when cleared in Settings
 - Pattern: when profile exists, use its value directly (empty = hide); when no profile, use default
 - No `||` fallback on title fields anymore
+---
+Task ID: 3
+Agent: Main Agent
+Task: Add editable Copyright and Credit text fields for Footer in Settings
+
+Work Log:
+- Added `footerCopyright String @default("")` and `footerCredit String @default("")` to Prisma schema
+- Added both fields to Profile interface in types.ts
+- Added both fields to PUT handler in API route
+- Added Copyright Text and Credit Text inputs to the existing Footer card in Settings page
+- Updated footer.tsx bottom bar: when field is set, use custom text; when empty, use dynamic default (year + fullName for copyright, brandName for credit)
+- Pushed schema with db:push, lint passes clean
+- Verified footer renders correctly with dynamic defaults, API returns new fields
+
+Stage Summary:
+- Footer card in Settings now has 3 inputs: Footer Bio, Copyright Text, Credit Text
+- Empty copyright/credit = dynamic defaults (year auto-updates, name from profile)
+- Custom text overrides the default when set
+- No `||` fallback bug — uses ternary `profile?.footerCopyright ? ... : ...`

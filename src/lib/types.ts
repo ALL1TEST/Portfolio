@@ -38,6 +38,8 @@ export interface Profile {
   resumeExpTitle: string;
   contactPageTitle: string;
   contactPageDescription: string;
+  footerCopyright: string;
+  footerCredit: string;
   logoUrl: string;
   profileImage: string;
   cvFile: string;

@@ -56,6 +56,8 @@ export const PUT = withAuth(async (req: Request) => {
         ...(body.resumeExpTitle !== undefined && { resumeExpTitle: body.resumeExpTitle }),
         ...(body.contactPageTitle !== undefined && { contactPageTitle: body.contactPageTitle }),
         ...(body.contactPageDescription !== undefined && { contactPageDescription: body.contactPageDescription }),
+        ...(body.footerCopyright !== undefined && { footerCopyright: body.footerCopyright }),
+        ...(body.footerCredit !== undefined && { footerCredit: body.footerCredit }),
       },
     });
   } else {

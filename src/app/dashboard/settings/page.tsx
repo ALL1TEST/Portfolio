@@ -54,6 +54,8 @@ interface Profile {
   resumeExpTitle: string;
   contactPageTitle: string;
   contactPageDescription: string;
+  footerCopyright: string;
+  footerCredit: string;
 }
 
 const emptyProfile: Profile = {
@@ -98,6 +100,8 @@ const emptyProfile: Profile = {
   resumeExpTitle: '',
   contactPageTitle: '',
   contactPageDescription: '',
+  footerCopyright: '',
+  footerCredit: '',
 };
 
 export default function SettingsPage() {
@@ -452,6 +456,28 @@ export default function SettingsPage() {
           <Label className="text-sm text-white">Footer Bio</Label>
           <Textarea value={profile.footerBio} onChange={(e) => updateField('footerBio', e.target.value)} className="bg-dark border-stroke text-white placeholder:text-muted-text min-h-[100px]" placeholder="A short bio or tagline that appears in the footer..." />
           <p className="text-xs text-muted-text">This appears in the footer section of your website.</p>
+        </div>
+        <div className="mt-4 space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Copyright Text</Label>
+            <Input
+              value={profile.footerCopyright}
+              onChange={(e) => updateField('footerCopyright', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+              placeholder="© 2026 ABDELLAH AIT-SI. All rights reserved."
+            />
+            <p className="text-xs text-muted-text">Leave empty to use the default: © {year} {fullName}. All rights reserved.</p>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm text-white">Credit Text</Label>
+            <Input
+              value={profile.footerCredit}
+              onChange={(e) => updateField('footerCredit', e.target.value)}
+              className="bg-dark border-stroke text-white placeholder:text-muted-text"
+              placeholder="Designed & Built by CodeVirtox"
+            />
+            <p className="text-xs text-muted-text">Leave empty to use the default: Designed & Built by {brandName}.</p>
+          </div>
         </div>
       </Card>
 

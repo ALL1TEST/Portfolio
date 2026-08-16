@@ -116,10 +116,14 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-stroke/30 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-text">
-            © {new Date().getFullYear()} {profile?.fullName || 'Abdellah Ait-Si'}. All rights reserved.
+            {profile?.footerCopyright
+              ? profile.footerCopyright
+              : `© ${new Date().getFullYear()} ${profile?.fullName || 'Abdellah Ait-Si'}. All rights reserved.`}
           </p>
           <p className="text-xs text-muted-text">
-            Designed & Built by {profile?.brandName || 'CodeVirtox'}
+            {profile?.footerCredit
+              ? profile.footerCredit
+              : `Designed & Built by ${profile?.brandName || 'CodeVirtox'}`}
           </p>
         </div>
       </div>
