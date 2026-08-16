@@ -4,6 +4,7 @@ import { signOut } from 'next-auth/react';
 import { Menu, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { NotificationBell } from './notification-bell';
 
 interface HeaderProps {
   title: string;
@@ -36,7 +37,8 @@ export function DashboardHeader({ title, onMenuClick, userName }: HeaderProps) {
         <h1 className="text-lg font-semibold text-white">{title}</h1>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <NotificationBell />
         <div className="hidden sm:flex items-center gap-2 text-sm text-muted-text">
           <User className="w-4 h-4" />
           <span>{userName || 'Admin'}</span>
