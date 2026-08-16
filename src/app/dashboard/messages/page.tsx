@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -48,6 +49,7 @@ interface ContactMessage {
 }
 
 export default function MessagesPage() {
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewOpen, setViewOpen] = useState(false);
@@ -69,6 +71,19 @@ export default function MessagesPage() {
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
+
+  // Auto-open message when navigated from notification bell (?view=ID)
+  const hasAutoOpened = useRef(false);
+  useEffect(() => {
+    const viewId = searchParams.get('view');
+    if (!viewId || messages.length === 0 || hasAutoOpened.current) return;
+    const msg = messages.find((m) => m.id === viewId);
+    if (msg) {
+      hasAutoOpened.current = true;
+      viewMessage(msg);
+      window.history.replaceState({}, '', '/dashboard/messages');
+    }
+  }, [searchParams, messages, viewMessage]);
 
   const unreadCount = messages.filter((m) => !m.read).length;
 

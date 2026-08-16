@@ -101,9 +101,9 @@ export function NotificationBell() {
         // silently fail
       }
     }
-    // Navigate to Messages page
+    // Navigate to Messages page and auto-open this message
     setOpen(false);
-    router.push('/dashboard/messages');
+    router.push(`/dashboard/messages?view=${msg.id}`);
   };
 
   const handleMarkAllRead = async () => {
