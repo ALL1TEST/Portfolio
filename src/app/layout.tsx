@@ -14,44 +14,58 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Abdellah Ait-Si | Full Stack Developer & AI Automation",
-  description:
-    "Full Stack Developer specializing in React, Laravel, modern web applications, AI tools, and workflow automation. CodeVirtox — Building smart automated solutions.",
-  keywords: [
-    "Abdellah Ait-Si",
-    "CodeVirtox",
-    "Full Stack Developer",
-    "React",
-    "Laravel",
-    "Next.js",
-    "AI Automation",
-    "Web Developer",
-    "Morocco",
-  ],
-  authors: [{ name: "Abdellah Ait-Si" }],
-  icons: {
-    icon: "/logo.png",
-  },
-  openGraph: {
-    title: "Abdellah Ait-Si | Full Stack Developer & AI Automation",
-    description:
-      "Full Stack Developer specializing in React, Laravel, modern web applications, AI tools, and workflow automation.",
-    siteName: "CodeVirtox",
-    type: "website",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Abdellah Ait-Si | Full Stack Developer & AI Automation",
-    description:
-      "Full Stack Developer specializing in React, Laravel, modern web applications, AI tools, and workflow automation.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+import { db } from "@/lib/db";
+
+export async function generateMetadata(): Promise<Metadata> {
+  let profile = null;
+  try {
+    profile = await db.profile.findFirst();
+  } catch (error) {
+    console.error("Failed to fetch profile for metadata:", error);
+  }
+
+  const logoUrl = profile?.logoUrl || "/logo.png";
+  const title = profile?.brandName ? `${profile.fullName || 'Abdellah Ait-Si'} | ${profile.brandName}` : "Abdellah Ait-Si | Full Stack Developer & AI Automation";
+  const description = profile?.shortBio || "Full Stack Developer specializing in React, Laravel, modern web applications, AI tools, and workflow automation.";
+
+  return {
+    title,
+    description,
+    keywords: [
+      "Abdellah Ait-Si",
+      "CodeVirtox",
+      "Full Stack Developer",
+      "React",
+      "Laravel",
+      "Next.js",
+      "AI Automation",
+      "Web Developer",
+      "Morocco",
+    ],
+    authors: [{ name: profile?.fullName || "Abdellah Ait-Si" }],
+    icons: {
+      icon: logoUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      siteName: profile?.brandName || "CodeVirtox",
+      type: "website",
+      locale: "en_US",
+      images: [logoUrl],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [logoUrl],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 export default function RootLayout({
   children,

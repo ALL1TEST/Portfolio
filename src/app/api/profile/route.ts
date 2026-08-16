@@ -63,5 +63,10 @@ export const PUT = withAuth(async (req: Request) => {
   } else {
     profile = await db.profile.create({ data: body });
   }
+
+  // Force Next.js to regenerate the root layout metadata so favicon changes take effect immediately
+  const { revalidatePath } = await import('next/cache');
+  revalidatePath('/', 'layout');
+
   return NextResponse.json(profile);
 });
