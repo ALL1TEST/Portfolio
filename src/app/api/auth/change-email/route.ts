@@ -11,9 +11,9 @@ export const POST = withAuth(async (req: Request) => {
     return NextResponse.json({ error: 'Current and new email are required' }, { status: 400 });
   }
 
-  const session = await import('next-auth').then((m) =>
-    m.getServerSession?.(await import('@/lib/auth').then((a) => a.authOptions))
-  );
+  const { getServerSession } = await import('next-auth');
+  const { authOptions } = await import('@/lib/auth');
+  const session = await getServerSession(authOptions);
 
   const userId = (session?.user as Record<string, unknown> | undefined)?.id as string | undefined;
   if (!userId) {

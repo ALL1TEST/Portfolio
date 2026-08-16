@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { randomBytes } from 'crypto';
+import { randomBytes, createHash } from 'crypto';
+import { sendPasswordResetEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
@@ -14,30 +15,48 @@ export async function POST(request: Request) {
       );
     }
 
+    const userEmail = email.trim().toLowerCase();
     const user = await db.user.findUnique({
-      where: { email: email.trim().toLowerCase() },
+      where: { email: userEmail },
     });
 
     // Always return success to avoid email enumeration
     if (!user) {
       return NextResponse.json({
-        message: 'If an account exists with this email, a reset token has been generated.',
-        token: null,
+        message: 'If an account exists with this email, a reset link has been sent.',
       });
     }
 
-    // Generate reset token (32 bytes hex = 64 chars)
-    const resetToken = randomBytes(32).toString('hex');
-    const resetTokenExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
-
-    await db.user.update({
-      where: { id: user.id },
-      data: { resetToken, resetTokenExpiry },
+    // Delete any existing reset tokens for this email to ensure single-use uniqueness
+    await db.passwordResetToken.deleteMany({
+      where: { email: userEmail },
     });
 
+    // Generate raw reset token (32 bytes hex = 64 chars)
+    const rawToken = randomBytes(32).toString('hex');
+    
+    // Hash the token using SHA-256 before storing it in the database
+    const hashedToken = createHash('sha256').update(rawToken).digest('hex');
+    const resetTokenExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    // Store the hashed token
+    await db.passwordResetToken.create({
+      data: {
+        email: userEmail,
+        token: hashedToken,
+        expires: resetTokenExpiry,
+      },
+    });
+
+    // Determine the base URL for the reset link
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000';
+    const resetUrl = `${baseUrl}/reset-password?token=${rawToken}`;
+
+    // Send the email containing the raw token
+    await sendPasswordResetEmail(userEmail, resetUrl);
+
     return NextResponse.json({
-      message: 'Reset token generated successfully.',
-      token: resetToken,
+      message: 'If an account exists with this email, a reset link has been sent.',
     });
   } catch (error) {
     console.error('Forgot password error:', error);

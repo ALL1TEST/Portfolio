@@ -15,7 +15,7 @@ export const GET = withAuth(async () => {
 // PUT - save SMTP settings
 export const PUT = withAuth(async (req: Request) => {
   const body = await req.json();
-  const { smtpPass, ...rest } = body;
+  const { smtpPass, hasPassword, ...rest } = body;
 
   const updateData: Record<string, unknown> = { ...rest };
   // Only update password if a new one was provided (not the masked placeholder)

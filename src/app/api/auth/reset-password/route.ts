@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hash } from 'bcryptjs';
+import { createHash } from 'crypto';
 
 export async function POST(request: Request) {
   try {
@@ -28,31 +29,48 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find user with valid token
-    const user = await db.user.findFirst({
+    // Hash the incoming raw token to compare with the database
+    const hashedToken = createHash('sha256').update(token.trim()).digest('hex');
+
+    // Find the valid token in the database
+    const resetTokenRecord = await db.passwordResetToken.findUnique({
       where: {
-        resetToken: token.trim(),
-        resetTokenExpiry: { gt: new Date() },
+        token: hashedToken,
       },
     });
 
-    if (!user) {
+    if (!resetTokenRecord || resetTokenRecord.expires < new Date()) {
       return NextResponse.json(
         { error: 'Invalid or expired reset token. Please request a new one.' },
         { status: 400 }
       );
     }
 
-    // Hash new password and clear reset token
-    const hashedPassword = await hash(password, 10);
-    await db.user.update({
-      where: { id: user.id },
-      data: {
-        password: hashedPassword,
-        resetToken: null,
-        resetTokenExpiry: null,
-      },
+    // Ensure user still exists
+    const user = await db.user.findUnique({
+      where: { email: resetTokenRecord.email },
     });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found.' },
+        { status: 400 }
+      );
+    }
+
+    // Hash new password
+    const hashedPassword = await hash(password, 10);
+    
+    // Update user password and delete the reset token in a transaction
+    await db.$transaction([
+      db.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword },
+      }),
+      db.passwordResetToken.delete({
+        where: { id: resetTokenRecord.id },
+      }),
+    ]);
 
     return NextResponse.json({
       message: 'Password has been reset successfully. You can now sign in with your new password.',

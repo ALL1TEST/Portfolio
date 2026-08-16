@@ -1,0 +1,538 @@
+{
+  "users": [
+    {
+      "id": "cmstq444a0000k9a0uhvup9y7",
+      "email": "admin@codevirtox.com",
+      "password": "$2b$12$N34F/FDwv7PI8MprZIrteewFo2MGPgWanrImkJmRLZXluRr2kZmgi",
+      "name": "Abdellah Ait-Si",
+      "resetToken": null,
+      "resetTokenExpiry": null,
+      "createdAt": "2026-08-15T01:54:56.602Z",
+      "updatedAt": "2026-08-15T01:54:56.602Z"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "default",
+      "fullName": "ABDELLAH AIT-SI",
+      "brandName": "CodeVirtox",
+      "professionalTitle": "Full Stack Developer | AI & Automation",
+      "shortBio": "Building modern web applications and smart automated solutions. Specialized in React, Laravel, and crafting full-stack experiences that drive real impact.",
+      "aboutText": "Développeur Full Stack spécialisé en React, Laravel et MySQL, passionné par la création d'applications web modernes. Intéressé par l'intelligence artificielle, l'automatisation et le développement de solutions innovantes.",
+      "footerBio": "",
+      "email": "contact@codevirtox.com",
+      "phone": "+212 600-000-000",
+      "location": "Oulad Teima, Morocco",
+      "githubUrl": "",
+      "linkedinUrl": "",
+      "instagramUrl": "",
+      "twitterUrl": "",
+      "featuredProjectsTitle": "Featured Projects",
+      "featuredProjectsDescription": "A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving.",
+      "aboutCard1Title": "Build & Develop",
+      "aboutCard1Description": "Creating modern, responsive, and scalable web applications using technologies such as React, Laravel, Next.js, and MySQL.",
+      "aboutCard2Title": "AI & Automation",
+      "aboutCard2Description": "Building intelligent workflows and automation solutions that simplify repetitive tasks and improve productivity.",
+      "aboutCard3Title": "Learn & Improve",
+      "aboutCard3Description": "Continuously exploring new technologies, improving my skills, and building better digital products.",
+      "stat1Value": "6+",
+      "stat1Label": "Certificates",
+      "stat2Value": "14+",
+      "stat2Label": "Projects",
+      "stat3Value": "8+",
+      "stat3Label": "Technologies",
+      "projectsPageTitle": "Selected Projects",
+      "projectsPageDescription": "A selection of projects showcasing my experience in full-stack development, web applications, automation, and problem-solving.",
+      "certificatesPageTitle": "Certificates & Credentials",
+      "certificatesPageDescription": "A collection of certifications and professional training completed throughout my journey in software development, programming, databases, and web technologies.",
+      "educationPageTitle": "My Educational Journey",
+      "educationPageDescription": "My academic background and continuous journey in software development and technology.",
+      "resumeIntro": "Full-stack developer with hands-on experience building web applications, backend systems, and database-driven solutions. Focused on clean architecture, practical problem-solving, and continuous learning.",
+      "resumeTechTitle": "Technologies I work with",
+      "resumeExpTitle": "Experience & Projects",
+      "contactPageTitle": "Let's Build Something Great Together.",
+      "contactPageDescription": "Have a project, a role,or just want to connect? I usually reply within 24 hours.",
+      "footerCopyright": "",
+      "footerCredit": "",
+      "logoUrl": "",
+      "profileImage": "",
+      "cvFile": "",
+      "createdAt": "2026-08-15T01:54:56.623Z",
+      "updatedAt": "2026-08-15T01:54:56.623Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-dentclinic",
+      "title": "DentClinic",
+      "slug": "dentclinic",
+      "shortDescription": "Development of a complete dental clinic management application with comprehensive features for appointment management, patient records, and financial tracking.",
+      "fullDescription": "A complete dental clinic management system featuring appointment scheduling, patient records management, administrative interfaces, process automation, and financial tracking.",
+      "technologies": "[\"Laravel\",\"PHP\",\"MySQL\",\"FilamentPHP\"]",
+      "startDate": "May 2026",
+      "endDate": "June 2026",
+      "location": "Oulad Teima, Morocco",
+      "projectImage": "",
+      "githubUrl": "",
+      "liveDemoUrl": "",
+      "featured": true,
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.637Z",
+      "updatedAt": "2026-08-15T01:54:56.637Z"
+    },
+    {
+      "id": "proj-crud-etudiant",
+      "title": "CRUD Étudiant",
+      "slug": "crud-etudiant",
+      "shortDescription": "Development of an application for managing student information with full CRUD operations and database management capabilities.",
+      "fullDescription": "A student management application with complete CRUD operations for creating, viewing, updating, and deleting student records, with database management.",
+      "technologies": "[\"PHP\",\"MySQL\",\"HTML\",\"CSS\"]",
+      "startDate": "April 2025",
+      "endDate": "May 2025",
+      "location": "Oulad Teima, Morocco",
+      "projectImage": "",
+      "githubUrl": "",
+      "liveDemoUrl": "",
+      "featured": false,
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.651Z",
+      "updatedAt": "2026-08-15T01:54:56.651Z"
+    },
+    {
+      "id": "proj-library-mgmt",
+      "title": "Library Management System",
+      "slug": "library-management-system",
+      "shortDescription": "Development of an application for managing and organizing a collection of books with browsing and data interaction capabilities.",
+      "fullDescription": "A library management application for browsing, organizing, and managing book data with interactive data features.",
+      "technologies": "[\"JavaScript\",\"HTML\",\"CSS\"]",
+      "startDate": "February 2023",
+      "endDate": "March 2023",
+      "location": "Oulad Teima, Morocco",
+      "projectImage": "",
+      "githubUrl": "",
+      "liveDemoUrl": "",
+      "featured": false,
+      "displayOrder": 3,
+      "createdAt": "2026-08-15T01:54:56.664Z",
+      "updatedAt": "2026-08-15T01:54:56.664Z"
+    }
+  ],
+  "certificates": [
+    {
+      "id": "cert-php-essential",
+      "title": "PHP Essential Training",
+      "issuer": "LinkedIn Learning",
+      "issueDate": "April 2025",
+      "skills": "[\"PHP\",\"Back-End Web Development\"]",
+      "certificateImage": "",
+      "credentialUrl": "",
+      "credentialId": "",
+      "category": "",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.676Z",
+      "updatedAt": "2026-08-15T01:54:56.676Z"
+    },
+    {
+      "id": "cert-cybersecurity-foundations",
+      "title": "Foundations of Cybersecurity",
+      "issuer": "Google",
+      "issueDate": "May 2025",
+      "skills": "[\"Cybersecurity\",\"Network Security\"]",
+      "certificateImage": "",
+      "credentialUrl": "",
+      "credentialId": "",
+      "category": "",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.689Z",
+      "updatedAt": "2026-08-15T01:54:56.689Z"
+    }
+  ],
+  "skills": [
+    {
+      "id": "skill-js",
+      "name": "JavaScript",
+      "category": "Programming",
+      "icon": "Code2",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.704Z",
+      "updatedAt": "2026-08-15T01:54:56.704Z"
+    },
+    {
+      "id": "skill-php",
+      "name": "PHP",
+      "category": "Programming",
+      "icon": "Code2",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.717Z",
+      "updatedAt": "2026-08-15T01:54:56.717Z"
+    },
+    {
+      "id": "skill-python",
+      "name": "Python",
+      "category": "Programming",
+      "icon": "Code2",
+      "displayOrder": 3,
+      "createdAt": "2026-08-15T01:54:56.728Z",
+      "updatedAt": "2026-08-15T01:54:56.728Z"
+    },
+    {
+      "id": "skill-sql",
+      "name": "SQL",
+      "category": "Programming",
+      "icon": "Code2",
+      "displayOrder": 4,
+      "createdAt": "2026-08-15T01:54:56.739Z",
+      "updatedAt": "2026-08-15T01:54:56.739Z"
+    },
+    {
+      "id": "skill-react",
+      "name": "React",
+      "category": "Front-end",
+      "icon": "Globe",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.750Z",
+      "updatedAt": "2026-08-15T01:54:56.750Z"
+    },
+    {
+      "id": "skill-nextjs",
+      "name": "Next.js",
+      "category": "Front-end",
+      "icon": "Globe",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.761Z",
+      "updatedAt": "2026-08-15T01:54:56.761Z"
+    },
+    {
+      "id": "skill-tailwind",
+      "name": "Tailwind CSS",
+      "category": "Front-end",
+      "icon": "Globe",
+      "displayOrder": 3,
+      "createdAt": "2026-08-15T01:54:56.772Z",
+      "updatedAt": "2026-08-15T01:54:56.772Z"
+    },
+    {
+      "id": "skill-html",
+      "name": "HTML",
+      "category": "Front-end",
+      "icon": "Globe",
+      "displayOrder": 4,
+      "createdAt": "2026-08-15T01:54:56.781Z",
+      "updatedAt": "2026-08-15T01:54:56.781Z"
+    },
+    {
+      "id": "skill-css",
+      "name": "CSS",
+      "category": "Front-end",
+      "icon": "Globe",
+      "displayOrder": 5,
+      "createdAt": "2026-08-15T01:54:56.791Z",
+      "updatedAt": "2026-08-15T01:54:56.791Z"
+    },
+    {
+      "id": "skill-laravel",
+      "name": "Laravel",
+      "category": "Back-end",
+      "icon": "Server",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.801Z",
+      "updatedAt": "2026-08-15T01:54:56.801Z"
+    },
+    {
+      "id": "skill-nodejs",
+      "name": "Node.js",
+      "category": "Back-end",
+      "icon": "Server",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.812Z",
+      "updatedAt": "2026-08-15T01:54:56.812Z"
+    },
+    {
+      "id": "skill-mysql",
+      "name": "MySQL",
+      "category": "Databases",
+      "icon": "Database",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.822Z",
+      "updatedAt": "2026-08-15T01:54:56.822Z"
+    },
+    {
+      "id": "skill-mongodb",
+      "name": "MongoDB",
+      "category": "Databases",
+      "icon": "Database",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.927Z",
+      "updatedAt": "2026-08-15T01:54:56.927Z"
+    },
+    {
+      "id": "skill-ai-tools",
+      "name": "AI Tools",
+      "category": "AI & Automation",
+      "icon": "Brain",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.937Z",
+      "updatedAt": "2026-08-15T01:54:56.937Z"
+    },
+    {
+      "id": "skill-workflow-auto",
+      "name": "Workflow Automation",
+      "category": "AI & Automation",
+      "icon": "Brain",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.947Z",
+      "updatedAt": "2026-08-15T01:54:56.947Z"
+    },
+    {
+      "id": "skill-api-integration",
+      "name": "API Integration",
+      "category": "AI & Automation",
+      "icon": "Brain",
+      "displayOrder": 3,
+      "createdAt": "2026-08-15T01:54:56.956Z",
+      "updatedAt": "2026-08-15T01:54:56.956Z"
+    },
+    {
+      "id": "skill-wordpress",
+      "name": "WordPress",
+      "category": "CMS",
+      "icon": "Layout",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.966Z",
+      "updatedAt": "2026-08-15T01:54:56.966Z"
+    },
+    {
+      "id": "skill-elementor",
+      "name": "Elementor",
+      "category": "CMS",
+      "icon": "Layout",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.976Z",
+      "updatedAt": "2026-08-15T01:54:56.976Z"
+    },
+    {
+      "id": "skill-git",
+      "name": "Git",
+      "category": "Tools & Cloud",
+      "icon": "Cloud",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:56.986Z",
+      "updatedAt": "2026-08-15T01:54:56.986Z"
+    },
+    {
+      "id": "skill-github",
+      "name": "GitHub",
+      "category": "Tools & Cloud",
+      "icon": "Cloud",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:56.996Z",
+      "updatedAt": "2026-08-15T01:54:56.996Z"
+    },
+    {
+      "id": "skill-docker",
+      "name": "Docker",
+      "category": "Tools & Cloud",
+      "icon": "Cloud",
+      "displayOrder": 3,
+      "createdAt": "2026-08-15T01:54:57.005Z",
+      "updatedAt": "2026-08-15T01:54:57.005Z"
+    },
+    {
+      "id": "skill-vscode",
+      "name": "VS Code",
+      "category": "Tools & Cloud",
+      "icon": "Cloud",
+      "displayOrder": 4,
+      "createdAt": "2026-08-15T01:54:57.015Z",
+      "updatedAt": "2026-08-15T01:54:57.015Z"
+    },
+    {
+      "id": "skill-oracle-cloud",
+      "name": "Oracle Cloud",
+      "category": "Tools & Cloud",
+      "icon": "Cloud",
+      "displayOrder": 5,
+      "createdAt": "2026-08-15T01:54:57.025Z",
+      "updatedAt": "2026-08-15T01:54:57.025Z"
+    },
+    {
+      "id": "skill-seo",
+      "name": "SEO",
+      "category": "SEO",
+      "icon": "Search",
+      "displayOrder": 0,
+      "createdAt": "2026-08-15T01:54:57.036Z",
+      "updatedAt": "2026-08-15T01:54:57.036Z"
+    },
+    {
+      "id": "skill-web-opt",
+      "name": "Web Optimization",
+      "category": "SEO",
+      "icon": "Search",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:57.046Z",
+      "updatedAt": "2026-08-15T01:54:57.046Z"
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-1",
+      "degree": "Full Stack Development",
+      "field": "Développement Digital",
+      "institution": "Institut Spécialisé de Technologie Appliquée NTIC",
+      "location": "Oulad Teima, Morocco",
+      "year": "2024 – Present",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:57.057Z",
+      "updatedAt": "2026-08-16T15:09:33.989Z"
+    },
+    {
+      "id": "edu-2",
+      "degree": "Software Engineering & Artificial Intelligence",
+      "field": "",
+      "institution": "DEVMINDS",
+      "location": "",
+      "year": "2026",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:57.068Z",
+      "updatedAt": "2026-08-16T15:09:34.004Z"
+    }
+  ],
+  "experience": [
+    {
+      "id": "exp-dentclinic",
+      "title": "DentClinic",
+      "description": "Development of a dental clinic management application.",
+      "technologies": "[\"Laravel\",\"PHP\",\"MySQL\",\"FilamentPHP\"]",
+      "startDate": "May 2026",
+      "endDate": "June 2026",
+      "location": "Oulad Teima, Morocco",
+      "displayOrder": 1,
+      "createdAt": "2026-08-15T01:54:57.079Z",
+      "updatedAt": "2026-08-15T01:54:57.079Z"
+    },
+    {
+      "id": "exp-crud-etudiant",
+      "title": "CRUD Étudiant",
+      "description": "Development of a student management application.",
+      "technologies": "[\"PHP\",\"MySQL\",\"HTML\",\"CSS\"]",
+      "startDate": "April 2025",
+      "endDate": "May 2025",
+      "location": "Oulad Teima, Morocco",
+      "displayOrder": 2,
+      "createdAt": "2026-08-15T01:54:57.090Z",
+      "updatedAt": "2026-08-15T01:54:57.090Z"
+    },
+    {
+      "id": "exp-library-mgmt",
+      "title": "Library Management System",
+      "description": "Development of a library management application.",
+      "technologies": "[\"JavaScript\",\"HTML\",\"CSS\"]",
+      "startDate": "February 2023",
+      "endDate": "March 2023",
+      "location": "Oulad Teima, Morocco",
+      "displayOrder": 3,
+      "createdAt": "2026-08-15T01:54:57.100Z",
+      "updatedAt": "2026-08-15T01:54:57.100Z"
+    }
+  ],
+  "languages": [
+    {
+      "id": "lang-arabic",
+      "name": "Arabic",
+      "level": "Native",
+      "displayOrder": 1
+    },
+    {
+      "id": "lang-amazigh",
+      "name": "Amazigh",
+      "level": "Native",
+      "displayOrder": 2
+    },
+    {
+      "id": "lang-french",
+      "name": "French",
+      "level": "Intermediate",
+      "displayOrder": 3
+    },
+    {
+      "id": "lang-english",
+      "name": "English",
+      "level": "Technical",
+      "displayOrder": 4
+    }
+  ],
+  "softSkills": [
+    {
+      "id": "ss-project-mgmt",
+      "name": "Project Management",
+      "icon": "Calendar",
+      "displayOrder": 1
+    },
+    {
+      "id": "ss-teamwork",
+      "name": "Teamwork",
+      "icon": "Users",
+      "displayOrder": 2
+    },
+    {
+      "id": "ss-adaptability",
+      "name": "Adaptability",
+      "icon": "RefreshCw",
+      "displayOrder": 3
+    },
+    {
+      "id": "ss-problem-solving",
+      "name": "Problem Solving",
+      "icon": "Lightbulb",
+      "displayOrder": 4
+    }
+  ],
+  "contactMessages": [
+    {
+      "id": "cmsvydoha0000k9f4gsdpwzgt",
+      "name": "kari molit",
+      "email": "zzandagi959@gmail.com",
+      "subject": "The frontend was sending ",
+      "message": "The frontend was sending a temporary property (hasPassword) to the backend to indicate whether a password was already saved. ",
+      "read": true,
+      "createdAt": "2026-08-16T15:21:52.175Z"
+    },
+    {
+      "id": "cmsvyw5uh0001k9f4t5bc5o48",
+      "name": "dsbwbd",
+      "email": "booomba@gmail.com",
+      "subject": "hello ",
+      "message": "rangooooooo",
+      "read": true,
+      "createdAt": "2026-08-16T15:36:14.490Z"
+    },
+    {
+      "id": "cmsvz10mg0002k9f4b53xlws8",
+      "name": "Iman Bens",
+      "email": "jakoob@gmail.com",
+      "subject": "hiiiiiii borr",
+      "message": "fffffffffffff gggggg",
+      "read": false,
+      "createdAt": "2026-08-16T15:40:01.001Z"
+    }
+  ],
+  "appSettings": [
+    {
+      "id": "singleton",
+      "smtpHost": "smtp.gmail.com",
+      "smtpPort": 587,
+      "smtpUser": "aitsiiabdellah@gmail.com",
+      "smtpPass": "zfjk vzpk xlfe tfbs",
+      "smtpSecure": false,
+      "fromName": "CodeVirtox",
+      "fromEmail": "aitsiiabdellah@gmail.com",
+      "replyToEmail": "aitsiiabdellah@gmail.com",
+      "contactReceiverEmail": "bensiman04@gmail.com",
+      "contactEmailEnabled": true,
+      "adminLoginEmailEnabled": false,
+      "createdAt": "2026-08-16T15:14:22.744Z",
+      "updatedAt": "2026-08-16T15:39:33.305Z"
+    }
+  ]
+}

@@ -68,19 +68,59 @@ export async function sendContactEmail(data: { name: string; email: string; subj
 
   return sendEmail({
     to: receiver,
-    subject: `New Contact: ${data.subject}`,
+    subject: `📩 New Contact Message — ${data.subject}`,
     html: `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #333;">New Contact Form Submission</h2>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
-          <tr><td style="padding: 8px; border: 1px solid #eee; font-weight: bold;">Name</td><td style="padding: 8px; border: 1px solid #eee;">${data.name}</td></tr>
-          <tr><td style="padding: 8px; border: 1px solid #eee; font-weight: bold;">Email</td><td style="padding: 8px; border: 1px solid #eee;">${data.email}</td></tr>
-          <tr><td style="padding: 8px; border: 1px solid #eee; font-weight: bold;">Subject</td><td style="padding: 8px; border: 1px solid #eee;">${data.subject}</td></tr>
-          <tr><td style="padding: 8px; border: 1px solid #eee; font-weight: bold;">Date</td><td style="padding: 8px; border: 1px solid #eee;">${data.createdAt.toISOString()}</td></tr>
-        </table>
-        <div style="margin-top: 16px; padding: 16px; background: #f9f9f9; border-radius: 8px;">
-          <p style="font-weight: bold; margin-bottom: 8px;">Message:</p>
-          <p style="white-space: pre-wrap;">${data.message}</p>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0a0a0a; padding: 40px 20px;">
+        <div style="max-width: 600px; margin: 0 auto;">
+          
+          <!-- Header -->
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #ff5722; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">CodeVirtox</h1>
+          </div>
+        
+          <!-- Main Card -->
+          <div style="background-color: #1a1a1a; border-radius: 12px; padding: 32px; border: 1px solid #333; box-shadow: 0 8px 16px rgba(0,0,0,0.4);">
+            <h2 style="margin: 0 0 8px 0; color: #ffffff; font-size: 20px;">New Contact Message</h2>
+            <p style="margin: 0 0 24px 0; color: #a0a0a0; font-size: 14px;">You received a new message from your portfolio contact form.</p>
+        
+            <!-- Info Grid -->
+            <div style="background-color: #222222; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <tr>
+                  <td style="padding: 6px 0; color: #888888; width: 80px; vertical-align: top;">👤 Name</td>
+                  <td style="padding: 6px 0; color: #ffffff; font-weight: 500;">${data.name}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; color: #888888; vertical-align: top;">📧 Email</td>
+                  <td style="padding: 6px 0; color: #ffffff; font-weight: 500;"><a href="mailto:${data.email}" style="color: #ff5722; text-decoration: none;">${data.email}</a></td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; color: #888888; vertical-align: top;">📝 Subject</td>
+                  <td style="padding: 6px 0; color: #ffffff; font-weight: 500;">${data.subject}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; color: #888888; vertical-align: top;">📅 Date</td>
+                  <td style="padding: 6px 0; color: #ffffff; font-weight: 500;">${new Date(data.createdAt).toLocaleString()}</td>
+                </tr>
+              </table>
+            </div>
+        
+            <!-- Message Box -->
+            <h3 style="margin: 0 0 12px 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Message</h3>
+            <div style="background-color: #111111; border-left: 4px solid #ff5722; border-radius: 6px; padding: 20px; margin-bottom: 32px; color: #e0e0e0; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${data.message}</div>
+        
+            <!-- CTA Button -->
+            <div style="text-align: center;">
+              <a href="mailto:${data.email}" style="display: inline-block; background-color: #ff5722; color: #ffffff; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px;">Reply to ${data.name}</a>
+            </div>
+          </div>
+        
+          <!-- Footer -->
+          <div style="text-align: center; margin-top: 32px; color: #666666; font-size: 12px; line-height: 1.5;">
+            <p style="margin: 0 0 8px 0;">This notification was sent from your CodeVirtox Portfolio contact form.</p>
+            <p style="margin: 0;">&copy; ${new Date().getFullYear()} CodeVirtox. All rights reserved.</p>
+          </div>
+          
         </div>
       </div>
     `,
@@ -130,4 +170,21 @@ export async function sendTestEmail(to: string): Promise<{ success: boolean; err
 export async function isSmtpConfigured(): Promise<boolean> {
   const config = await getSmtpConfig();
   return !!config && config.host.length > 0 && config.user.length > 0;
+}
+
+export async function sendPasswordResetEmail(email: string, resetUrl: string): Promise<{ success: boolean; error?: string }> {
+  return sendEmail({
+    to: email,
+    subject: 'Password Reset Request - CodeVirtox Portfolio',
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+        <h2 style="color: #333; text-align: center;">Reset Your Password</h2>
+        <p style="color: #555; font-size: 16px; line-height: 1.5;">You requested a password reset for your CodeVirtox admin account. Please click the button below to set a new password.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetUrl}" style="background-color: #ff5722; color: #fff; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 4px; font-weight: bold; display: inline-block;">Set New Password</a>
+        </div>
+        <p style="color: #777; font-size: 14px; text-align: center;">If you did not request this, you can safely ignore this email. This link will expire in 30 minutes.</p>
+      </div>
+    `,
+  });
 }
