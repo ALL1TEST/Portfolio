@@ -1090,3 +1090,21 @@ Stage Summary:
 - Empty copyright/credit = dynamic defaults (year auto-updates, name from profile)
 - Custom text overrides the default when set
 - No `||` fallback bug — uses ternary `profile?.footerCopyright ? ... : ...`
+
+---
+Task ID: git-pull-github
+Agent: Main Agent
+Task: Pull latest updates from GitHub repository
+
+Work Log:
+- Ran `git stash` (no local changes)
+- Ran `git pull --rebase origin main`
+- Resolved 3 merge conflicts in `src/components/focus-reveal.tsx` (formatting-only differences)
+- Resolved 1 merge conflict in `worklog.md`
+- Continued rebase successfully
+- Pulled commit 940b489: "Fix settings ReferenceError and make dashboard/login logo dynamic"
+
+Stage Summary:
+- Updated files: sidebar.tsx, settings/page.tsx, login/page.tsx, prisma/db/custom.db
+- ESLint passes cleanly
+- Dev server running on port 3000
