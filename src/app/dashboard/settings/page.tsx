@@ -368,20 +368,22 @@ export default function SettingsPage() {
     finally { setSaving(false); }
   };
 
-  // Fetch user email for account settings
+  // Fetch user email for account settings from session, not profile
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchSession = async () => {
       try {
-        const res = await fetch('/api/profile');
+        const res = await fetch('/api/auth/session');
         if (res.ok) {
-          const data = await res.json();
-          setCurrentEmail(data.email || '');
+          const session = await res.json();
+          if (session?.user?.email) {
+            setCurrentEmail(session.user.email);
+          }
         }
       } catch {
         // silently fail
       }
     };
-    if (currentEmail === '' && !loading) fetchUser();
+    if (currentEmail === '' && !loading) fetchSession();
   }, [currentEmail, loading]);
 
   const handleChangeEmail = async (e: React.FormEvent) => {
