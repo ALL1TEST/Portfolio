@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import RadialRevealButton from '@/components/ui/radial-reveal-button';
-import { Loader2, ArrowRight, ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft, KeyRound, ShieldCheck, Mail, Eye, EyeOff } from 'lucide-react';
 
 type View = 'login' | 'forgot-email' | 'forgot-reset';
 
@@ -19,6 +19,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resetToken, setResetToken] = useState('');
   const router = useRouter();
@@ -44,6 +47,9 @@ export default function LoginPage() {
     setPassword('');
     setNewPassword('');
     setConfirmPassword('');
+    setShowPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
     setResetToken('');
     setLoading(false);
   }, []);
@@ -253,16 +259,26 @@ export default function LoginPage() {
                         Forgot password?
                       </button>
                     </div>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
-                      disabled={loading}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20 pr-10"
+                        disabled={loading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-white transition-colors duration-200"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="w-full flex justify-center pt-2">
@@ -414,17 +430,27 @@ export default function LoginPage() {
                     <Label htmlFor="new-password" className="text-sm font-medium text-white">
                       New Password
                     </Label>
-                    <Input
-                      id="new-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                      minLength={6}
-                      className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
-                      disabled={loading}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="new-password"
+                        type={showNewPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        minLength={6}
+                        className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20 pr-10"
+                        disabled={loading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-white transition-colors duration-200"
+                        tabIndex={-1}
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                     <p className="text-xs text-muted-text/60">Minimum 6 characters</p>
                   </div>
 
@@ -432,17 +458,27 @@ export default function LoginPage() {
                     <Label htmlFor="confirm-password" className="text-sm font-medium text-white">
                       Confirm New Password
                     </Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      minLength={6}
-                      className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20"
-                      disabled={loading}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        minLength={6}
+                        className="bg-dark border-stroke text-white placeholder:text-muted-text focus:border-brand focus:ring-brand/20 pr-10"
+                        disabled={loading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-white transition-colors duration-200"
+                        tabIndex={-1}
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                     {confirmPassword && confirmPassword !== newPassword && (
                       <p className="text-xs text-red-400">Passwords do not match</p>
                     )}
