@@ -336,10 +336,18 @@ export default function SettingsPage() {
 
 
   const handleRemoveFile = async (url: string, field: keyof Profile) => {
+    console.log(`[FILE_REMOVE] Button clicked`);
+    console.log(`[FILE_REMOVE] Field: ${field}`);
+    console.log(`[FILE_REMOVE] Original value: ${url}`);
+    
     try {
-      if (!url) return;
+      if (!url) {
+        console.log(`[FILE_REMOVE] Value is null/empty`);
+        return;
+      }
 
       if (pendingFiles[field]) {
+        console.log(`[FILE_REMOVE] Removing unsaved pending file for ${field}`);
         URL.revokeObjectURL(pendingFiles[field].previewUrl);
         setPendingFiles(prev => {
           const updated = { ...prev };
@@ -351,28 +359,37 @@ export default function SettingsPage() {
       }
 
       const filePath = extractStoragePath(url);
+      console.log(`[STORAGE_PATH] Result returned by utility: ${filePath}`);
       if (!filePath) {
         toast.error('Could not determine file path');
         return;
       }
 
+      console.log(`[DELETE_API] Sending filePath: ${filePath}`);
       const res = await fetch('/api/upload/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filePath }),
       });
       const data = await res.json();
+      console.log(`[DELETE_API] Response status: ${res.status}`);
+      console.log(`[DELETE_API] Supabase delete result:`, data);
+      
       if (!res.ok) throw new Error(data.error || 'Failed to delete file');
       
       updateField(field, '');
+      console.log(`[FILE_REMOVE] Frontend state updated`);
+      console.log(`[FILE_REMOVE] Save Changes is required to persist this deletion in the database`);
       toast.success('File deleted successfully');
     } catch (error: any) {
-      console.error(error);
+      console.error('[FILE_REMOVE] Error:', error);
       toast.error(error.message || 'Failed to delete file');
     }
   };
 
   const handleSave = async () => {
+    const reqId = Math.random().toString(36).substring(7);
+    console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Save Changes button clicked`);
     setSaving(true);
     try {
       let updatedProfile = { ...profile };
@@ -384,6 +401,7 @@ export default function SettingsPage() {
         formData.append('file', file);
         formData.append('category', field === 'cvFile' ? 'cv' : 'profile');
 
+        console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Uploading new file for ${field}`);
         const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
         if (!uploadRes.ok) {
           const errData = await uploadRes.json();
@@ -392,6 +410,16 @@ export default function SettingsPage() {
         const data = await uploadRes.json();
         updatedProfile[field] = data.url;
       }
+
+      console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Sending profile update`);
+      const payloadKeys = Object.keys(updatedProfile);
+      console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Fields being sent:`, payloadKeys.filter(k => (updatedProfile as any)[k] !== (original as any)[k]));
+      if (updatedProfile.profileImage) console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] File field: profileImage, URL/path: ${updatedProfile.profileImage}`);
+      if (updatedProfile.logoUrl) console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] File field: logoUrl, URL/path: ${updatedProfile.logoUrl}`);
+      if (updatedProfile.cvFile) console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] File field: cvFile, URL/path: ${updatedProfile.cvFile}`);
+
+      console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] API endpoint: /api/profile`);
+      console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Request starts`);
 
       const res = await fetch('/api/profile', {
         method: 'PUT',
@@ -420,13 +448,15 @@ export default function SettingsPage() {
         setProfile(data);
         setOriginal(data);
         setPendingFiles({});
+        console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Request successful and frontend state updated`);
         toast.success('Profile saved successfully');
       } else { 
         const errData = await res.json().catch(()=>({}));
+        console.error(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Save failed with status ${res.status}`);
         throw new Error(errData.error || 'Failed to save profile'); 
       }
     } catch (err: any) { 
-      console.error('Save error:', err);
+      console.error(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Save error trace:`, err);
       toast.error(err.message || 'Failed to save profile'); 
     }
     finally { setSaving(false); }

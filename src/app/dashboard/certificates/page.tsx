@@ -165,10 +165,18 @@ export default function CertificatesPage() {
 
 
   const handleRemoveFile = async (url: string, field: 'certificateImage' | 'credentialUrl') => {
+    console.log(`[FILE_REMOVE] Button clicked`);
+    console.log(`[FILE_REMOVE] Field: ${field}`);
+    console.log(`[FILE_REMOVE] Original value: ${url}`);
+    
     try {
-      if (!url) return;
+      if (!url) {
+        console.log(`[FILE_REMOVE] Value is null/empty`);
+        return;
+      }
 
       if (pendingFiles[field]) {
+        console.log(`[FILE_REMOVE] Removing unsaved pending file for ${field}`);
         URL.revokeObjectURL(pendingFiles[field].previewUrl);
         setPendingFiles(prev => {
           const updated = { ...prev };
@@ -181,22 +189,30 @@ export default function CertificatesPage() {
       }
 
       const filePath = extractStoragePath(url);
+      console.log(`[STORAGE_PATH] Result returned by utility: ${filePath}`);
       if (!filePath) {
         toast.error('Could not determine file path');
         return;
       }
+      
+      console.log(`[DELETE_API] Sending filePath: ${filePath}`);
       const res = await fetch('/api/upload/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filePath }),
       });
       const data = await res.json();
+      console.log(`[DELETE_API] Response status: ${res.status}`);
+      console.log(`[DELETE_API] Supabase delete result:`, data);
+      
       if (!res.ok) throw new Error(data.error || 'Failed to delete file');
       
       setForm((p) => ({ ...p, [field]: '' }));
+      console.log(`[FILE_REMOVE] Frontend state updated`);
+      console.log(`[FILE_REMOVE] Save Changes is required to persist this deletion in the database`);
       toast.success('File deleted successfully');
     } catch (error: any) {
-      console.error(error);
+      console.error('[FILE_REMOVE] Error:', error);
       toast.error(error.message || 'Failed to delete file');
     }
   };

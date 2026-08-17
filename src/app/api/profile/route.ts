@@ -8,11 +8,21 @@ export const GET = publicRoute(async () => {
 });
 
 export const PUT = withAuth(async (req: Request) => {
+  const reqId = Math.random().toString(36).substring(7);
+  console.log(`[PROFILE_SAVE_API][REQUEST_ID: ${reqId}] Request received`);
+  console.log(`[PROFILE_SAVE_API][REQUEST_ID: ${reqId}] Importing prisma from @/lib/prisma`);
+  
   try {
     const body = await req.json();
+    console.log(`[PROFILE_SAVE_API][REQUEST_ID: ${reqId}] Body parsed. Keys:`, Object.keys(body));
+    
+    console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] About to execute profile.findFirst()`);
     const existing = await prisma.profile.findFirst();
+    console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] profile.findFirst() succeeded. Existing profile ID:`, existing?.id);
+    
     let profile;
     if (existing) {
+      console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] About to execute profile.update()`);
       profile = await prisma.profile.update({
         where: { id: existing.id },
         data: {
@@ -61,17 +71,22 @@ export const PUT = withAuth(async (req: Request) => {
           ...(body.footerCredit !== undefined && { footerCredit: body.footerCredit }),
         },
       });
+      console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] profile.update() succeeded`);
     } else {
+      console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] About to execute profile.create()`);
       profile = await prisma.profile.create({ data: body });
+      console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] profile.create() succeeded`);
     }
 
     // Force Next.js to regenerate the root layout metadata so favicon changes take effect immediately
     const { revalidatePath } = await import('next/cache');
     revalidatePath('/', 'layout');
 
+    console.log(`[PROFILE_SAVE_API][REQUEST_ID: ${reqId}] Profile updated successfully`);
     return NextResponse.json(profile);
   } catch (error: any) {
-    console.error('Profile update error:', error);
+    console.error(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] Prisma or API error occurred:`, error?.name, error?.message, error?.code);
+    console.error(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] Full error trace:`, error);
     return NextResponse.json(
       { error: error.message || 'Internal Server Error' },
       { status: 500 }

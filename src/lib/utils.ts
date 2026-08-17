@@ -6,16 +6,22 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function extractStoragePath(url: string | null | undefined): string | null {
-  if (!url) return null;
+  if (!url) {
+    console.log('[STORAGE_PATH] Value is null/empty');
+    return null;
+  }
   
   try {
     const parsed = new URL(url);
+    console.log('[STORAGE_PATH] Detected format: full Supabase URL');
     const uploadsIndex = parsed.pathname.indexOf('/uploads/');
     if (uploadsIndex !== -1) {
-      return decodeURIComponent(parsed.pathname.substring(uploadsIndex + '/uploads/'.length));
+      const extracted = decodeURIComponent(parsed.pathname.substring(uploadsIndex + '/uploads/'.length));
+      console.log(`[STORAGE_PATH] Extracted path: ${extracted}`);
+      return extracted;
     }
   } catch (e) {
-    // Ignore invalid URL errors, fall through to string parsing
+    console.log('[STORAGE_PATH] Detected format: relative or unknown format');
   }
   
   const marker = '/uploads/';
@@ -23,8 +29,11 @@ export function extractStoragePath(url: string | null | undefined): string | nul
   if (index !== -1) {
     const pathWithQuery = url.substring(index + marker.length);
     const pathOnly = pathWithQuery.split('?')[0].split('#')[0];
-    return decodeURIComponent(pathOnly);
+    const extracted = decodeURIComponent(pathOnly);
+    console.log(`[STORAGE_PATH] Extracted path via string manipulation: ${extracted}`);
+    return extracted;
   }
   
+  console.log('[STORAGE_PATH] Failed to extract path from URL');
   return null;
 }

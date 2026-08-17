@@ -26,8 +26,11 @@ export const POST = withAuth(async (req: Request) => {
 
     const body = await req.json();
     const filePath = body.filePath;
+    
+    console.log(`[DELETE_API] Received request to delete filePath: ${filePath}`);
 
     if (!filePath) {
+      console.log('[DELETE_API] Error: File path is required');
       return NextResponse.json(
         { error: 'File path is required' },
         { status: 400 }
@@ -39,22 +42,24 @@ export const POST = withAuth(async (req: Request) => {
       .remove([filePath]);
 
     if (error) {
-      console.error('Supabase delete error:', error);
+      console.error('[DELETE_API] Supabase delete error:', error);
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
       );
     }
 
+    console.log('[DELETE_API] Supabase response: success', data);
+
     return NextResponse.json({
       success: true,
       deleted: data,
     });
 
-  } catch (error) {
-    console.error('Delete error:', error);
+  } catch (error: any) {
+    console.error('[DELETE_API] Catch error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete file' },
+      { error: error.message || 'Failed to delete file' },
       { status: 500 }
     );
   }
