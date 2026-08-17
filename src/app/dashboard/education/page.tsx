@@ -209,7 +209,7 @@ export default function EducationPage() {
           </div>
         ) : (
           <ScrollArea className="max-h-[calc(100vh-16rem)]">
-            <Table>
+            <Table className="min-w-[700px]">
               <TableHeader>
                 <TableRow className="border-stroke hover:bg-transparent">
                   <TableHead className="text-muted-text font-medium w-[80px]">Order</TableHead>
