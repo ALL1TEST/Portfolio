@@ -304,8 +304,11 @@ export default function SettingsPage() {
         const data = await res.json();
         updateField('profileImage', data.url);
         toast.success('Image uploaded successfully');
-      } else { toast.error('Failed to upload image'); }
-    } catch { toast.error('Failed to upload image'); }
+      } else { 
+        const errData = await res.json();
+        toast.error(errData.error || 'Failed to upload image'); 
+      }
+    } catch (err: any) { toast.error(err.message || 'Failed to upload image'); }
     finally { setUploading(null); if (imageInputRef.current) imageInputRef.current.value = ''; }
   };
 
@@ -325,8 +328,11 @@ export default function SettingsPage() {
         const data = await res.json();
         updateField('cvFile', data.url);
         toast.success('CV uploaded successfully');
-      } else { toast.error('Failed to upload CV'); }
-    } catch { toast.error('Failed to upload CV'); }
+      } else { 
+        const errData = await res.json();
+        toast.error(errData.error || 'Failed to upload CV'); 
+      }
+    } catch (err: any) { toast.error(err.message || 'Failed to upload CV'); }
     finally { setUploading(null); if (cvInputRef.current) cvInputRef.current.value = ''; }
   };
 
@@ -346,8 +352,11 @@ export default function SettingsPage() {
         const data = await res.json();
         updateField('logoUrl', data.url);
         toast.success('Logo uploaded successfully');
-      } else { toast.error('Failed to upload logo'); }
-    } catch { toast.error('Failed to upload logo'); }
+      } else { 
+        const errData = await res.json();
+        toast.error(errData.error || 'Failed to upload logo'); 
+      }
+    } catch (err: any) { toast.error(err.message || 'Failed to upload logo'); }
     finally { setUploading(null); if (logoInputRef.current) logoInputRef.current.value = ''; }
   };
 

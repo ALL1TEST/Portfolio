@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Github, Linkedin, Instagram, Twitter } from 'lucide-react';
+import { Menu, X, Github, Linkedin, Instagram } from 'lucide-react';
+import { TwitterX } from './icons';
 import { useData } from '@/lib/data-provider';
 
 const navLinks = [
@@ -27,7 +28,7 @@ export function Navbar() {
   if (profile?.githubUrl) socialLinks.push({ href: profile.githubUrl, label: 'GitHub', icon: Github });
   if (profile?.linkedinUrl) socialLinks.push({ href: profile.linkedinUrl, label: 'LinkedIn', icon: Linkedin });
   if (profile?.instagramUrl) socialLinks.push({ href: profile.instagramUrl, label: 'Instagram', icon: Instagram });
-  if (profile?.twitterUrl) socialLinks.push({ href: profile.twitterUrl, label: 'Twitter', icon: Twitter });
+  if (profile?.twitterUrl) socialLinks.push({ href: profile.twitterUrl, label: 'Twitter', icon: TwitterX });
 
   const handleScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 50);

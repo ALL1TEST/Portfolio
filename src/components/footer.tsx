@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowUp, Github, Linkedin, Instagram, Twitter } from 'lucide-react';
+import { ArrowUp, Github, Linkedin, Instagram } from 'lucide-react';
+import { TwitterX } from './icons';
 import { ScrollReveal } from './scroll-reveal';
 import { useData } from '@/lib/data-provider';
 
@@ -27,7 +28,7 @@ export function Footer() {
   if (profile?.githubUrl) socialLinks.push({ href: profile.githubUrl, label: 'GitHub', icon: Github });
   if (profile?.linkedinUrl) socialLinks.push({ href: profile.linkedinUrl, label: 'LinkedIn', icon: Linkedin });
   if (profile?.instagramUrl) socialLinks.push({ href: profile.instagramUrl, label: 'Instagram', icon: Instagram });
-  if (profile?.twitterUrl) socialLinks.push({ href: profile.twitterUrl, label: 'Twitter', icon: Twitter });
+  if (profile?.twitterUrl) socialLinks.push({ href: profile.twitterUrl, label: 'Twitter', icon: TwitterX });
 
   return (
     <footer className="relative border-t border-stroke/30 bg-dark">

@@ -66,16 +66,38 @@ export const POST = withAuth(async (req: Request) => {
     const buffer = Buffer.from(bytes);
 
     // Upload to Supabase Storage
-    const { error: uploadError } = await supabase.storage
+    let { error: uploadError } = await supabase.storage
       .from('uploads')
       .upload(filePath, buffer, {
         contentType: file.type,
         upsert: false,
       });
 
+    // If bucket doesn't exist, try to create it and retry upload
+    if (uploadError && (uploadError.message.includes('not found') || uploadError.message.includes('NoSuchBucket'))) {
+      console.log('Bucket not found, attempting to create public bucket "uploads"...');
+      const { error: createBucketError } = await supabase.storage.createBucket('uploads', {
+        public: true,
+      });
+      
+      if (createBucketError && !createBucketError.message.includes('already exists')) {
+        console.error('Failed to create bucket:', createBucketError);
+        return NextResponse.json({ error: 'Storage not initialized. Failed to create bucket: ' + createBucketError.message }, { status: 500 });
+      }
+
+      // Retry upload after bucket creation
+      const retryUpload = await supabase.storage
+        .from('uploads')
+        .upload(filePath, buffer, {
+          contentType: file.type,
+          upsert: false,
+        });
+      uploadError = retryUpload.error;
+    }
+
     if (uploadError) {
       console.error('Supabase upload error:', uploadError);
-      return NextResponse.json({ error: uploadError.message }, { status: 500 });
+      return NextResponse.json({ error: uploadError.message || 'Failed to upload to Supabase' }, { status: 500 });
     }
 
     // Generate public URL

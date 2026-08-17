@@ -148,8 +148,8 @@ export default function CertificatesPage() {
         const err = await res.json().catch(() => ({}));
         toast.error(err.error || 'Failed to upload image');
       }
-    } catch {
-      toast.error('Failed to upload image');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to upload image');
     } finally {
       setUploading(false);
       if (imageInputRef.current) imageInputRef.current.value = '';
@@ -172,8 +172,8 @@ export default function CertificatesPage() {
         const err = await res.json().catch(() => ({}));
         toast.error(err.error || 'Failed to upload PDF');
       }
-    } catch {
-      toast.error('Failed to upload PDF');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to upload PDF');
     } finally {
       setUploading(false);
       if (pdfInputRef.current) pdfInputRef.current.value = '';

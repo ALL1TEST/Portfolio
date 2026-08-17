@@ -172,8 +172,8 @@ export default function ProjectsPage() {
         const err = await res.json();
         toast.error(err.error || 'Upload failed');
       }
-    } catch {
-      toast.error('Upload failed');
+    } catch (err: any) {
+      toast.error(err.message || 'Upload failed');
     } finally {
       setUploading(false);
       // Reset file input so the same file can be re-selected
