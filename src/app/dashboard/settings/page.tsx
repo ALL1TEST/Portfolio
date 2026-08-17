@@ -347,7 +347,7 @@ export default function SettingsPage() {
           delete updated[field];
           return updated;
         });
-        updateField(field, '');
+        updateField(field, (original[field] as any) || '');
         return;
       }
 
@@ -402,12 +402,34 @@ export default function SettingsPage() {
       
       if (res.ok) {
         const data = await res.json();
+        
+        // Delete old replaced files
+        for (const field of fileFields) {
+          const oldUrl = original[field] as string;
+          if (oldUrl) {
+            const filePath = getStoragePath(oldUrl);
+            if (filePath) {
+              fetch('/api/upload/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filePath }),
+              }).catch(console.error);
+            }
+          }
+        }
+
         setProfile(data);
         setOriginal(data);
         setPendingFiles({});
         toast.success('Profile saved successfully');
-      } else { toast.error('Failed to save profile'); }
-    } catch (err: any) { toast.error(err.message || 'Failed to save profile'); }
+      } else { 
+        const errData = await res.json().catch(()=>({}));
+        throw new Error(errData.error || 'Failed to save profile'); 
+      }
+    } catch (err: any) { 
+      console.error('Save error:', err);
+      toast.error(err.message || 'Failed to save profile'); 
+    }
     finally { setSaving(false); }
   };
 

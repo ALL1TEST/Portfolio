@@ -165,7 +165,7 @@ export default function CertificatesPage() {
     return url.substring(index + marker.length);
   };
 
-  const handleRemoveFile = async (url: string, field: 'credentialUrl' | 'certificateImage') => {
+  const handleRemoveFile = async (url: string, field: 'certificateImage' | 'credentialUrl') => {
     try {
       if (!url) return;
 
@@ -176,7 +176,8 @@ export default function CertificatesPage() {
           delete updated[field];
           return updated;
         });
-        setForm((p) => ({ ...p, [field]: '' }));
+        const originalCert = editingId ? certificates.find(c => c.id === editingId) : null;
+        setForm((p) => ({ ...p, [field]: originalCert ? originalCert[field] : '' }));
         return;
       }
 
@@ -270,15 +271,35 @@ export default function CertificatesPage() {
       }
 
       if (res.ok) {
+        if (editingId) {
+          const originalCert = certificates.find(c => c.id === editingId);
+          if (originalCert) {
+            const fileFields: ('certificateImage' | 'credentialUrl')[] = ['certificateImage', 'credentialUrl'];
+            for (const field of fileFields) {
+              if (pendingFiles[field] && originalCert[field]) {
+                const filePath = getStoragePath(originalCert[field]);
+                if (filePath) {
+                  fetch('/api/upload/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filePath }),
+                  }).catch(console.error);
+                }
+              }
+            }
+          }
+        }
+
         toast.success(editingId ? 'Certificate updated' : 'Certificate created');
         setFormOpen(false);
         fetchCertificates();
       } else {
-        const err = await res.json().catch(() => ({}));
-        toast.error(err.error || 'Failed to save certificate');
+        const errData = await res.json().catch(()=>({}));
+        throw new Error(errData.error || 'Failed to save certificate');
       }
-    } catch {
-      toast.error('Failed to save certificate');
+    } catch (err: any) {
+      console.error('Save error:', err);
+      toast.error(err.message || 'Failed to save certificate');
     } finally {
       setSaving(false);
     }

@@ -187,7 +187,8 @@ export default function ProjectsPage() {
           delete updated[field];
           return updated;
         });
-        setForm((p) => ({ ...p, [field]: '' }));
+        const originalProject = form.id ? projects.find(p => p.id === form.id) : null;
+        setForm((p) => ({ ...p, [field]: originalProject ? originalProject[field] : '' }));
         return;
       }
 
@@ -250,14 +251,30 @@ export default function ProjectsPage() {
       });
 
       if (res.ok) {
+        if (editingId && pendingFiles.projectImage) {
+          const originalProject = projects.find(p => p.id === editingId);
+          if (originalProject && originalProject.projectImage) {
+            const filePath = getStoragePath(originalProject.projectImage);
+            if (filePath) {
+              fetch('/api/upload/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filePath }),
+              }).catch(console.error);
+            }
+          }
+        }
+        
         toast.success(editingId ? 'Project updated' : 'Project created');
         setFormOpen(false);
         fetchProjects();
       } else {
-        toast.error('Failed to save project');
+        const errData = await res.json().catch(()=>({}));
+        throw new Error(errData.error || 'Failed to save project');
       }
-    } catch {
-      toast.error('Failed to save project');
+    } catch (err: any) {
+      console.error('Save error:', err);
+      toast.error(err.message || 'Failed to save project');
     } finally {
       setSaving(false);
     }
