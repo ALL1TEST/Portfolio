@@ -6,11 +6,6 @@ const globalForPrisma = globalThis as unknown as {
 
 let databaseUrl = process.env.DATABASE_URL || '';
 
-// CRITICAL FIX FOR VERCEL + SUPABASE:
-// Vercel serverless functions must use PgBouncer in transaction mode (port 6543)
-// and strict connection limits. If the user configured port 5432 (session mode),
-// we dynamically switch it to 6543 and append the correct pooler parameters
-// to prevent "max clients reached in session mode".
 if (process.env.NODE_ENV === 'production' && databaseUrl && (databaseUrl.includes('supabase.com') || databaseUrl.includes('supabase.co'))) {
   try {
     const url = new URL(databaseUrl);
@@ -27,7 +22,7 @@ if (process.env.NODE_ENV === 'production' && databaseUrl && (databaseUrl.include
     
     // Add aggressive timeouts
     if (!url.searchParams.has('pool_timeout')) {
-      url.searchParams.set('pool_timeout', '5'); // Wait max 5 seconds for a connection
+      url.searchParams.set('pool_timeout', '5');
     }
 
     databaseUrl = url.toString();
@@ -37,7 +32,23 @@ if (process.env.NODE_ENV === 'production' && databaseUrl && (databaseUrl.include
 }
 
 if (!globalForPrisma.prisma) {
-  console.log(`[PRISMA_INIT] Creating NEW PrismaClient instance in ${process.env.NODE_ENV} mode`);
+  try {
+    const parsed = new URL(databaseUrl);
+    const isPgbouncer = parsed.searchParams.get('pgbouncer') === 'true';
+    const port = parsed.port || '5432';
+    
+    console.log('[PRISMA_CONFIG]');
+    console.log(`runtime: ${process.env.NODE_ENV}`);
+    console.log(`host: ${parsed.hostname}`);
+    console.log(`port: ${port}`);
+    console.log(`pool_mode: ${port === '6543' ? 'transaction' : 'session'}`);
+    console.log(`connection_limit: ${parsed.searchParams.get('connection_limit') || 'default'}`);
+    console.log(`pgbouncer: ${isPgbouncer}`);
+    console.log(`prisma_version: 6.19.3`);
+  } catch(e) {
+    console.log('[PRISMA_CONFIG] Unable to parse URL for logging.');
+  }
+
   globalForPrisma.prisma = new PrismaClient({
     datasources: {
       db: {
@@ -46,8 +57,6 @@ if (!globalForPrisma.prisma) {
     },
     log: ['query', 'info', 'warn', 'error'],
   });
-} else {
-  console.log(`[PRISMA_INIT] Reusing EXISTING PrismaClient instance in ${process.env.NODE_ENV} mode`);
 }
 
 export const prisma = globalForPrisma.prisma;
