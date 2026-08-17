@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { hash } from 'bcryptjs';
 import { createHash } from 'crypto';
 
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const hashedToken = createHash('sha256').update(token.trim()).digest('hex');
 
     // Find the valid token in the database
-    const resetTokenRecord = await db.passwordResetToken.findUnique({
+    const resetTokenRecord = await prisma.passwordResetToken.findUnique({
       where: {
         token: hashedToken,
       },
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     // Ensure user still exists
-    const user = await db.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email: resetTokenRecord.email },
     });
 
@@ -62,12 +62,12 @@ export async function POST(request: Request) {
     const hashedPassword = await hash(password, 10);
     
     // Update user password and delete the reset token in a transaction
-    await db.$transaction([
-      db.user.update({
+    await prisma.$transaction([
+      prisma.user.update({
         where: { id: user.id },
         data: { password: hashedPassword },
       }),
-      db.passwordResetToken.delete({
+      prisma.passwordResetToken.delete({
         where: { id: resetTokenRecord.id },
       }),
     ]);

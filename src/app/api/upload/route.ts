@@ -5,8 +5,10 @@ import { createClient } from '@supabase/supabase-js';
 const ALLOWED_TYPES = [
   // Images
   'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
-  // PDFs
+  // Documents
   'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 ];
 
 const MAX_SIZE = Number.MAX_SAFE_INTEGER; // Unlimited
@@ -56,7 +58,13 @@ export const POST = withAuth(async (req: Request) => {
     if (lastDotIndex !== -1 && lastDotIndex !== 0) {
       ext = file.name.substring(lastDotIndex);
     } else {
-      ext = file.type === 'application/pdf' ? '.pdf' : '.png';
+      if (file.type === 'application/pdf') ext = '.pdf';
+      else if (file.type === 'application/msword') ext = '.doc';
+      else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ext = '.docx';
+      else if (file.type === 'image/jpeg') ext = '.jpg';
+      else if (file.type === 'image/webp') ext = '.webp';
+      else if (file.type === 'image/gif') ext = '.gif';
+      else ext = '.png';
     }
 
     const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;

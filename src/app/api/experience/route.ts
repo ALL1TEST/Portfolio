@@ -1,9 +1,9 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const GET = publicRoute(async () => {
-  const data = await db.experience.findMany({ orderBy: { displayOrder: 'asc' } });
+  const data = await prisma.experience.findMany({ orderBy: { displayOrder: 'asc' } });
   return NextResponse.json(data);
 });
 
@@ -17,7 +17,7 @@ function normalizeTechnologies(raw: unknown): string {
 
 export const POST = withAuth(async (req: Request) => {
   const body = await req.json();
-  return NextResponse.json(await db.experience.create({
+  return NextResponse.json(await prisma.experience.create({
     data: { ...body, technologies: normalizeTechnologies(body.technologies) },
   }));
 });
@@ -29,14 +29,14 @@ export const PUT = withAuth(async (req: Request) => {
   if (body.reorder && Array.isArray(body.reorder)) {
     await Promise.all(
       body.reorder.map((item: { id: string; displayOrder: number }) =>
-        db.experience.update({ where: { id: item.id }, data: { displayOrder: item.displayOrder } })
+        prisma.experience.update({ where: { id: item.id }, data: { displayOrder: item.displayOrder } })
       )
     );
     return NextResponse.json({ success: true });
   }
 
   if (!body.id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
-  return NextResponse.json(await db.experience.update({
+  return NextResponse.json(await prisma.experience.update({
     where: { id: body.id },
     data: { ...body, technologies: normalizeTechnologies(body.technologies) },
   }));
@@ -46,6 +46,6 @@ export const DELETE = withAuth(async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
-  await db.experience.delete({ where: { id } });
+  await prisma.experience.delete({ where: { id } });
   return NextResponse.json({ success: true });
 });

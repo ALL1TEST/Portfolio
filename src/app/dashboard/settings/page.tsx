@@ -297,7 +297,8 @@ export default function SettingsPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
+    const allowedImages = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (!allowedImages.includes(file.type) && !file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
 
     const previewUrl = URL.createObjectURL(file);
     setPendingFiles(prev => ({ ...prev, profileImage: { file, previewUrl } }));
@@ -309,7 +310,8 @@ export default function SettingsPage() {
   const handleCvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.type !== 'application/pdf') { toast.error('Only PDF files are allowed'); return; }
+    const allowedDocs = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedDocs.includes(file.type)) { toast.error('Only PDF and Word documents are allowed'); return; }
 
     const previewUrl = URL.createObjectURL(file);
     setPendingFiles(prev => ({ ...prev, cvFile: { file, previewUrl } }));
@@ -321,7 +323,8 @@ export default function SettingsPage() {
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
+    const allowedImages = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (!allowedImages.includes(file.type) && !file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
 
     const previewUrl = URL.createObjectURL(file);
     setPendingFiles(prev => ({ ...prev, logoUrl: { file, previewUrl } }));
@@ -778,7 +781,7 @@ export default function SettingsPage() {
               )}
             </div>
             <p className="text-xs text-muted-text">PDF format only.</p>
-            <input ref={cvInputRef} type="file" accept="application/pdf" onChange={handleCvUpload} className="hidden" />
+            <input ref={cvInputRef} type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.doc,.docx" onChange={handleCvUpload} className="hidden" />
           </div>
         </div>
       </Card>

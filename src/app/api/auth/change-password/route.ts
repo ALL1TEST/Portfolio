@@ -1,6 +1,6 @@
 import { withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { compare, hash } from 'bcryptjs';
 
 // POST - change account password
@@ -26,7 +26,7 @@ export const POST = withAuth(async (req: Request) => {
   }
 
   // Verify current password
-  const user = await db.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || !user.password) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
@@ -38,7 +38,7 @@ export const POST = withAuth(async (req: Request) => {
 
   // Hash and update
   const hashed = await hash(newPassword, 12);
-  await db.user.update({
+  await prisma.user.update({
     where: { id: userId },
     data: { password: hashed },
   });

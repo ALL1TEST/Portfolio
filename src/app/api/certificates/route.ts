@@ -1,16 +1,16 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const GET = publicRoute(async () => {
-  const certificates = await db.certificate.findMany({ orderBy: { displayOrder: 'asc' } });
+  const certificates = await prisma.certificate.findMany({ orderBy: { displayOrder: 'asc' } });
   return NextResponse.json(certificates);
 });
 
 export const POST = withAuth(async (req: Request) => {
   try {
     const body = await req.json();
-    const cert = await db.certificate.create({
+    const cert = await prisma.certificate.create({
       data: {
         title: body.title,
         issuer: body.issuer,
@@ -38,14 +38,14 @@ export const PUT = withAuth(async (req: Request) => {
     if (body.reorder && Array.isArray(body.reorder)) {
       await Promise.all(
         body.reorder.map((item: { id: string; displayOrder: number }) =>
-          db.certificate.update({ where: { id: item.id }, data: { displayOrder: item.displayOrder } })
+          prisma.certificate.update({ where: { id: item.id }, data: { displayOrder: item.displayOrder } })
         )
       );
       return NextResponse.json({ success: true });
     }
 
     if (!body.id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
-    const cert = await db.certificate.update({
+    const cert = await prisma.certificate.update({
       where: { id: body.id },
       data: {
         ...(body.title !== undefined && { title: body.title }),
@@ -71,7 +71,7 @@ export const DELETE = withAuth(async (req: Request) => {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
-    await db.certificate.delete({ where: { id } });
+    await prisma.certificate.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Certificates DELETE error:', error);

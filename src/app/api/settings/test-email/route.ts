@@ -1,10 +1,10 @@
 import { withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
 import { sendTestEmail } from '@/lib/email';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const POST = withAuth(async () => {
-  const settings = await db.appSettings.findUnique({ where: { id: 'singleton' } });
+  const settings = await prisma.appSettings.findUnique({ where: { id: 'singleton' } });
   const to = settings?.contactReceiverEmail || settings?.fromEmail || settings?.smtpUser;
   if (!to) {
     return NextResponse.json({ error: 'No receiver email configured' }, { status: 400 });

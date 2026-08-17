@@ -1,27 +1,27 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const GET = publicRoute(async () => {
-  const data = await db.softSkill.findMany({ orderBy: { displayOrder: 'asc' } });
+  const data = await prisma.softSkill.findMany({ orderBy: { displayOrder: 'asc' } });
   return NextResponse.json(data);
 });
 
 export const POST = withAuth(async (req: Request) => {
   const body = await req.json();
-  return NextResponse.json(await db.softSkill.create({ data: body }));
+  return NextResponse.json(await prisma.softSkill.create({ data: body }));
 });
 
 export const PUT = withAuth(async (req: Request) => {
   const body = await req.json();
   if (!body.id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
-  return NextResponse.json(await db.softSkill.update({ where: { id: body.id }, data: body }));
+  return NextResponse.json(await prisma.softSkill.update({ where: { id: body.id }, data: body }));
 });
 
 export const DELETE = withAuth(async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
-  await db.softSkill.delete({ where: { id } });
+  await prisma.softSkill.delete({ where: { id } });
   return NextResponse.json({ success: true });
 });

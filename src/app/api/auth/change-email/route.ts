@@ -1,6 +1,6 @@
 import { withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 // POST - change account email
 export const POST = withAuth(async (req: Request) => {
@@ -22,7 +22,7 @@ export const POST = withAuth(async (req: Request) => {
     }
 
     // Verify current email matches
-    const user = await db.user.findUnique({ where: { id: userId } });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user || user.email !== currentEmail.trim()) {
       return NextResponse.json({ error: 'Current email is incorrect' }, { status: 400 });
     }
@@ -35,12 +35,12 @@ export const POST = withAuth(async (req: Request) => {
     }
 
     // Check new email is not already taken
-    const existing = await db.user.findUnique({ where: { email: trimmedNewEmail } });
+    const existing = await prisma.user.findUnique({ where: { email: trimmedNewEmail } });
     if (existing) {
       return NextResponse.json({ error: 'Email is already in use' }, { status: 400 });
     }
 
-    const updated = await db.user.update({
+    const updated = await prisma.user.update({
       where: { id: userId },
       data: { email: trimmedNewEmail },
     });

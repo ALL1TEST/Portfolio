@@ -1,19 +1,19 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const GET = publicRoute(async () => {
-  const profile = await db.profile.findFirst();
+  const profile = await prisma.profile.findFirst();
   return NextResponse.json(profile || {});
 });
 
 export const PUT = withAuth(async (req: Request) => {
   try {
     const body = await req.json();
-    const existing = await db.profile.findFirst();
+    const existing = await prisma.profile.findFirst();
     let profile;
     if (existing) {
-      profile = await db.profile.update({
+      profile = await prisma.profile.update({
         where: { id: existing.id },
         data: {
           ...(body.fullName !== undefined && { fullName: body.fullName }),
@@ -62,7 +62,7 @@ export const PUT = withAuth(async (req: Request) => {
         },
       });
     } else {
-      profile = await db.profile.create({ data: body });
+      profile = await prisma.profile.create({ data: body });
     }
 
     // Force Next.js to regenerate the root layout metadata so favicon changes take effect immediately

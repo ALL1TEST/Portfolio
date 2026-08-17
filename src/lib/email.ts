@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 interface SmtpConfig {
   host: string;
@@ -13,7 +13,7 @@ interface SmtpConfig {
 }
 
 async function getSmtpConfig(): Promise<SmtpConfig | null> {
-  const settings = await db.appSettings.findUnique({ where: { id: 'singleton' } });
+  const settings = await prisma.appSettings.findUnique({ where: { id: 'singleton' } });
   if (!settings || !settings.smtpHost || !settings.smtpUser) return null;
   return {
     host: settings.smtpHost,
@@ -60,7 +60,7 @@ export async function sendEmail({ to, subject, html, replyTo }: {
 }
 
 export async function sendContactEmail(data: { name: string; email: string; subject: string; message: string; createdAt: Date }): Promise<{ success: boolean; error?: string }> {
-  const settings = await db.appSettings.findUnique({ where: { id: 'singleton' } });
+  const settings = await prisma.appSettings.findUnique({ where: { id: 'singleton' } });
   if (!settings?.contactEmailEnabled) return { success: false, error: 'Contact email notifications are disabled' };
 
   const receiver = settings.contactReceiverEmail || settings.fromEmail || settings.smtpUser;
@@ -129,7 +129,7 @@ export async function sendContactEmail(data: { name: string; email: string; subj
 }
 
 export async function sendAdminLoginNotification(data: { email: string; ip?: string; userAgent?: string }): Promise<{ success: boolean; error?: string }> {
-  const settings = await db.appSettings.findUnique({ where: { id: 'singleton' } });
+  const settings = await prisma.appSettings.findUnique({ where: { id: 'singleton' } });
   if (!settings?.adminLoginEmailEnabled) return { success: false, error: 'Admin login notifications are disabled' };
 
   const receiver = settings.contactReceiverEmail || settings.fromEmail || settings.smtpUser;

@@ -143,6 +143,8 @@ export default function CertificatesPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const allowedImages = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (!allowedImages.includes(file.type) && !file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
     const previewUrl = URL.createObjectURL(file);
     setPendingFiles(prev => ({ ...prev, certificateImage: { file, previewUrl } }));
     setForm((p) => ({ ...p, certificateImage: previewUrl }));
@@ -152,6 +154,8 @@ export default function CertificatesPage() {
   const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const allowedDocs = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedDocs.includes(file.type)) { toast.error('Only PDF and Word documents are allowed'); return; }
     const previewUrl = URL.createObjectURL(file);
     setPendingFiles(prev => ({ ...prev, credentialUrl: { file, previewUrl } }));
     setForm((p) => ({ ...p, credentialUrl: previewUrl }));
@@ -555,7 +559,7 @@ export default function CertificatesPage() {
                 <input
                   ref={pdfInputRef}
                   type="file"
-                  accept=".pdf,application/pdf"
+                  accept=".pdf,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.doc,.docx"
                   className="hidden"
                   onChange={handlePdfUpload}
                 />
@@ -587,7 +591,7 @@ export default function CertificatesPage() {
                   <input
                     ref={imageInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml,image/*"
                     className="hidden"
                     onChange={handleImageUpload}
                   />

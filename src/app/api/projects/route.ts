@@ -1,10 +1,10 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 // GET all projects (public)
 export const GET = publicRoute(async () => {
-  const projects = await db.project.findMany({ orderBy: { displayOrder: 'asc' } });
+  const projects = await prisma.project.findMany({ orderBy: { displayOrder: 'asc' } });
   return NextResponse.json(projects);
 });
 
@@ -13,7 +13,7 @@ export const POST = withAuth(async (req: Request) => {
   try {
     const body = await req.json();
     const slug = body.slug || body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const project = await db.project.create({
+    const project = await prisma.project.create({
       data: {
         title: body.title,
         slug,
@@ -43,7 +43,7 @@ export const PUT = withAuth(async (req: Request) => {
     const body = await req.json();
     if (!body.id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-    const project = await db.project.update({
+    const project = await prisma.project.update({
       where: { id: body.id },
       data: {
         ...(body.title !== undefined && { title: body.title }),
@@ -75,7 +75,7 @@ export const DELETE = withAuth(async (req: Request) => {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-    await db.project.delete({ where: { id } });
+    await prisma.project.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Projects DELETE error:', error);

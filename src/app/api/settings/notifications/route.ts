@@ -1,11 +1,11 @@
 import { withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const GET = withAuth(async () => {
-  let settings = await db.appSettings.findUnique({ where: { id: 'singleton' } });
+  let settings = await prisma.appSettings.findUnique({ where: { id: 'singleton' } });
   if (!settings) {
-    settings = await db.appSettings.create({ data: { id: 'singleton' } });
+    settings = await prisma.appSettings.create({ data: { id: 'singleton' } });
   }
   return NextResponse.json({
     contactEmailEnabled: settings.contactEmailEnabled,
@@ -15,7 +15,7 @@ export const GET = withAuth(async () => {
 
 export const PUT = withAuth(async (req: Request) => {
   const body = await req.json();
-  const settings = await db.appSettings.upsert({
+  const settings = await prisma.appSettings.upsert({
     where: { id: 'singleton' },
     create: { id: 'singleton', ...body },
     update: body,

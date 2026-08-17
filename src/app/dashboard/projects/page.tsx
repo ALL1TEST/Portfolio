@@ -163,6 +163,9 @@ export default function ProjectsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const allowedImages = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (!allowedImages.includes(file.type) && !file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
+
     const previewUrl = URL.createObjectURL(file);
     setPendingFiles(prev => ({ ...prev, projectImage: { file, previewUrl } }));
     setForm((prev) => ({ ...prev, projectImage: previewUrl }));
