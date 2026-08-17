@@ -15,8 +15,9 @@ interface HeaderProps {
 export function DashboardHeader({ title, onMenuClick, userName }: HeaderProps) {
   const handleLogout = async () => {
     try {
-      await signOut({ callbackUrl: '/login' });
+      await signOut({ redirect: false });
       toast.success('Logged out');
+      window.location.href = '/login';
     } catch {
       toast.error('Failed to logout');
     }
