@@ -81,6 +81,11 @@ function slugify(text: string) {
     .replace(/(^-|-$)/g, '');
 }
 
+interface PendingFile {
+  file: File;
+  previewUrl: string;
+}
+
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,6 +96,7 @@ export default function ProjectsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [pendingFiles, setPendingFiles] = useState<Record<string, PendingFile>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchProjects = useCallback(async () => {
@@ -119,6 +125,7 @@ export default function ProjectsPage() {
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setPendingFiles({});
     setFormOpen(true);
   };
 
@@ -147,38 +154,19 @@ export default function ProjectsPage() {
       featured: project.featured,
       displayOrder: project.displayOrder,
     });
+    setPendingFiles({});
     setFormOpen(true);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setForm((prev) => ({ ...prev, projectImage: data.url }));
-        toast.success('Image uploaded');
-      } else {
-        const err = await res.json();
-        toast.error(err.error || 'Upload failed');
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Upload failed');
-    } finally {
-      setUploading(false);
-      // Reset file input so the same file can be re-selected
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+    const previewUrl = URL.createObjectURL(file);
+    setPendingFiles(prev => ({ ...prev, projectImage: { file, previewUrl } }));
+    setForm((prev) => ({ ...prev, projectImage: previewUrl }));
+    
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const getStoragePath = (url: string) => {
@@ -191,6 +179,18 @@ export default function ProjectsPage() {
   const handleRemoveFile = async (url: string, field: 'projectImage') => {
     try {
       if (!url) return;
+
+      if (pendingFiles[field]) {
+        URL.revokeObjectURL(pendingFiles[field].previewUrl);
+        setPendingFiles(prev => {
+          const updated = { ...prev };
+          delete updated[field];
+          return updated;
+        });
+        setForm((p) => ({ ...p, [field]: '' }));
+        return;
+      }
+
       const filePath = getStoragePath(url);
       if (!filePath) {
         toast.error('Could not determine file path');
@@ -216,6 +216,20 @@ export default function ProjectsPage() {
     e.preventDefault();
     setSaving(true);
     try {
+      let finalProjectImage = form.projectImage;
+
+      if (pendingFiles.projectImage) {
+        const formData = new FormData();
+        formData.append('file', pendingFiles.projectImage.file);
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        if (res.ok) {
+          const data = await res.json();
+          finalProjectImage = data.url;
+        } else {
+           throw new Error('Failed to upload image');
+        }
+      }
+
       const technologies = form.technologies
         .split(',')
         .map((t) => t.trim())
@@ -224,7 +238,7 @@ export default function ProjectsPage() {
       const payload = {
         ...form,
         technologies,
-        // Store description in both fields for backward compatibility
+        projectImage: finalProjectImage,
         shortDescription: form.description,
         fullDescription: form.description,
       };
@@ -430,15 +444,10 @@ export default function ProjectsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading}
                       className="border-stroke text-white hover:bg-surface gap-1.5"
                     >
-                      {uploading ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <ImagePlus className="w-3.5 h-3.5" />
-                      )}
-                      {uploading ? 'Uploading...' : 'Upload Image'}
+                      <ImagePlus className="w-3.5 h-3.5" />
+                      Upload Image
                     </Button>
                   </div>
                   <Input

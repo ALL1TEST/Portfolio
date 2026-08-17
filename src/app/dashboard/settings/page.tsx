@@ -122,6 +122,11 @@ function FilterableCard({ category, title, searchQuery, activeFilter, children }
   return <>{children}</>;
 }
 
+interface PendingFile {
+  file: File;
+  previewUrl: string;
+}
+
 export default function SettingsPage() {
   const [profile, setProfile] = useState<Profile>(emptyProfile);
   const [original, setOriginal] = useState<Profile>(emptyProfile);
@@ -129,7 +134,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
-  const [uploading, setUploading] = useState<'profile' | 'cv' | 'logo' | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<Record<string, PendingFile>>({});
   // Account change states
   const [currentEmail, setCurrentEmail] = useState('');
   const [newEmail, setNewEmail] = useState('');
@@ -288,155 +293,121 @@ export default function SettingsPage() {
     setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
-    if (file.size > 5 * 1024 * 1024) { /* size check removed */ }
 
-    setUploading('profile');
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('category', 'profile');
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        updateField('profileImage', data.url);
-        toast.success('Image uploaded successfully');
-      } else { 
-        const errData = await res.json();
-        toast.error(errData.error || 'Failed to upload image'); 
-      }
-    } catch (err: any) { toast.error(err.message || 'Failed to upload image'); }
-    finally { setUploading(null); if (imageInputRef.current) imageInputRef.current.value = ''; }
+    const previewUrl = URL.createObjectURL(file);
+    setPendingFiles(prev => ({ ...prev, profileImage: { file, previewUrl } }));
+    updateField('profileImage', previewUrl);
+    
+    if (imageInputRef.current) imageInputRef.current.value = '';
   };
 
-  const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.type !== 'application/pdf') { toast.error('Only PDF files are allowed'); return; }
 
-    setUploading('cv');
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('category', 'cv');
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        updateField('cvFile', data.url);
-        toast.success('CV uploaded successfully');
-      } else { 
-        const errData = await res.json();
-        toast.error(errData.error || 'Failed to upload CV'); 
-      }
-    } catch (err: any) { toast.error(err.message || 'Failed to upload CV'); }
-    finally { setUploading(null); if (cvInputRef.current) cvInputRef.current.value = ''; }
+    const previewUrl = URL.createObjectURL(file);
+    setPendingFiles(prev => ({ ...prev, cvFile: { file, previewUrl } }));
+    updateField('cvFile', previewUrl);
+    
+    if (cvInputRef.current) cvInputRef.current.value = '';
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
-    if (file.size > 5 * 1024 * 1024) { /* size check removed */ }
 
-    setUploading('logo');
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('category', 'profile');
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        updateField('logoUrl', data.url);
-        toast.success('Logo uploaded successfully');
-      } else { 
-        const errData = await res.json();
-        toast.error(errData.error || 'Failed to upload logo'); 
-      }
-    } catch (err: any) { toast.error(err.message || 'Failed to upload logo'); }
-    finally { setUploading(null); if (logoInputRef.current) logoInputRef.current.value = ''; }
+    const previewUrl = URL.createObjectURL(file);
+    setPendingFiles(prev => ({ ...prev, logoUrl: { file, previewUrl } }));
+    updateField('logoUrl', previewUrl);
+    
+    if (logoInputRef.current) logoInputRef.current.value = '';
   };
 
   const getStoragePath = (url: string) => {
-    console.log('🔍 GETTING PATH FROM:', url);
     const marker = '/storage/v1/object/public/uploads/';
     const index = url.indexOf(marker);
-    console.log('📍 MARKER INDEX:', index);
-
-    if (index === -1) {
-      console.error('❌ STORAGE MARKER NOT FOUND');
-      return null;
-    }
-
-    const path = decodeURIComponent(url.substring(index + marker.length));
-    console.log('✅ STORAGE PATH:', path);
-    return path;
+    if (index === -1) return null;
+    return url.substring(index + marker.length);
   };
 
   const handleRemoveFile = async (url: string, field: keyof Profile) => {
-    console.log('🔥 HANDLE REMOVE FILE STARTED');
-    console.log('URL:', url);
-    console.log('FIELD:', field);
-
     try {
-      if (!url) {
-        console.error('❌ URL is empty');
-        toast.error('No file URL found');
+      if (!url) return;
+
+      if (pendingFiles[field]) {
+        URL.revokeObjectURL(pendingFiles[field].previewUrl);
+        setPendingFiles(prev => {
+          const updated = { ...prev };
+          delete updated[field];
+          return updated;
+        });
+        updateField(field, '');
         return;
       }
 
       const filePath = getStoragePath(url);
-      console.log('📁 EXTRACTED FILE PATH:', filePath);
-
       if (!filePath) {
-        console.error('❌ Could not extract file path');
         toast.error('Could not determine file path');
         return;
       }
 
-      console.log('🚀 CALLING DELETE API...');
       const res = await fetch('/api/upload/delete', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filePath }),
       });
-
-      console.log('📡 RESPONSE STATUS:', res.status);
       const data = await res.json();
-      console.log('📦 RESPONSE DATA:', data);
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to delete file');
-      }
-
-      console.log('✅ FILE DELETED FROM SUPABASE');
+      if (!res.ok) throw new Error(data.error || 'Failed to delete file');
+      
       updateField(field, '');
       toast.success('File deleted successfully');
-
     } catch (error: any) {
-      console.error('❌ DELETE ERROR:', error);
-      toast.error(error?.message || 'Failed to delete file');
+      console.error(error);
+      toast.error(error.message || 'Failed to delete file');
     }
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
+      let updatedProfile = { ...profile };
+
+      const fileFields = Object.keys(pendingFiles) as Array<keyof Profile>;
+      for (const field of fileFields) {
+        const { file } = pendingFiles[field];
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('category', field === 'cvFile' ? 'cv' : 'profile');
+
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+        if (!uploadRes.ok) {
+          const errData = await uploadRes.json();
+          throw new Error(`Failed to upload ${field}: ${errData.error}`);
+        }
+        const data = await uploadRes.json();
+        updatedProfile[field] = data.url;
+      }
+
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile),
+        body: JSON.stringify(updatedProfile),
       });
+      
       if (res.ok) {
         const data = await res.json();
+        setProfile(data);
         setOriginal(data);
+        setPendingFiles({});
         toast.success('Profile saved successfully');
       } else { toast.error('Failed to save profile'); }
-    } catch { toast.error('Failed to save profile'); }
+    } catch (err: any) { toast.error(err.message || 'Failed to save profile'); }
     finally { setSaving(false); }
   };
 
@@ -499,7 +470,7 @@ export default function SettingsPage() {
     finally { setSavingPassword(false); }
   };
 
-  const hasChanges = JSON.stringify(profile) !== JSON.stringify(original);
+  const hasChanges = JSON.stringify(profile) !== JSON.stringify(original) || Object.keys(pendingFiles).length > 0;
 
   if (loading) {
     return (
@@ -741,26 +712,12 @@ export default function SettingsPage() {
           </div>
           <div className="flex-1 space-y-3">
             <div className="flex items-center gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => imageInputRef.current?.click()} disabled={uploading === 'profile'} className="border-stroke text-white hover:bg-dark gap-2">
-                {uploading === 'profile' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                {uploading === 'profile' ? 'Uploading...' : 'Upload Image'}
+              <Button type="button" variant="outline" size="sm" onClick={() => imageInputRef.current?.click()} className="border-stroke text-white hover:bg-dark gap-2">
+                <Camera className="w-4 h-4" />
+                Upload Image
               </Button>
               {profile.profileImage && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    console.log('🔥 REMOVE BUTTON CLICKED');
-                    console.log('Profile image:', profile.profileImage);
-
-                    handleRemoveFile(profile.profileImage, 'profileImage');
-                  }}
-                  className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1"
-                >
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.profileImage, 'profileImage')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
                   <Trash2 className="w-3.5 h-3.5" /> Remove
                 </Button>
               )}
@@ -792,18 +749,18 @@ export default function SettingsPage() {
           </div>
           <div className="flex-1 space-y-3">
             <div className="flex items-center gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => cvInputRef.current?.click()} disabled={uploading === 'cv'} className="border-stroke text-white hover:bg-dark gap-2">
-                {uploading === 'cv' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                {uploading === 'cv' ? 'Uploading...' : 'Upload CV'}
+              <Button type="button" variant="outline" size="sm" onClick={() => cvInputRef.current?.click()} className="border-stroke text-white hover:bg-dark gap-2">
+                <Upload className="w-4 h-4" />
+                Upload CV
               </Button>
-              {profile.cvFile && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.cvFile, 'cvFile')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+              {(profile.cvFile || pendingFiles.cvFile) && (
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile('cvFile')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
                   <Trash2 className="w-3.5 h-3.5" /> Remove
                 </Button>
               )}
             </div>
             <p className="text-xs text-muted-text">PDF format only.</p>
-            <input ref={cvInputRef} type="file" accept=".pdf" onChange={handleCvUpload} className="hidden" />
+            <input ref={cvInputRef} type="file" accept="application/pdf" onChange={handleCvUpload} className="hidden" />
           </div>
         </div>
       </Card>
@@ -825,11 +782,11 @@ export default function SettingsPage() {
           </div>
           <div className="flex-1 space-y-3">
             <div className="flex items-center gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploading === 'logo'} className="border-stroke text-white hover:bg-dark gap-2">
-                {uploading === 'logo' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                {uploading === 'logo' ? 'Uploading...' : 'Upload Logo'}
+              <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} className="border-stroke text-white hover:bg-dark gap-2">
+                <Camera className="w-4 h-4" />
+                Upload Logo
               </Button>
-              {profile.logoUrl && (
+              {(profile.logoUrl || pendingFiles.logoUrl) && (
                 <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.logoUrl, 'logoUrl')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
                   <Trash2 className="w-3.5 h-3.5" /> Remove
                 </Button>

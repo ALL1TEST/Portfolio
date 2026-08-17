@@ -64,6 +64,11 @@ const emptyForm = {
   displayOrder: 0,
 };
 
+interface PendingFile {
+  file: File;
+  previewUrl: string;
+}
+
 export default function CertificatesPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +79,7 @@ export default function CertificatesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [pendingFiles, setPendingFiles] = useState<Record<string, PendingFile>>({});
   const imageInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
 
@@ -104,6 +110,7 @@ export default function CertificatesPage() {
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setPendingFiles({});
     setFormOpen(true);
   };
 
@@ -129,55 +136,26 @@ export default function CertificatesPage() {
       category: cert.category || '',
       displayOrder: cert.displayOrder,
     });
+    setPendingFiles({});
     setFormOpen(true);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        setForm((p) => ({ ...p, certificateImage: data.url }));
-        toast.success('Image uploaded');
-      } else {
-        const err = await res.json().catch(() => ({}));
-        toast.error(err.error || 'Failed to upload image');
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to upload image');
-    } finally {
-      setUploading(false);
-      if (imageInputRef.current) imageInputRef.current.value = '';
-    }
+    const previewUrl = URL.createObjectURL(file);
+    setPendingFiles(prev => ({ ...prev, certificateImage: { file, previewUrl } }));
+    setForm((p) => ({ ...p, certificateImage: previewUrl }));
+    if (imageInputRef.current) imageInputRef.current.value = '';
   };
 
-  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        setForm((p) => ({ ...p, credentialUrl: data.url }));
-        toast.success('PDF uploaded');
-      } else {
-        const err = await res.json().catch(() => ({}));
-        toast.error(err.error || 'Failed to upload PDF');
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to upload PDF');
-    } finally {
-      setUploading(false);
-      if (pdfInputRef.current) pdfInputRef.current.value = '';
-    }
+    const previewUrl = URL.createObjectURL(file);
+    setPendingFiles(prev => ({ ...prev, credentialUrl: { file, previewUrl } }));
+    setForm((p) => ({ ...p, credentialUrl: previewUrl }));
+    if (pdfInputRef.current) pdfInputRef.current.value = '';
   };
 
   const getStoragePath = (url: string) => {
@@ -190,6 +168,18 @@ export default function CertificatesPage() {
   const handleRemoveFile = async (url: string, field: 'credentialUrl' | 'certificateImage') => {
     try {
       if (!url) return;
+
+      if (pendingFiles[field]) {
+        URL.revokeObjectURL(pendingFiles[field].previewUrl);
+        setPendingFiles(prev => {
+          const updated = { ...prev };
+          delete updated[field];
+          return updated;
+        });
+        setForm((p) => ({ ...p, [field]: '' }));
+        return;
+      }
+
       const filePath = getStoragePath(url);
       if (!filePath) {
         toast.error('Could not determine file path');
@@ -215,6 +205,33 @@ export default function CertificatesPage() {
     e.preventDefault();
     setSaving(true);
     try {
+      let finalCertificateImage = form.certificateImage;
+      let finalCredentialUrl = form.credentialUrl;
+
+      if (pendingFiles.certificateImage) {
+        const formData = new FormData();
+        formData.append('file', pendingFiles.certificateImage.file);
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        if (res.ok) {
+          const data = await res.json();
+          finalCertificateImage = data.url;
+        } else {
+           throw new Error('Failed to upload image');
+        }
+      }
+      
+      if (pendingFiles.credentialUrl) {
+        const formData = new FormData();
+        formData.append('file', pendingFiles.credentialUrl.file);
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        if (res.ok) {
+          const data = await res.json();
+          finalCredentialUrl = data.url;
+        } else {
+           throw new Error('Failed to upload PDF');
+        }
+      }
+
       const skills = form.skills
         .split(',')
         .map((t) => t.trim())
@@ -222,6 +239,8 @@ export default function CertificatesPage() {
 
       const payload = {
         ...form,
+        certificateImage: finalCertificateImage,
+        credentialUrl: finalCredentialUrl,
         skills,
         category: form.category.trim(),
       };
@@ -514,7 +533,7 @@ export default function CertificatesPage() {
                     className="border-stroke text-muted-text hover:text-white hover:bg-surface shrink-0"
                     onClick={() => pdfInputRef.current?.click()}
                   >
-                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    <Upload className="w-4 h-4" />
                   </Button>
                 </div>
                 <input
@@ -562,10 +581,9 @@ export default function CertificatesPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => imageInputRef.current?.click()}
-                      disabled={uploading}
                       className="border-stroke text-white hover:bg-surface gap-1.5"
                     >
-                      {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                      <Upload className="w-3.5 h-3.5" />
                       Upload Image
                     </Button>
                   </div>
