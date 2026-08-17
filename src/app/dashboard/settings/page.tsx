@@ -360,33 +360,66 @@ export default function SettingsPage() {
   };
 
   const getStoragePath = (url: string) => {
+    console.log('🔍 GETTING PATH FROM:', url);
     const marker = '/storage/v1/object/public/uploads/';
     const index = url.indexOf(marker);
-    if (index === -1) return null;
-    return url.substring(index + marker.length);
+    console.log('📍 MARKER INDEX:', index);
+
+    if (index === -1) {
+      console.error('❌ STORAGE MARKER NOT FOUND');
+      return null;
+    }
+
+    const path = decodeURIComponent(url.substring(index + marker.length));
+    console.log('✅ STORAGE PATH:', path);
+    return path;
   };
 
   const handleRemoveFile = async (url: string, field: keyof Profile) => {
+    console.log('🔥 HANDLE REMOVE FILE STARTED');
+    console.log('URL:', url);
+    console.log('FIELD:', field);
+
     try {
-      if (!url) return;
+      if (!url) {
+        console.error('❌ URL is empty');
+        toast.error('No file URL found');
+        return;
+      }
+
       const filePath = getStoragePath(url);
+      console.log('📁 EXTRACTED FILE PATH:', filePath);
+
       if (!filePath) {
+        console.error('❌ Could not extract file path');
         toast.error('Could not determine file path');
         return;
       }
+
+      console.log('🚀 CALLING DELETE API...');
       const res = await fetch('/api/upload/delete', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ filePath }),
       });
+
+      console.log('📡 RESPONSE STATUS:', res.status);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to delete file');
-      
+      console.log('📦 RESPONSE DATA:', data);
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete file');
+      }
+
+      console.log('✅ FILE DELETED FROM SUPABASE');
       updateField(field, '');
       toast.success('File deleted successfully');
+
     } catch (error: any) {
-      console.error(error);
-      toast.error(error.message || 'Failed to delete file');
+      console.error('❌ DELETE ERROR:', error);
+      toast.error(error?.message || 'Failed to delete file');
     }
   };
 
@@ -713,7 +746,21 @@ export default function SettingsPage() {
                 {uploading === 'profile' ? 'Uploading...' : 'Upload Image'}
               </Button>
               {profile.profileImage && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.profileImage, 'profileImage')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    console.log('🔥 REMOVE BUTTON CLICKED');
+                    console.log('Profile image:', profile.profileImage);
+
+                    handleRemoveFile(profile.profileImage, 'profileImage');
+                  }}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1"
+                >
                   <Trash2 className="w-3.5 h-3.5" /> Remove
                 </Button>
               )}
