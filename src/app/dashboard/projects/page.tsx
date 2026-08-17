@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { extractStoragePath } from '@/lib/utils';
 import { Plus, Pencil, Trash2, Loader2, ImagePlus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -169,12 +170,7 @@ export default function ProjectsPage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const getStoragePath = (url: string) => {
-    const marker = '/storage/v1/object/public/uploads/';
-    const index = url.indexOf(marker);
-    if (index === -1) return null;
-    return url.substring(index + marker.length);
-  };
+
 
   const handleRemoveFile = async (url: string, field: 'projectImage') => {
     try {
@@ -192,7 +188,7 @@ export default function ProjectsPage() {
         return;
       }
 
-      const filePath = getStoragePath(url);
+      const filePath = extractStoragePath(url);
       if (!filePath) {
         toast.error('Could not determine file path');
         return;
@@ -254,7 +250,7 @@ export default function ProjectsPage() {
         if (editingId && pendingFiles.projectImage) {
           const originalProject = projects.find(p => p.id === editingId);
           if (originalProject && originalProject.projectImage) {
-            const filePath = getStoragePath(originalProject.projectImage);
+            const filePath = extractStoragePath(originalProject.projectImage);
             if (filePath) {
               fetch('/api/upload/delete', {
                 method: 'POST',

@@ -158,12 +158,7 @@ export default function CertificatesPage() {
     if (pdfInputRef.current) pdfInputRef.current.value = '';
   };
 
-  const getStoragePath = (url: string) => {
-    const marker = '/storage/v1/object/public/uploads/';
-    const index = url.indexOf(marker);
-    if (index === -1) return null;
-    return url.substring(index + marker.length);
-  };
+
 
   const handleRemoveFile = async (url: string, field: 'certificateImage' | 'credentialUrl') => {
     try {
@@ -181,7 +176,7 @@ export default function CertificatesPage() {
         return;
       }
 
-      const filePath = getStoragePath(url);
+      const filePath = extractStoragePath(url);
       if (!filePath) {
         toast.error('Could not determine file path');
         return;
@@ -277,7 +272,7 @@ export default function CertificatesPage() {
             const fileFields: ('certificateImage' | 'credentialUrl')[] = ['certificateImage', 'credentialUrl'];
             for (const field of fileFields) {
               if (pendingFiles[field] && originalCert[field]) {
-                const filePath = getStoragePath(originalCert[field]);
+                const filePath = extractStoragePath(originalCert[field]);
                 if (filePath) {
                   fetch('/api/upload/delete', {
                     method: 'POST',

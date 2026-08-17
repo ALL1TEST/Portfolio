@@ -7,6 +7,7 @@ import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X, Mail,
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { extractStoragePath } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -329,12 +330,7 @@ export default function SettingsPage() {
     if (logoInputRef.current) logoInputRef.current.value = '';
   };
 
-  const getStoragePath = (url: string) => {
-    const marker = '/storage/v1/object/public/uploads/';
-    const index = url.indexOf(marker);
-    if (index === -1) return null;
-    return url.substring(index + marker.length);
-  };
+
 
   const handleRemoveFile = async (url: string, field: keyof Profile) => {
     try {
@@ -351,7 +347,7 @@ export default function SettingsPage() {
         return;
       }
 
-      const filePath = getStoragePath(url);
+      const filePath = extractStoragePath(url);
       if (!filePath) {
         toast.error('Could not determine file path');
         return;
@@ -407,7 +403,7 @@ export default function SettingsPage() {
         for (const field of fileFields) {
           const oldUrl = original[field] as string;
           if (oldUrl) {
-            const filePath = getStoragePath(oldUrl);
+            const filePath = extractStoragePath(oldUrl);
             if (filePath) {
               fetch('/api/upload/delete', {
                 method: 'POST',
