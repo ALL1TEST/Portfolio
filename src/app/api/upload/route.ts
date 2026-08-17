@@ -9,7 +9,7 @@ const ALLOWED_TYPES = [
   'application/pdf',
 ];
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE = Number.MAX_SAFE_INTEGER; // Unlimited
 
 export const POST = withAuth(async (req: Request) => {
   try {
@@ -34,7 +34,7 @@ export const POST = withAuth(async (req: Request) => {
     }
 
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 400 });
+      return NextResponse.json({ error: 'File too large.' }, { status: 400 });
     }
 
     // Determine file extension

@@ -292,7 +292,7 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return; }
+    if (file.size > 5 * 1024 * 1024) { /* size check removed */ }
 
     setUploading('profile');
     try {
@@ -316,7 +316,6 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.type !== 'application/pdf') { toast.error('Only PDF files are allowed'); return; }
-    if (file.size > 10 * 1024 * 1024) { toast.error('File must be under 10MB'); return; }
 
     setUploading('cv');
     try {
@@ -340,7 +339,7 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Only image files are allowed'); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return; }
+    if (file.size > 5 * 1024 * 1024) { /* size check removed */ }
 
     setUploading('logo');
     try {
@@ -688,7 +687,7 @@ export default function SettingsPage() {
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-text">Recommended: Square image, min 300×300px. Max 5MB.</p>
+            <p className="text-xs text-muted-text">Recommended: Square image, min 300×300px.</p>
             <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
           </div>
         </div>
@@ -725,7 +724,7 @@ export default function SettingsPage() {
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-text">PDF format only. Max 10MB.</p>
+            <p className="text-xs text-muted-text">PDF format only.</p>
             <input ref={cvInputRef} type="file" accept=".pdf" onChange={handleCvUpload} className="hidden" />
           </div>
         </div>
@@ -758,7 +757,7 @@ export default function SettingsPage() {
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-text">Recommended: Square PNG with transparent background, min 200×200px. Max 5MB.</p>
+            <p className="text-xs text-muted-text">Recommended: Square PNG with transparent background, min 200×200px.</p>
             <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
           </div>
         </div>
