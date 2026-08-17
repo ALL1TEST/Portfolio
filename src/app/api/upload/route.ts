@@ -120,6 +120,7 @@ export const POST = withAuth(async (req: Request) => {
 
     return NextResponse.json({ 
       url: publicUrlData.publicUrl, 
+      path: filePath,
       name: file.name, 
       size: file.size, 
       type: file.type 

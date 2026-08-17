@@ -180,6 +180,37 @@ export default function CertificatesPage() {
     }
   };
 
+  const getStoragePath = (url: string) => {
+    const marker = '/storage/v1/object/public/uploads/';
+    const index = url.indexOf(marker);
+    if (index === -1) return null;
+    return url.substring(index + marker.length);
+  };
+
+  const handleRemoveFile = async (url: string, field: 'credentialUrl' | 'certificateImage') => {
+    try {
+      if (!url) return;
+      const filePath = getStoragePath(url);
+      if (!filePath) {
+        toast.error('Could not determine file path');
+        return;
+      }
+      const res = await fetch('/api/upload/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete file');
+      
+      setForm((p) => ({ ...p, [field]: '' }));
+      toast.success('File deleted successfully');
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || 'Failed to delete file');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -464,7 +495,7 @@ export default function CertificatesPage() {
                       <span className="text-[10px] text-red-300 max-w-[80px] truncate">{form.credentialUrl.split('/').pop()}</span>
                       <button
                         type="button"
-                        onClick={() => setForm((p) => ({ ...p, credentialUrl: '' }))}
+                        onClick={() => handleRemoveFile(form.credentialUrl, 'credentialUrl')}
                         className="text-red-400 hover:text-red-300"
                       >
                         <X className="w-3 h-3" />
@@ -506,7 +537,7 @@ export default function CertificatesPage() {
                     <img src={form.certificateImage} alt="Preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
-                      onClick={() => setForm((p) => ({ ...p, certificateImage: '' }))}
+                      onClick={() => handleRemoveFile(form.certificateImage, 'certificateImage')}
                       className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 transition-colors"
                     >
                       <X className="w-2.5 h-2.5 text-white" />

@@ -181,6 +181,37 @@ export default function ProjectsPage() {
     }
   };
 
+  const getStoragePath = (url: string) => {
+    const marker = '/storage/v1/object/public/uploads/';
+    const index = url.indexOf(marker);
+    if (index === -1) return null;
+    return url.substring(index + marker.length);
+  };
+
+  const handleRemoveFile = async (url: string, field: 'projectImage') => {
+    try {
+      if (!url) return;
+      const filePath = getStoragePath(url);
+      if (!filePath) {
+        toast.error('Could not determine file path');
+        return;
+      }
+      const res = await fetch('/api/upload/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete file');
+      
+      setForm((p) => ({ ...p, [field]: '' }));
+      toast.success('File deleted successfully');
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || 'Failed to delete file');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -374,7 +405,7 @@ export default function ProjectsPage() {
                     />
                     <button
                       type="button"
-                      onClick={() => setForm((p) => ({ ...p, projectImage: '' }))}
+                      onClick={() => handleRemoveFile(form.projectImage, 'projectImage')}
                       className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 transition-colors"
                     >
                       <X className="w-3 h-3 text-white" />

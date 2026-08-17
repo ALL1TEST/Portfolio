@@ -359,6 +359,37 @@ export default function SettingsPage() {
     finally { setUploading(null); if (logoInputRef.current) logoInputRef.current.value = ''; }
   };
 
+  const getStoragePath = (url: string) => {
+    const marker = '/storage/v1/object/public/uploads/';
+    const index = url.indexOf(marker);
+    if (index === -1) return null;
+    return url.substring(index + marker.length);
+  };
+
+  const handleRemoveFile = async (url: string, field: keyof Profile) => {
+    try {
+      if (!url) return;
+      const filePath = getStoragePath(url);
+      if (!filePath) {
+        toast.error('Could not determine file path');
+        return;
+      }
+      const res = await fetch('/api/upload/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete file');
+      
+      updateField(field, '');
+      toast.success('File deleted successfully');
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || 'Failed to delete file');
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -682,7 +713,7 @@ export default function SettingsPage() {
                 {uploading === 'profile' ? 'Uploading...' : 'Upload Image'}
               </Button>
               {profile.profileImage && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('profileImage', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.profileImage, 'profileImage')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
                   <Trash2 className="w-3.5 h-3.5" /> Remove
                 </Button>
               )}
@@ -719,7 +750,7 @@ export default function SettingsPage() {
                 {uploading === 'cv' ? 'Uploading...' : 'Upload CV'}
               </Button>
               {profile.cvFile && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('cvFile', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.cvFile, 'cvFile')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
                   <Trash2 className="w-3.5 h-3.5" /> Remove
                 </Button>
               )}
@@ -752,7 +783,7 @@ export default function SettingsPage() {
                 {uploading === 'logo' ? 'Uploading...' : 'Upload Logo'}
               </Button>
               {profile.logoUrl && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => updateField('logoUrl', '')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.logoUrl, 'logoUrl')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
                   <Trash2 className="w-3.5 h-3.5" /> Remove
                 </Button>
               )}
