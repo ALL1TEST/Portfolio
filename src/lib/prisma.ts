@@ -10,6 +10,12 @@ if (process.env.NODE_ENV === 'production' && databaseUrl && (databaseUrl.include
   try {
     const url = new URL(databaseUrl);
     
+    // Automatically switch to Supabase Transaction Pooler (port 6543) instead of Session Pooler (port 5432)
+    // This avoids the "EMAXCONNSESSION: max clients reached in session mode" 15-connection limit during Vercel builds.
+    if (url.port === '5432' && (url.hostname.includes('supabase.com') || url.hostname.includes('supabase.co'))) {
+      url.port = '6543';
+    }
+
     // Disable prepared statements (required for PgBouncer / Supavisor in serverless)
     if (!url.searchParams.has('pgbouncer')) {
       url.searchParams.set('pgbouncer', 'true');
