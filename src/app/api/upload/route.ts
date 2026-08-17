@@ -1,7 +1,6 @@
 import { withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js';
 
 const ALLOWED_TYPES = [
   // Images
@@ -11,6 +10,15 @@ const ALLOWED_TYPES = [
 ];
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+// Initialize Supabase client for backend usage
+// This uses the service role key which bypasses RLS and allows uploading to the bucket
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { persistSession: false },
+});
 
 export const POST = withAuth(async (req: Request) => {
   try {
@@ -29,11 +37,16 @@ export const POST = withAuth(async (req: Request) => {
       return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Determine file extension
+    let ext = '';
+    const lastDotIndex = file.name.lastIndexOf('.');
+    if (lastDotIndex !== -1 && lastDotIndex !== 0) {
+      ext = file.name.substring(lastDotIndex);
+    } else {
+      ext = file.type === 'application/pdf' ? '.pdf' : '.png';
+    }
 
-    const ext = path.extname(file.name) || (file.type === 'application/pdf' ? '.pdf' : '.png');
-    const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
+    const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;
 
     // Determine subdirectory based on file type or category
     const category = (formData.get('category') as string) || '';
@@ -47,15 +60,35 @@ export const POST = withAuth(async (req: Request) => {
     } else {
       subDir = 'projects';
     }
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', subDir);
-    await mkdir(uploadDir, { recursive: true });
 
-    const filePath = path.join(uploadDir, uniqueName);
-    await writeFile(filePath, buffer);
+    const filePath = `${subDir}/${uniqueName}`;
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-    const url = `/uploads/${subDir}/${uniqueName}`;
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('uploads')
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
 
-    return NextResponse.json({ url, name: file.name, size: file.size, type: file.type });
+    if (uploadError) {
+      console.error('Supabase upload error:', uploadError);
+      return NextResponse.json({ error: uploadError.message }, { status: 500 });
+    }
+
+    // Generate public URL
+    const { data: publicUrlData } = supabase.storage
+      .from('uploads')
+      .getPublicUrl(filePath);
+
+    return NextResponse.json({ 
+      url: publicUrlData.publicUrl, 
+      name: file.name, 
+      size: file.size, 
+      type: file.type 
+    });
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
