@@ -805,7 +805,7 @@ export default function SettingsPage() {
                 Upload CV
               </Button>
               {(profile.cvFile || pendingFiles.cvFile) && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile('cvFile')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.cvFile, 'cvFile')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
                   <Trash2 className="w-3.5 h-3.5" /> Remove
                 </Button>
               )}

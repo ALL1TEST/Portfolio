@@ -78,9 +78,11 @@ export const PUT = withAuth(async (req: Request) => {
       console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] profile.create() succeeded`);
     }
 
-    // Force Next.js to regenerate the root layout metadata so favicon changes take effect immediately
+    // Revalidate specific paths to avoid triggering a full app re-render 
+    // which causes Prisma connection exhaustion (max clients reached)
     const { revalidatePath } = await import('next/cache');
-    revalidatePath('/', 'layout');
+    revalidatePath('/');
+    revalidatePath('/dashboard/settings');
 
     console.log(`[PROFILE_SAVE_API][REQUEST_ID: ${reqId}] Profile updated successfully`);
     return NextResponse.json(profile);
