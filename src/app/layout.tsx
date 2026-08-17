@@ -14,14 +14,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { prisma } from "@/lib/prisma";
+import { getProfile, getAppSettings } from "@/lib/data-fetching";
 
 export async function generateMetadata(): Promise<Metadata> {
   let profile = null;
   let appSettings = null;
   try {
-    profile = await prisma.profile.findFirst();
-    appSettings = await prisma.appSettings.findUnique({ where: { id: 'singleton' } });
+    profile = await getProfile();
+    appSettings = await getAppSettings();
   } catch (error) {
     console.error("Failed to fetch profile for metadata:", error);
   }

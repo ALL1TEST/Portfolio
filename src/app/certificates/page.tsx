@@ -1,5 +1,3 @@
-'use client';
-
 import { SiteLayout } from '@/components/site-layout';
 import { CertificatesSection } from '@/components/certificates-section';
 import { EducationSection } from '@/components/education-section';

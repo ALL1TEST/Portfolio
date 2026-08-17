@@ -27,16 +27,16 @@ const DataContext = createContext<DataContextType>({
   loading: true,
 });
 
-export function DataProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [education, setEducation] = useState<Education[]>([]);
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [languages, setLanguages] = useState<Language[]>([]);
-  const [softSkills, setSoftSkills] = useState<SoftSkill[]>([]);
-  const [loading, setLoading] = useState(true);
+export function DataProvider({ children, initialData }: { children: ReactNode, initialData?: Partial<DataContextType> }) {
+  const [profile, setProfile] = useState<Profile | null>(initialData?.profile || null);
+  const [projects, setProjects] = useState<Project[]>(initialData?.projects || []);
+  const [certificates, setCertificates] = useState<Certificate[]>(initialData?.certificates || []);
+  const [skills, setSkills] = useState<Skill[]>(initialData?.skills || []);
+  const [education, setEducation] = useState<Education[]>(initialData?.education || []);
+  const [experiences, setExperiences] = useState<Experience[]>(initialData?.experiences || []);
+  const [languages, setLanguages] = useState<Language[]>(initialData?.languages || []);
+  const [softSkills, setSoftSkills] = useState<SoftSkill[]>(initialData?.softSkills || []);
+  const [loading, setLoading] = useState(!initialData);
 
   const fetchData = useCallback(async () => {
     try {

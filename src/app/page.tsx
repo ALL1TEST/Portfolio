@@ -1,5 +1,3 @@
-'use client';
-
 import { SiteLayout } from '@/components/site-layout';
 import { Hero } from '@/components/hero';
 import { TechMarquee } from '@/components/tech-marquee';

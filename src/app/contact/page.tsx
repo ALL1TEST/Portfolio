@@ -1,5 +1,3 @@
-'use client';
-
 import { SiteLayout } from '@/components/site-layout';
 import { ContactSection } from '@/components/contact-section';
 
