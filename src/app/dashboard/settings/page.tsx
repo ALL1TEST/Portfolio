@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X, Mail, Lock, KeyRound, Server, Send, ShieldCheck } from 'lucide-react';
+import { Save, Loader2, User, Upload, Trash2, Camera, FileText, Search, X, Mail, Lock, KeyRound, Server, Send, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -144,6 +144,7 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [savingPassword, setSavingPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
 
   // SMTP settings state
   const [smtpSettings, setSmtpSettings] = useState({
@@ -683,16 +684,28 @@ export default function SettingsPage() {
 
           {/* Change Password */}
           <div className="relative">
-            <div className="flex items-center gap-2 mb-3">
-              <KeyRound className="w-4 h-4 text-brand" />
-              <span className="text-sm font-medium text-white">Change Password</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-brand" />
+                <span className="text-sm font-medium text-white">Change Password</span>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPasswords(!showPasswords)}
+                className="h-8 text-xs text-muted-text hover:text-white"
+              >
+                {showPasswords ? <EyeOff className="w-3.5 h-3.5 mr-1" /> : <Eye className="w-3.5 h-3.5 mr-1" />}
+                {showPasswords ? 'Hide' : 'Show'}
+              </Button>
             </div>
             <form onSubmit={handleChangePassword} className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-1">
                   <Label className="text-xs text-white/70">Current Password</Label>
                   <Input
-                    type="password"
+                    type={showPasswords ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     required
@@ -704,7 +717,7 @@ export default function SettingsPage() {
                 <div className="space-y-1">
                   <Label className="text-xs text-white/70">New Password</Label>
                   <Input
-                    type="password"
+                    type={showPasswords ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -717,7 +730,7 @@ export default function SettingsPage() {
                 <div className="space-y-1">
                   <Label className="text-xs text-white/70">Confirm Password</Label>
                   <Input
-                    type="password"
+                    type={showPasswords ? "text" : "password"}
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                     required

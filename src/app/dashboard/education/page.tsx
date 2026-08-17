@@ -214,9 +214,9 @@ export default function EducationPage() {
                 <TableRow className="border-stroke hover:bg-transparent">
                   <TableHead className="text-muted-text font-medium w-[80px]">Order</TableHead>
                   <TableHead className="text-muted-text font-medium">Institution</TableHead>
-                  <TableHead className="text-muted-text font-medium hidden md:table-cell">Degree / Field</TableHead>
-                  <TableHead className="text-muted-text font-medium hidden sm:table-cell">Year</TableHead>
-                  <TableHead className="text-muted-text font-medium text-right">Actions</TableHead>
+                  <TableHead className="text-muted-text font-medium min-w-[200px]">Degree / Field</TableHead>
+                  <TableHead className="text-muted-text font-medium min-w-[100px]">Year</TableHead>
+                  <TableHead className="text-muted-text font-medium text-right min-w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -244,14 +244,14 @@ export default function EducationPage() {
                         </Button>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium text-white">{item.institution}</TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell className="font-medium text-white min-w-[200px]">{item.institution}</TableCell>
+                    <TableCell className="min-w-[200px]">
                       <div>
                         <p className="text-sm text-white">{item.degree}</p>
                         <p className="text-xs text-muted-text">{item.field}</p>
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-text hidden sm:table-cell text-sm">{item.year}</TableCell>
+                    <TableCell className="text-muted-text text-sm min-w-[100px]">{item.year}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button
