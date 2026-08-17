@@ -1,11 +1,9 @@
-'use client';
-
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
 import { SectionHeading } from './section-heading';
 import { ScrollReveal } from './scroll-reveal';
-import { useData } from '@/lib/data-provider';
+import { getProfile } from '@/lib/data-fetching';
 
 // Default cards used when profile data is empty
 const DEFAULT_CARDS = [
@@ -29,9 +27,8 @@ const DEFAULT_CARDS = [
   },
 ] as const;
 
-export function AboutPreview() {
-  const { profile } = useData();
-  const router = useRouter();
+export async function AboutPreview() {
+  const profile = await getProfile();
 
   // Build cards: when profile exists use its data (filter out empty cards);
   // when no profile exists use hardcoded defaults
@@ -61,6 +58,7 @@ export function AboutPreview() {
                     src={profile.profileImage}
                     alt={profile?.fullName || 'Abdellah Ait-Si'}
                     fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
                     priority
                   />
@@ -122,11 +120,12 @@ export function AboutPreview() {
             {/* CTA Button */}
             <ScrollReveal direction="right" delay={0.5}>
               <div className="mt-8">
-                <SlideFillButton
-                  label="Learn More"
-                  variant="secondary"
-                  onClick={() => router.push('/resume')}
-                />
+                <Link href="/resume">
+                  <SlideFillButton
+                    label="Learn More"
+                    variant="secondary"
+                  />
+                </Link>
               </div>
             </ScrollReveal>
           </div>
