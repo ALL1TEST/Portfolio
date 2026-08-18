@@ -30,6 +30,12 @@ export const POST = withAuth(async (req: Request) => {
         displayOrder: body.displayOrder || 0,
       },
     });
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('projects');
+    revalidatePath('/projects');
+    revalidatePath('/');
+    revalidatePath('/dashboard/projects');
+
     return NextResponse.json(project);
   } catch (error: any) {
     console.error('Projects POST error:', error);
@@ -61,6 +67,13 @@ export const PUT = withAuth(async (req: Request) => {
         ...(body.displayOrder !== undefined && { displayOrder: body.displayOrder }),
       },
     });
+
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('projects');
+    revalidatePath('/projects');
+    revalidatePath('/');
+    revalidatePath('/dashboard/projects');
+
     return NextResponse.json(project);
   } catch (error: any) {
     console.error('Projects PUT error:', error);
@@ -76,6 +89,13 @@ export const DELETE = withAuth(async (req: Request) => {
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
     await prisma.project.delete({ where: { id } });
+
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('projects');
+    revalidatePath('/projects');
+    revalidatePath('/');
+    revalidatePath('/dashboard/projects');
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Projects DELETE error:', error);

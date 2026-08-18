@@ -12,6 +12,13 @@ export const POST = withAuth(async (req: Request) => {
   const skill = await prisma.skill.create({
     data: { name: body.name, category: body.category, icon: body.icon || '', displayOrder: body.displayOrder || 0 },
   });
+
+  const { revalidateTag, revalidatePath } = await import('next/cache');
+  revalidateTag('skills');
+  revalidatePath('/resume');
+  revalidatePath('/');
+  revalidatePath('/dashboard/skills');
+
   return NextResponse.json(skill);
 });
 
@@ -25,6 +32,13 @@ export const PUT = withAuth(async (req: Request) => {
         prisma.skill.update({ where: { id: item.id }, data: { displayOrder: item.displayOrder } })
       )
     );
+
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('skills');
+    revalidatePath('/resume');
+    revalidatePath('/');
+    revalidatePath('/dashboard/skills');
+
     return NextResponse.json({ success: true });
   }
 
@@ -38,6 +52,13 @@ export const PUT = withAuth(async (req: Request) => {
       ...(body.displayOrder !== undefined && { displayOrder: body.displayOrder }),
     },
   });
+
+  const { revalidateTag, revalidatePath } = await import('next/cache');
+  revalidateTag('skills');
+  revalidatePath('/resume');
+  revalidatePath('/');
+  revalidatePath('/dashboard/skills');
+
   return NextResponse.json(skill);
 });
 
@@ -47,9 +68,21 @@ export const DELETE = withAuth(async (req: Request) => {
   const category = searchParams.get('category');
   if (category) {
     const { count } = await prisma.skill.deleteMany({ where: { category } });
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('skills');
+    revalidatePath('/resume');
+    revalidatePath('/');
+    revalidatePath('/dashboard/skills');
     return NextResponse.json({ success: true, deleted: count });
   }
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
   await prisma.skill.delete({ where: { id } });
+
+  const { revalidateTag, revalidatePath } = await import('next/cache');
+  revalidateTag('skills');
+  revalidatePath('/resume');
+  revalidatePath('/');
+  revalidatePath('/dashboard/skills');
+
   return NextResponse.json({ success: true });
 });

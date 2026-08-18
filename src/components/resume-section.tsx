@@ -223,16 +223,26 @@ export function ResumeSection() {
 
         {/* Download CV */}
         <ScrollReveal className="text-center">
-          <SlideFillButton
-            label="Download Resume"
-            variant="primary"
-            disabled={!profile?.cvFile}
-            onClick={() => {
-              if (profile?.cvFile) {
-                window.open(profile.cvFile, '_blank');
-              }
-            }}
-          />
+          {profile?.cvFile ? (
+            <a
+              href={profile.cvFile}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block"
+              aria-label="Download Resume PDF"
+            >
+              <SlideFillButton
+                label="Download Resume"
+                variant="primary"
+              />
+            </a>
+          ) : (
+            <SlideFillButton
+              label="Download Resume"
+              variant="primary"
+              disabled
+            />
+          )}
         </ScrollReveal>
       </div>
     </section>

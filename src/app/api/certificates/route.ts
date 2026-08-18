@@ -23,6 +23,13 @@ export const POST = withAuth(async (req: Request) => {
         displayOrder: body.displayOrder || 0,
       },
     });
+
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('certificates');
+    revalidatePath('/certificates');
+    revalidatePath('/');
+    revalidatePath('/dashboard/certificates');
+
     return NextResponse.json(cert);
   } catch (error: any) {
     console.error('Certificates POST error:', error);
@@ -41,6 +48,11 @@ export const PUT = withAuth(async (req: Request) => {
           prisma.certificate.update({ where: { id: item.id }, data: { displayOrder: item.displayOrder } })
         )
       );
+      const { revalidateTag, revalidatePath } = await import('next/cache');
+      revalidateTag('certificates');
+      revalidatePath('/certificates');
+      revalidatePath('/');
+      revalidatePath('/dashboard/certificates');
       return NextResponse.json({ success: true });
     }
 
@@ -59,6 +71,13 @@ export const PUT = withAuth(async (req: Request) => {
         ...(body.displayOrder !== undefined && { displayOrder: body.displayOrder }),
       },
     });
+
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('certificates');
+    revalidatePath('/certificates');
+    revalidatePath('/');
+    revalidatePath('/dashboard/certificates');
+
     return NextResponse.json(cert);
   } catch (error: any) {
     console.error('Certificates PUT error:', error);
@@ -72,6 +91,13 @@ export const DELETE = withAuth(async (req: Request) => {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
     await prisma.certificate.delete({ where: { id } });
+
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('certificates');
+    revalidatePath('/certificates');
+    revalidatePath('/');
+    revalidatePath('/dashboard/certificates');
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Certificates DELETE error:', error);

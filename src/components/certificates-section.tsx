@@ -28,7 +28,7 @@ function formatIssueYear(dateStr: string): string {
 
 function CertificateCard({ cert, index }: { cert: Certificate; index: number }) {
   const hasImage = !!cert.certificateImage;
-  const href = cert.credentialUrl || '#';
+  const targetUrl = cert.credentialUrl || cert.certificateImage || '';
   const skills = parseSkills(cert.skills);
   const year = formatIssueYear(cert.issueDate);
 
@@ -79,15 +79,21 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
           {subtitleParts.length > 0 && (
             <p className="certificate-meta">{subtitleParts.join(' · ')}</p>
           )}
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="certificate-link"
-            aria-label={`View credential for ${cert.title}`}
-          >
-            View Certificate
-          </a>
+          {targetUrl ? (
+            <a
+              href={targetUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="certificate-link"
+              aria-label={`View credential for ${cert.title}`}
+            >
+              View Certificate
+            </a>
+          ) : (
+            <span className="certificate-link opacity-40 cursor-default pointer-events-none">
+              Certificate Verified
+            </span>
+          )}
         </div>
       </div>
     </motion.div>

@@ -76,7 +76,18 @@ export function DataProvider({ children, initialData }: { children: ReactNode, i
   }, []);
 
   useEffect(() => {
-    // If server provided initialData, do not trigger redundant client-side fetch waterfall
+    if (initialData?.profile !== undefined) setProfile(initialData.profile || null);
+    if (initialData?.projects !== undefined) setProjects(initialData.projects || []);
+    if (initialData?.certificates !== undefined) setCertificates(initialData.certificates || []);
+    if (initialData?.skills !== undefined) setSkills(initialData.skills || []);
+    if (initialData?.education !== undefined) setEducation(initialData.education || []);
+    if (initialData?.experiences !== undefined) setExperiences(initialData.experiences || []);
+    if (initialData?.languages !== undefined) setLanguages(initialData.languages || []);
+    if (initialData?.softSkills !== undefined) setSoftSkills(initialData.softSkills || []);
+  }, [initialData]);
+
+  useEffect(() => {
+    // If server did not provide initialData, fetch on client
     if (!initialData) {
       fetchData();
     }

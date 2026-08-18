@@ -78,10 +78,14 @@ export const PUT = withAuth(async (req: Request) => {
       console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] profile.create() succeeded`);
     }
 
-    // Revalidate specific paths to avoid triggering a full app re-render 
-    // which causes Prisma connection exhaustion (max clients reached)
-    const { revalidatePath } = await import('next/cache');
+    const { revalidateTag, revalidatePath } = await import('next/cache');
+    revalidateTag('profile');
+    revalidatePath('/', 'layout');
     revalidatePath('/');
+    revalidatePath('/resume');
+    revalidatePath('/certificates');
+    revalidatePath('/projects');
+    revalidatePath('/contact');
     revalidatePath('/dashboard/settings');
 
     console.log(`[PROFILE_SAVE_API][REQUEST_ID: ${reqId}] Profile updated successfully`);
