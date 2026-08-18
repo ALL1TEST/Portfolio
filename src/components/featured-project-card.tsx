@@ -1,18 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Github } from 'lucide-react';
+import { ArrowUpRight, Github, ChevronUp, ChevronDown } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
 import { GlowCard } from '@/components/ui/glow-card';
 import type { Project } from '@/lib/types';
 
 export function FeaturedProjectCard({ project, index }: { project: Project; index: number }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const technologies: string[] = (() => {
     try { return JSON.parse(project.technologies); } catch { return []; }
   })();
 
   const hasImage = !!project.projectImage;
+  const description = project.fullDescription || project.shortDescription || '';
+  const isLongDescription = description.length > 130;
 
   return (
     <ScrollReveal delay={index * 0.12} direction="up">
@@ -51,14 +55,33 @@ export function FeaturedProjectCard({ project, index }: { project: Project; inde
         {/* Content area — clearly separated from image with generous padding */}
         <div className="p-6 lg:p-8 flex flex-col flex-1">
           {/* Title */}
-          <h3 className="text-xl lg:text-2xl font-bold text-white leading-snug mb-3 group-hover:text-brand transition-colors duration-300 whitespace-nowrap">
+          <h3 className="text-xl lg:text-2xl font-bold text-white leading-snug mb-3 group-hover:text-brand transition-colors duration-300 break-words">
             {project.title}
           </h3>
 
           {/* Description */}
-          <p className="text-sm lg:text-base text-muted-text leading-relaxed line-clamp-3 mb-5">
-            {project.fullDescription || project.shortDescription}
-          </p>
+          <div className="mb-5">
+            <p className={`text-sm lg:text-base text-muted-text leading-relaxed ${isLongDescription && !isExpanded ? 'line-clamp-3' : ''}`}>
+              {description}
+            </p>
+            {isLongDescription && (
+              <button
+                type="button"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-xs text-brand hover:text-brand-light font-medium transition-colors mt-2 inline-flex items-center gap-1 focus:outline-none"
+              >
+                {isExpanded ? (
+                  <>
+                    Show Less <ChevronUp className="w-3 h-3" />
+                  </>
+                ) : (
+                  <>
+                    Show More <ChevronDown className="w-3 h-3" />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
 
           {/* Tech pills */}
           {technologies.length > 0 && (

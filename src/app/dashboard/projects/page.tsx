@@ -470,7 +470,7 @@ export default function ProjectsPage() {
                     onChange={handleImageUpload}
                     className="hidden"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap items-center gap-3">
                     <Button
                       type="button"
                       variant="outline"
@@ -481,6 +481,9 @@ export default function ProjectsPage() {
                       <ImagePlus className="w-3.5 h-3.5" />
                       Upload Image
                     </Button>
+                    <span className="text-xs text-muted-text">
+                      Recommended image size: 1600 × 1000 px
+                    </span>
                   </div>
                   <Input
                     value={form.projectImage}

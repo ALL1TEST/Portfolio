@@ -8,19 +8,66 @@ export const GET = publicRoute(async () => {
   return NextResponse.json(projects);
 });
 
+// Helper to generate a slug that does not collide with other projects in the DB
+async function generateUniqueSlug(titleOrSlug: string, currentId?: string): Promise<string> {
+  const baseSlug = (titleOrSlug || 'project')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'project';
+
+  let uniqueSlug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existing = await prisma.project.findFirst({
+      where: {
+        slug: uniqueSlug,
+        ...(currentId ? { NOT: { id: currentId } } : {}),
+      },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return uniqueSlug;
+    }
+
+    uniqueSlug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+}
+
+function formatTechnologies(tech: any): string {
+  if (Array.isArray(tech)) return JSON.stringify(tech);
+  if (typeof tech === 'string') {
+    if (tech.trim().startsWith('[')) {
+      try {
+        JSON.parse(tech);
+        return tech;
+      } catch {
+        // fallback
+      }
+    }
+    return JSON.stringify(tech.split(',').map((t: string) => t.trim()).filter(Boolean));
+  }
+  return '[]';
+}
+
 // POST - Create project (admin)
 export const POST = withAuth(async (req: Request) => {
   try {
     const body = await req.json();
-    const slug = body.slug || body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const rawSlug = (body.slug && body.slug.trim()) || body.title || 'project';
+    const slug = await generateUniqueSlug(rawSlug);
+
     const project = await prisma.project.create({
       data: {
         title: body.title,
         slug,
-        shortDescription: body.shortDescription,
-        fullDescription: body.fullDescription || '',
-        technologies: JSON.stringify(body.technologies || []),
-        startDate: body.startDate,
+        shortDescription: body.shortDescription || body.fullDescription || '',
+        fullDescription: body.fullDescription || body.shortDescription || '',
+        technologies: formatTechnologies(body.technologies),
+        startDate: body.startDate || '',
         endDate: body.endDate || '',
         location: body.location || 'Oulad Teima, Morocco',
         projectImage: body.projectImage || '',
@@ -35,6 +82,7 @@ export const POST = withAuth(async (req: Request) => {
     revalidatePath('/projects');
     revalidatePath('/');
     revalidatePath('/dashboard/projects');
+    revalidatePath('/', 'layout');
 
     return NextResponse.json(project);
   } catch (error: any) {
@@ -49,14 +97,22 @@ export const PUT = withAuth(async (req: Request) => {
     const body = await req.json();
     if (!body.id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
+    let updatedSlug: string | undefined = undefined;
+    if (body.slug !== undefined || body.title !== undefined) {
+      const rawSlug = (body.slug !== undefined && body.slug.trim()) ? body.slug : (body.title || '');
+      if (rawSlug) {
+        updatedSlug = await generateUniqueSlug(rawSlug, body.id);
+      }
+    }
+
     const project = await prisma.project.update({
       where: { id: body.id },
       data: {
         ...(body.title !== undefined && { title: body.title }),
-        ...(body.slug !== undefined && { slug: body.slug }),
+        ...(updatedSlug !== undefined && { slug: updatedSlug }),
         ...(body.shortDescription !== undefined && { shortDescription: body.shortDescription }),
         ...(body.fullDescription !== undefined && { fullDescription: body.fullDescription }),
-        ...(body.technologies !== undefined && { technologies: JSON.stringify(body.technologies) }),
+        ...(body.technologies !== undefined && { technologies: formatTechnologies(body.technologies) }),
         ...(body.startDate !== undefined && { startDate: body.startDate }),
         ...(body.endDate !== undefined && { endDate: body.endDate }),
         ...(body.location !== undefined && { location: body.location }),
@@ -73,6 +129,7 @@ export const PUT = withAuth(async (req: Request) => {
     revalidatePath('/projects');
     revalidatePath('/');
     revalidatePath('/dashboard/projects');
+    revalidatePath('/', 'layout');
 
     return NextResponse.json(project);
   } catch (error: any) {
@@ -95,6 +152,7 @@ export const DELETE = withAuth(async (req: Request) => {
     revalidatePath('/projects');
     revalidatePath('/');
     revalidatePath('/dashboard/projects');
+    revalidatePath('/', 'layout');
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
