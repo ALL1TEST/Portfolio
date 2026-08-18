@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Github, Linkedin, Instagram } from 'lucide-react';
 import { TwitterX } from './icons';
@@ -84,10 +85,12 @@ export function Navbar() {
     }
   }, [closeMobileMenu, router, pathname]);
 
+  const CUBIC_EASE = [0.22, 1, 0.36, 1] as const;
+
   const overlayVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
-    exit: { opacity: 0, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } },
+    visible: { opacity: 1, transition: { duration: 0.35, ease: CUBIC_EASE } },
+    exit: { opacity: 0, transition: { duration: 0.25, ease: CUBIC_EASE } },
   };
 
   const contentVariants = {
@@ -95,18 +98,18 @@ export function Navbar() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1], delayChildren: 0.15, staggerChildren: 0.07 },
+      transition: { duration: 0.5, ease: CUBIC_EASE, delayChildren: 0.15, staggerChildren: 0.07 },
     },
     exit: {
       opacity: 0,
       y: -20,
-      transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.25, ease: CUBIC_EASE },
     },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, x: -12 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: CUBIC_EASE } },
     exit: { opacity: 0, x: -8, transition: { duration: 0.2 } },
   };
 
@@ -138,10 +141,13 @@ export function Navbar() {
                 className="flex items-center gap-2.5 min-w-0"
               >
                 {(profile ? profile.logoUrl : '/logo.png') && (
-                  <img
+                  <Image
                     src={profile ? profile.logoUrl : '/logo.png'}
                     alt="Logo"
+                    width={48}
+                    height={48}
                     className="object-contain h-10 w-auto lg:h-12"
+                    priority
                   />
                 )}
                 <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">{profile?.brandName ?? 'CodeVirtox'}</span>

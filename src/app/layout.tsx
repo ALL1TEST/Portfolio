@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 import { getProfile, getAppSettings } from "@/lib/data-fetching";
 
 export async function generateMetadata(): Promise<Metadata> {
-  let profile = null;
-  let appSettings = null;
+  let profile: Awaited<ReturnType<typeof getProfile>> = null;
+  let appSettings: Awaited<ReturnType<typeof getAppSettings>> = null;
   try {
     profile = await getProfile();
     appSettings = await getAppSettings();
@@ -79,10 +79,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-dark text-white noise-bg`}
       >
-        <AuthProvider>
-          {children}
-          <Toaster theme="dark" position="top-right" richColors />
-        </AuthProvider>
+        {children}
+        <Toaster theme="dark" position="top-right" richColors />
       </body>
     </html>
   );

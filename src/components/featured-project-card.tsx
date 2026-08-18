@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Github } from 'lucide-react';
 import { ScrollReveal } from './scroll-reveal';
@@ -28,10 +29,13 @@ export function FeaturedProjectCard({ project, index }: { project: Project; inde
             rel="noopener noreferrer"
             className="block relative aspect-[16/10] overflow-hidden"
           >
-            <img
+            <Image
               src={project.projectImage}
               alt={project.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              loading="lazy"
             />
             {/* Floating arrow */}
             <div className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">

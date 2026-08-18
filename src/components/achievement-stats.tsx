@@ -1,8 +1,5 @@
-'use client';
-
 import { ScrollReveal } from './scroll-reveal';
-import { motion } from 'framer-motion';
-import { useData } from '@/lib/data-provider';
+import { getProfile } from '@/lib/data-fetching';
 
 // Defaults used only when no profile exists at all
 const DEFAULT_STATS = [
@@ -11,8 +8,8 @@ const DEFAULT_STATS = [
   { value: '8+', label: 'Technologies' },
 ];
 
-export function AchievementStats() {
-  const { profile } = useData();
+export async function AchievementStats() {
+  const profile = await getProfile();
 
   // When profile exists, use its stat fields; filter out empty ones.
   // When no profile, use hardcoded defaults.
@@ -32,11 +29,7 @@ export function AchievementStats() {
         <div className={`grid gap-4 sm:gap-8 ${stats.length <= 3 ? 'grid-cols-3' : `grid-cols-${Math.min(stats.length, 4)}`}`}>
           {stats.map((stat, index) => (
             <ScrollReveal key={stat.label || index} delay={index * 0.1} direction="up">
-              <motion.div
-                className="relative flex flex-col items-center text-center py-8 lg:py-10 px-4"
-                whileHover={{ y: -2 }}
-                transition={{ duration: 0.3 }}
-              >
+              <div className="relative flex flex-col items-center text-center py-8 lg:py-10 px-4 transition-transform duration-300 hover:-translate-y-0.5">
                 {index > 0 && (
                   <div className="absolute left-0 top-1/4 bottom-1/4 w-px bg-stroke/40 hidden sm:block" />
                 )}
@@ -47,7 +40,7 @@ export function AchievementStats() {
                 <span className="mt-2 text-xs sm:text-sm font-medium text-muted-text uppercase tracking-wider">
                   {stat.label}
                 </span>
-              </motion.div>
+              </div>
             </ScrollReveal>
           ))}
         </div>

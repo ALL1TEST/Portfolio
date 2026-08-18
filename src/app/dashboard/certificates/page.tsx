@@ -7,6 +7,7 @@ import { Plus, Pencil, Trash2, Loader2, ExternalLink, Upload, FileText, X } from
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { extractStoragePath } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';

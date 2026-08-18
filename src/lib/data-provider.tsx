@@ -76,8 +76,11 @@ export function DataProvider({ children, initialData }: { children: ReactNode, i
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    // If server provided initialData, do not trigger redundant client-side fetch waterfall
+    if (!initialData) {
+      fetchData();
+    }
+  }, [fetchData, initialData]);
 
   // Auto-refresh when user switches back to this tab (e.g., after editing in dashboard)
   useEffect(() => {

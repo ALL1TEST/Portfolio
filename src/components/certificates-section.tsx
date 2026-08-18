@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollReveal } from './scroll-reveal';
 import FocusReveal from './focus-reveal';
@@ -51,7 +52,14 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
     >
       {/* Certificate image — fully visible background */}
       {hasImage ? (
-        <img src={cert.certificateImage} alt={cert.title} className="certificate-card-image" />
+        <Image
+          src={cert.certificateImage}
+          alt={cert.title}
+          fill
+          sizes="(max-width: 640px) 100vw, 50vw"
+          className="certificate-card-image"
+          loading="lazy"
+        />
       ) : (
         <div
           className="certificate-card-image"

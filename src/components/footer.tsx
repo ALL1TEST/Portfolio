@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowUp, Github, Linkedin, Instagram } from 'lucide-react';
@@ -52,10 +53,13 @@ export function Footer() {
                   className="flex items-center gap-2.5 mb-4 group/flogo min-w-0"
                 >
                   {(profile ? profile.logoUrl : '/logo.png') && (
-                    <img
+                    <Image
                       src={profile ? profile.logoUrl : '/logo.png'}
                       alt="Logo"
+                      width={48}
+                      height={48}
                       className="object-contain h-10 w-auto lg:h-12 transition-transform duration-300 group-hover/flogo:scale-105"
+                      loading="lazy"
                     />
                   )}
                   <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">

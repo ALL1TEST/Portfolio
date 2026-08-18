@@ -58,9 +58,9 @@ export async function AboutPreview() {
                     src={profile.profileImage}
                     alt={profile?.fullName || 'Abdellah Ait-Si'}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, 448px"
                     className="object-cover"
-                    priority
+                    loading="lazy"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-dark/50 text-muted-text">

@@ -55,6 +55,7 @@ export function HeroGlow() {
   const particlesRef = useRef<Particle[]>([]);
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
+  const isVisibleRef = useRef(true);
 
   const initOrbs = useCallback((w: number, h: number) => {
     orbsRef.current = ORB_CONFIGS.map((cfg, i) => ({
@@ -74,8 +75,8 @@ export function HeroGlow() {
     }));
   }, []);
 
-  const spawnParticle = useCallback((w: number, h: number) => {
-    if (particlesRef.current.length >= 35) return;
+  const spawnParticle = useCallback((w: number, h: number, maxCount: number) => {
+    if (particlesRef.current.length >= maxCount) return;
     particlesRef.current.push({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -99,13 +100,15 @@ export function HeroGlow() {
     if (!ctx) return;
 
     let w = 0, h = 0, dpr = 1;
+    let maxParticles = window.innerWidth < 768 ? 14 : 30;
 
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       w = window.innerWidth;
       h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      maxParticles = w < 768 ? 14 : 30;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -114,8 +117,8 @@ export function HeroGlow() {
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = {
-        x: e.clientX / w,
-        y: e.clientY / h,
+        x: e.clientX / (w || 1),
+        y: e.clientY / (h || 1),
       };
     };
 
@@ -128,9 +131,41 @@ export function HeroGlow() {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
 
+    // Pause animation when hero is offscreen
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          isVisibleRef.current = entry.isIntersecting;
+          if (entry.isIntersecting && !animRef.current) {
+            animRef.current = requestAnimationFrame(animate);
+          }
+        },
+        { threshold: 0.05 }
+      );
+      observer.observe(canvas);
+    }
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        isVisibleRef.current = false;
+      } else {
+        isVisibleRef.current = true;
+        if (!animRef.current) {
+          animRef.current = requestAnimationFrame(animate);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     let frameCount = 0;
 
     const animate = () => {
+      if (!isVisibleRef.current) {
+        animRef.current = 0;
+        return;
+      }
+
       timeRef.current += 1;
       frameCount++;
       const t = timeRef.current;
@@ -138,18 +173,13 @@ export function HeroGlow() {
 
       ctx.clearRect(0, 0, w, h);
 
-      // ── Draw orbs with blur ──
-      ctx.save();
-      ctx.filter = 'blur(80px)';
-
+      // ── Draw orbs with smooth radial gradient (GPU-blurred via container CSS filter) ──
       for (const orb of orbsRef.current) {
-        // Organic Lissajous-style movement
         const rawX = orb.baseX + Math.sin(t * orb.speedX + orb.phaseX) * orb.driftX
           + Math.cos(t * orb.speedX * 0.7 + orb.phaseY) * orb.driftX * 0.4;
         const rawY = orb.baseY + Math.cos(t * orb.speedY + orb.phaseY) * orb.driftY
           + Math.sin(t * orb.speedY * 0.6 + orb.phaseX) * orb.driftY * 0.3;
 
-        // Mouse parallax: orbs shift subtly toward cursor
         const parallaxStrength = 30;
         const px = (mx - 0.5) * parallaxStrength * (orb.radius / 350);
         const py = (my - 0.5) * parallaxStrength * (orb.radius / 350);
@@ -158,15 +188,13 @@ export function HeroGlow() {
         orb.y = rawY + py;
 
         const [r, g, b] = orb.color;
-
-        // Pulsing opacity
         const pulseFactor = 1 + Math.sin(t * 0.002 + orb.phaseX) * 0.15;
         const finalOpacity = orb.opacity * pulseFactor;
 
         const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.radius);
         grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${finalOpacity})`);
-        grad.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, ${finalOpacity * 0.5})`);
-        grad.addColorStop(0.7, `rgba(${r}, ${g}, ${b}, ${finalOpacity * 0.15})`);
+        grad.addColorStop(0.35, `rgba(${r}, ${g}, ${b}, ${finalOpacity * 0.55})`);
+        grad.addColorStop(0.65, `rgba(${r}, ${g}, ${b}, ${finalOpacity * 0.18})`);
         grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
         ctx.fillStyle = grad;
@@ -175,10 +203,8 @@ export function HeroGlow() {
         ctx.fill();
       }
 
-      ctx.restore();
-
-      // ── Mouse spotlight (no blur, very subtle) ──
-      if (mx > 0 && mx < 1 && my > 0 && my < 1) {
+      // ── Mouse spotlight (desktop only) ──
+      if (w >= 768 && mx > 0 && mx < 1 && my > 0 && my < 1) {
         const spotX = mx * w;
         const spotY = my * h;
         const spotGrad = ctx.createRadialGradient(spotX, spotY, 0, spotX, spotY, 250);
@@ -192,9 +218,8 @@ export function HeroGlow() {
       // ── Floating particles ──
       const particles = particlesRef.current;
 
-      // Spawn occasionally
-      if (frameCount % 8 === 0) {
-        spawnParticle(w, h);
+      if (frameCount % 10 === 0) {
+        spawnParticle(w, h, maxParticles);
       }
 
       for (let i = particles.length - 1; i >= 0; i--) {
@@ -203,7 +228,6 @@ export function HeroGlow() {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Fade in / fade out lifecycle
         const lifeRatio = p.life / p.maxLife;
         if (lifeRatio < 0.15) {
           p.opacity = lifeRatio / 0.15;
@@ -214,7 +238,6 @@ export function HeroGlow() {
         }
         p.opacity *= 0.45;
 
-        // Mouse proximity boost
         const dx = mx * w - p.x;
         const dy = my * h - p.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -224,7 +247,6 @@ export function HeroGlow() {
           p.vy -= (dy / Math.max(dist, 1)) * 0.003;
         }
 
-        // Slight orange tint near mouse
         const isNear = dist < 250;
         const pr = isNear ? 255 : 180;
         const pg = isNear ? 90 : 180;
@@ -235,7 +257,6 @@ export function HeroGlow() {
         ctx.fillStyle = `rgba(${pr}, ${pg}, ${pb}, ${p.opacity})`;
         ctx.fill();
 
-        // Remove dead particles
         if (p.life >= p.maxLife) {
           particles.splice(i, 1);
         }
@@ -244,10 +265,12 @@ export function HeroGlow() {
       animRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    animRef.current = requestAnimationFrame(animate);
 
     return () => {
-      cancelAnimationFrame(animRef.current);
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      observer?.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
@@ -257,7 +280,7 @@ export function HeroGlow() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
+      className="absolute inset-0 w-full h-full pointer-events-none filter blur-[50px] transform-gpu"
       style={{ zIndex: 0 }}
       aria-hidden="true"
     />

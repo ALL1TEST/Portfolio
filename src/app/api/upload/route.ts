@@ -86,11 +86,12 @@ export const POST = withAuth(async (req: Request) => {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage with 1-year immutable caching for static performance
     let { error: uploadError } = await supabase.storage
       .from('uploads')
       .upload(filePath, buffer, {
         contentType: file.type,
+        cacheControl: '31536000, immutable',
         upsert: false,
       });
 
@@ -111,6 +112,7 @@ export const POST = withAuth(async (req: Request) => {
         .from('uploads')
         .upload(filePath, buffer, {
           contentType: file.type,
+          cacheControl: '31536000, immutable',
           upsert: false,
         });
       uploadError = retryUpload.error;

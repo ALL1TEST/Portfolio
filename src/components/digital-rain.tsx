@@ -118,7 +118,7 @@ function OriginkitBaseDigitalRain(props: DigitalRainProps) {
         }
 
         function layout() {
-            const dpr = Math.min(2, window.devicePixelRatio || 1)
+            const dpr = Math.min(1.5, window.devicePixelRatio || 1)
             w = wrap.clientWidth || 360
             h = wrap.clientHeight || 320
             canvas.width = Math.round(w * dpr)
@@ -131,6 +131,8 @@ function OriginkitBaseDigitalRain(props: DigitalRainProps) {
                 releaseAt: nextRelease(),
             }))
         }
+
+        let isVisible = true;
 
         function draw(dt: number) {
             ctx.clearRect(0, 0, w, h)
@@ -199,6 +201,10 @@ function OriginkitBaseDigitalRain(props: DigitalRainProps) {
 
         function loop(time: number) {
             if (!alive) return
+            if (!isVisible) {
+                raf = 0
+                return
+            }
             const dt = last ? Math.min((time - last) / 1000, 0.05) : 1 / 60
             last = time
             draw(dt)
@@ -206,6 +212,31 @@ function OriginkitBaseDigitalRain(props: DigitalRainProps) {
         }
 
         layout()
+
+        let io: IntersectionObserver | null = null
+        if (typeof IntersectionObserver !== "undefined") {
+            io = new IntersectionObserver(([entry]) => {
+                isVisible = entry.isIntersecting
+                if (entry.isIntersecting && !raf && alive) {
+                    last = 0
+                    raf = requestAnimationFrame(loop)
+                }
+            }, { threshold: 0.05 })
+            io.observe(wrap)
+        }
+
+        const onVisChange = () => {
+            if (document.hidden) {
+                isVisible = false
+            } else {
+                isVisible = true
+                if (!raf && alive) {
+                    last = 0
+                    raf = requestAnimationFrame(loop)
+                }
+            }
+        }
+        document.addEventListener("visibilitychange", onVisChange)
 
         let ro: ResizeObserver | null = null
         if (typeof ResizeObserver !== "undefined") {
@@ -216,8 +247,10 @@ function OriginkitBaseDigitalRain(props: DigitalRainProps) {
 
         return () => {
             alive = false
-            cancelAnimationFrame(raf)
+            if (raf) cancelAnimationFrame(raf)
+            io?.disconnect()
             ro?.disconnect()
+            document.removeEventListener("visibilitychange", onVisChange)
         }
     }, [
         headColor,

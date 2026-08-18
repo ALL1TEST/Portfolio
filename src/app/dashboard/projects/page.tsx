@@ -194,7 +194,7 @@ export default function ProjectsPage() {
           delete updated[field];
           return updated;
         });
-        const originalProject = form.id ? projects.find(p => p.id === form.id) : null;
+        const originalProject = editingId ? projects.find(p => p.id === editingId) : null;
         setForm((p) => ({ ...p, [field]: originalProject ? originalProject[field] : '' }));
         return;
       }
