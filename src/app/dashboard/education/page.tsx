@@ -209,20 +209,20 @@ export default function EducationPage() {
           </div>
         ) : (
           <ScrollArea className="max-h-[calc(100vh-16rem)]">
-            <Table className="min-w-[700px]">
+            <Table className="w-full md:min-w-[700px]">
               <TableHeader>
                 <TableRow className="border-stroke hover:bg-transparent">
-                  <TableHead className="text-muted-text font-medium w-[80px]">Order</TableHead>
+                  <TableHead className="text-muted-text font-medium w-[80px] hidden md:table-cell">Order</TableHead>
                   <TableHead className="text-muted-text font-medium">Institution</TableHead>
-                  <TableHead className="text-muted-text font-medium min-w-[200px]">Degree / Field</TableHead>
-                  <TableHead className="text-muted-text font-medium min-w-[100px]">Year</TableHead>
-                  <TableHead className="text-muted-text font-medium text-right min-w-[100px]">Actions</TableHead>
+                  <TableHead className="text-muted-text font-medium min-w-[200px] hidden md:table-cell">Degree / Field</TableHead>
+                  <TableHead className="text-muted-text font-medium min-w-[100px] hidden md:table-cell">Year</TableHead>
+                  <TableHead className="text-muted-text font-medium text-right w-[90px] md:w-[100px] md:min-w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {items.map((item, idx) => (
                   <TableRow key={item.id} className="border-stroke hover:bg-dark/50">
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
@@ -244,15 +244,17 @@ export default function EducationPage() {
                         </Button>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium text-white min-w-[200px]">{item.institution}</TableCell>
-                    <TableCell className="min-w-[200px]">
+                    <TableCell className="font-medium text-white md:min-w-[200px] whitespace-normal break-words py-3">
+                      {item.institution}
+                    </TableCell>
+                    <TableCell className="min-w-[200px] hidden md:table-cell">
                       <div>
                         <p className="text-sm text-white">{item.degree}</p>
                         <p className="text-xs text-muted-text">{item.field}</p>
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-text text-sm min-w-[100px]">{item.year}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-muted-text text-sm min-w-[100px] hidden md:table-cell">{item.year}</TableCell>
+                    <TableCell className="text-right w-[90px] md:w-auto">
                       <div className="flex items-center justify-end gap-1">
                         <Button
                           variant="ghost"
