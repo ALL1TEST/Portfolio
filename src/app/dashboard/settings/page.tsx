@@ -781,8 +781,9 @@ export default function SettingsPage() {
                 Upload Image
               </Button>
               {profile.profileImage && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.profileImage, 'profileImage')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
-                  <Trash2 className="w-3.5 h-3.5" /> Remove
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.profileImage, 'profileImage')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1" aria-label="Remove profile image">
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Remove</span>
                 </Button>
               )}
             </div>
@@ -818,8 +819,9 @@ export default function SettingsPage() {
                 Upload CV
               </Button>
               {(profile.cvFile || pendingFiles.cvFile) && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.cvFile, 'cvFile')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
-                  <Trash2 className="w-3.5 h-3.5" /> Remove
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.cvFile, 'cvFile')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1" aria-label="Remove CV file">
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Remove</span>
                 </Button>
               )}
             </div>
@@ -851,8 +853,9 @@ export default function SettingsPage() {
                 Upload Logo
               </Button>
               {(profile.logoUrl || pendingFiles.logoUrl) && (
-                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.logoUrl, 'logoUrl')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1">
-                  <Trash2 className="w-3.5 h-3.5" /> Remove
+                <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFile(profile.logoUrl, 'logoUrl')} className="text-red-400 hover:text-red-300 hover:bg-red-400/10 gap-1" aria-label="Remove logo">
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Remove</span>
                 </Button>
               )}
             </div>
@@ -1340,7 +1343,8 @@ export default function SettingsPage() {
               className="border-stroke text-white hover:bg-dark gap-2 disabled:opacity-40"
             >
               {sendingTest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              Send Test Email
+              <span className="hidden md:inline">Send Test Email</span>
+              <span className="md:hidden">Test Email</span>
             </Button>
           </div>
         </div>
