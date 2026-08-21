@@ -63,7 +63,6 @@ export async function generateMetadata(): Promise<Metadata> {
     authors: [{ name: fullName, url: baseUrl }],
     creator: fullName,
     publisher: brandName,
-    metadataBase: new URL(baseUrl),
     alternates: {
       canonical: baseUrl,
     },

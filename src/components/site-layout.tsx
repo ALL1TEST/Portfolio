@@ -29,7 +29,7 @@ export async function SiteLayout({ children }: { children: React.ReactNode }) {
         <AnimatedBackground />
         <Navbar />
         <main className="relative z-10">{children}</main>
-        <Footer />
+        <Footer profile={profile} />
       </div>
     </DataProvider>
   );

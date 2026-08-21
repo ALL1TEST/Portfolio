@@ -1,6 +1,7 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { revalidateTag, revalidatePath } from '@/lib/revalidate';
 
 export const GET = publicRoute(async () => {
   const skills = await prisma.skill.findMany({ orderBy: [{ category: 'asc' }, { displayOrder: 'asc' }] });
@@ -13,7 +14,6 @@ export const POST = withAuth(async (req: Request) => {
     data: { name: body.name, category: body.category, icon: body.icon || '', displayOrder: body.displayOrder || 0 },
   });
 
-  const { revalidateTag, revalidatePath } = await import('next/cache');
   revalidateTag('skills');
   revalidatePath('/resume');
   revalidatePath('/');
@@ -33,7 +33,6 @@ export const PUT = withAuth(async (req: Request) => {
       )
     );
 
-    const { revalidateTag, revalidatePath } = await import('next/cache');
     revalidateTag('skills');
     revalidatePath('/resume');
     revalidatePath('/');
@@ -53,7 +52,6 @@ export const PUT = withAuth(async (req: Request) => {
     },
   });
 
-  const { revalidateTag, revalidatePath } = await import('next/cache');
   revalidateTag('skills');
   revalidatePath('/resume');
   revalidatePath('/');
@@ -68,7 +66,6 @@ export const DELETE = withAuth(async (req: Request) => {
   const category = searchParams.get('category');
   if (category) {
     const { count } = await prisma.skill.deleteMany({ where: { category } });
-    const { revalidateTag, revalidatePath } = await import('next/cache');
     revalidateTag('skills');
     revalidatePath('/resume');
     revalidatePath('/');
@@ -78,7 +75,6 @@ export const DELETE = withAuth(async (req: Request) => {
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
   await prisma.skill.delete({ where: { id } });
 
-  const { revalidateTag, revalidatePath } = await import('next/cache');
   revalidateTag('skills');
   revalidatePath('/resume');
   revalidatePath('/');

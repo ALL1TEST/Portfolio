@@ -10,12 +10,13 @@ interface GlowCardProps {
 export function GlowCard({ children, className = '' }: GlowCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
     if (!card) return;
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty('--glow-x', `${e.clientX - rect.left}px`);
-    card.style.setProperty('--glow-y', `${e.clientY - rect.top}px`);
+    const x = e.nativeEvent.offsetX;
+    const y = e.nativeEvent.offsetY;
+    card.style.setProperty('--glow-x', `${x}px`);
+    card.style.setProperty('--glow-y', `${y}px`);
   }, []);
 
   return (

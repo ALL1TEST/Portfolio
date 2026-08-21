@@ -1,6 +1,7 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { revalidateTag, revalidatePath } from '@/lib/revalidate';
 
 export const GET = publicRoute(async () => {
   const profile = await prisma.profile.findFirst();
@@ -78,9 +79,7 @@ export const PUT = withAuth(async (req: Request) => {
       console.log(`[PRISMA_DEBUG][REQUEST_ID: ${reqId}] profile.create() succeeded`);
     }
 
-    const { revalidateTag, revalidatePath } = await import('next/cache');
     revalidateTag('profile');
-    revalidatePath('/', 'layout');
     revalidatePath('/');
     revalidatePath('/resume');
     revalidatePath('/certificates');

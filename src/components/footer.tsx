@@ -1,13 +1,9 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { ArrowUp, Github, Linkedin, Instagram } from 'lucide-react';
 import { TwitterX } from './icons';
 import { ScrollReveal } from './scroll-reveal';
-import { useData } from '@/lib/data-provider';
+import type { Profile } from '@prisma/client';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -17,13 +13,7 @@ const navLinks = [
   { label: 'Contact', href: '/contact' },
 ];
 
-export function Footer() {
-  const { profile } = useData();
-  const pathname = usePathname();
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+export function Footer({ profile }: { profile?: Profile | null }) {
   // Build social links array from profile — only include non-empty URLs
   const socialLinks: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [];
   if (profile?.githubUrl) socialLinks.push({ href: profile.githubUrl, label: 'GitHub', icon: Github });
@@ -38,20 +28,8 @@ export function Footer() {
           {/* Brand */}
           <ScrollReveal direction="up" delay={0}>
             <div>
-              <Link
-                href="/"
-                onClick={(e) => {
-                  if (pathname === '/') {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }
-                }}
-              >
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2.5 mb-4 group/flogo min-w-0"
-                >
+              <Link href="/" className="inline-block">
+                <div className="flex items-center gap-2.5 mb-4 group/flogo min-w-0 transition-transform duration-300 hover:scale-105">
                   {(profile ? profile.logoUrl : '/logo.png') && (
                     <Image
                       src={profile ? profile.logoUrl : '/logo.png'}
@@ -65,7 +43,7 @@ export function Footer() {
                   <span className="text-xl lg:text-2xl font-medium tracking-tight text-white/90">
                     {profile?.brandName ?? 'CodeVirtox'}
                   </span>
-                </motion.div>
+                </div>
               </Link>
               {/* Footer bio: only show if explicitly set by user in Settings */}
               {profile?.footerBio && (
@@ -103,12 +81,6 @@ export function Footer() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    onClick={(e) => {
-                      if (pathname === link.href) {
-                        e.preventDefault();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }
-                    }}
                     className="block text-sm text-muted-text hover:text-white transition-colors"
                   >
                     {link.label}
@@ -125,15 +97,13 @@ export function Footer() {
                 <p className="text-xs font-semibold uppercase tracking-widest text-muted-text mb-4">
                   Quick Action
                 </p>
-                <motion.button
-                  onClick={scrollToTop}
-                  className="group inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-surface border border-stroke rounded-lg hover:border-brand/50 transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <a
+                  href="#home"
+                  className="group inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-surface border border-stroke rounded-lg hover:border-brand/50 transition-all cursor-pointer hover:scale-105 active:scale-95"
                 >
                   <ArrowUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />
                   Back to Top
-                </motion.button>
+                </a>
               </div>
             </div>
           </ScrollReveal>

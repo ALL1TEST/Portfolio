@@ -1,6 +1,7 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { revalidateTag, revalidatePath } from '@/lib/revalidate';
 
 // GET all projects (public)
 export const GET = publicRoute(async () => {
@@ -25,47 +26,43 @@ async function generateUniqueSlug(titleOrSlug: string, currentId?: string): Prom
         slug: uniqueSlug,
         ...(currentId ? { NOT: { id: currentId } } : {}),
       },
-      select: { id: true },
     });
 
-    if (!existing) {
-      return uniqueSlug;
-    }
+    if (!existing) return uniqueSlug;
 
     uniqueSlug = `${baseSlug}-${counter}`;
     counter++;
   }
 }
 
-function formatTechnologies(tech: any): string {
-  if (Array.isArray(tech)) return JSON.stringify(tech);
-  if (typeof tech === 'string') {
-    if (tech.trim().startsWith('[')) {
-      try {
-        JSON.parse(tech);
-        return tech;
-      } catch {
-        // fallback
-      }
+function formatTechnologies(raw: unknown): string {
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return JSON.stringify(parsed);
+    } catch {
+      // not valid JSON, fall through
     }
-    return JSON.stringify(tech.split(',').map((t: string) => t.trim()).filter(Boolean));
+    return raw;
   }
-  return '[]';
+  return JSON.stringify(Array.isArray(raw) ? raw : []);
 }
 
-// POST - Create project (admin)
+// POST - Create new project
 export const POST = withAuth(async (req: Request) => {
   try {
     const body = await req.json();
-    const rawSlug = (body.slug && body.slug.trim()) || body.title || 'project';
+
+    const title = body.title || 'Untitled Project';
+    const rawSlug = (body.slug && body.slug.trim()) ? body.slug : title;
     const slug = await generateUniqueSlug(rawSlug);
 
     const project = await prisma.project.create({
       data: {
-        title: body.title,
+        title,
         slug,
-        shortDescription: body.shortDescription || body.fullDescription || '',
-        fullDescription: body.fullDescription || body.shortDescription || '',
+        shortDescription: body.shortDescription || '',
+        fullDescription: body.fullDescription || '',
         technologies: formatTechnologies(body.technologies),
         startDate: body.startDate || '',
         endDate: body.endDate || '',
@@ -77,12 +74,10 @@ export const POST = withAuth(async (req: Request) => {
         displayOrder: body.displayOrder || 0,
       },
     });
-    const { revalidateTag, revalidatePath } = await import('next/cache');
     revalidateTag('projects');
     revalidatePath('/projects');
     revalidatePath('/');
     revalidatePath('/dashboard/projects');
-    revalidatePath('/', 'layout');
 
     return NextResponse.json(project);
   } catch (error: any) {
@@ -124,12 +119,10 @@ export const PUT = withAuth(async (req: Request) => {
       },
     });
 
-    const { revalidateTag, revalidatePath } = await import('next/cache');
     revalidateTag('projects');
     revalidatePath('/projects');
     revalidatePath('/');
     revalidatePath('/dashboard/projects');
-    revalidatePath('/', 'layout');
 
     return NextResponse.json(project);
   } catch (error: any) {
@@ -147,12 +140,10 @@ export const DELETE = withAuth(async (req: Request) => {
 
     await prisma.project.delete({ where: { id } });
 
-    const { revalidateTag, revalidatePath } = await import('next/cache');
     revalidateTag('projects');
     revalidatePath('/projects');
     revalidatePath('/');
     revalidatePath('/dashboard/projects');
-    revalidatePath('/', 'layout');
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

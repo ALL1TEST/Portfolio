@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -31,8 +31,13 @@ export function Navbar() {
   if (profile?.instagramUrl) socialLinks.push({ href: profile.instagramUrl, label: 'Instagram', icon: Instagram });
   if (profile?.twitterUrl) socialLinks.push({ href: profile.twitterUrl, label: 'Twitter', icon: TwitterX });
 
+  const isScrolledRef = useRef(false);
   const handleScroll = useCallback(() => {
-    setIsScrolled(window.scrollY > 50);
+    const next = window.scrollY > 50;
+    if (next !== isScrolledRef.current) {
+      isScrolledRef.current = next;
+      setIsScrolled(next);
+    }
   }, []);
 
   // Lock body scroll when mobile menu is open

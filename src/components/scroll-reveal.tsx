@@ -24,10 +24,10 @@ export function ScrollReveal({
   const isInView = useInView(ref, { once, margin: '-20px' });
 
   const directionMap = {
-    up: { y: 40, x: 0 },
-    down: { y: -40, x: 0 },
-    left: { x: 40, y: 0 },
-    right: { x: -40, y: 0 },
+    up: { y: 24, x: 0 },
+    down: { y: -24, x: 0 },
+    left: { x: 24, y: 0 },
+    right: { x: -24, y: 0 },
     none: { x: 0, y: 0 },
   };
 
@@ -43,7 +43,7 @@ export function ScrollReveal({
         delay,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className={className}
+      className={`transform-gpu ${className}`}
     >
       {children}
     </motion.div>

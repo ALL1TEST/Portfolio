@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { motion, useAnimate, type Transition } from 'framer-motion';
+import { useCallback, useState } from 'react';
 
 /* ── helpers ─────────────────────────────────────────────── */
 
@@ -28,12 +27,6 @@ const wavePath = (period: number, amp: number, invert = false): string => {
 const BACK_PATH = wavePath(200, 9, true);
 const FRONT_PATH = wavePath(100, 10);
 
-const DEFAULT_TRANSITION: Transition = {
-  type: 'spring',
-  stiffness: 800,
-  damping: 60,
-  mass: 1,
-};
 
 /* ── types ──────────────────────────────────────────────── */
 
@@ -102,126 +95,27 @@ export function SlideFillButton({
     iconHoverColor,
   } = preset;
 
-  const [scope, animate] = useAnimate();
-  const waterRef = useRef<HTMLDivElement | null>(null);
-  const labelRef = useRef<HTMLSpanElement | null>(null);
-  const iconRef = useRef<HTMLSpanElement | null>(null);
-  const backRef = useRef<SVGSVGElement | null>(null);
-  const frontRef = useRef<SVGSVGElement | null>(null);
-  const loopsRef = useRef<unknown[]>([]);
-
-  const hovered = useRef(false);
-  const focused = useRef(false);
-  const filled = useRef(false);
-  const [box, setBox] = useState({ w: 0, h: 0 });
-
-  /* ── track button size ── */
-  useEffect(() => {
-    const el = scope.current as HTMLElement | null;
-    if (!el) return;
-    const read = () =>
-      setBox((prev) =>
-        prev.w === el.clientWidth && prev.h === el.clientHeight
-          ? prev
-          : { w: el.clientWidth, h: el.clientHeight }
-      );
-    read();
-    const ro = new ResizeObserver(read);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [scope]);
-
-  /* ── continuous wave loop ── */
-  useEffect(() => {
-    const specs: Array<[SVGSVGElement | null, number, string[]]> = [
-      [backRef.current, 0.81, ['0%', '-50%']],
-      [frontRef.current, 0.6, ['-50%', '0%']],
-    ];
-    const controls = specs
-      .map(([el, duration, keys]) =>
-        el
-          ? animate(el, { x: keys }, { duration, repeat: Infinity, ease: 'linear' })
-          : null
-      )
-      .filter(Boolean);
-    loopsRef.current = controls;
-    return () => {
-      controls.forEach((c: any) => c?.stop());
-      loopsRef.current = [];
-    };
-  }, [animate]);
+  const [isHovered, setIsHovered] = useState(false);
 
   const restOffset = getOffset(0);
   const fullOffset = getOffset(100);
 
-  /* ── fill / drain ── */
-  const resetToEmpty = useCallback(() => {
-    filled.current = false;
-    if (waterRef.current) {
-      animate(waterRef.current, { x: restOffset.x, y: restOffset.y }, { duration: 0 });
-    }
-    if (labelRef.current) animate(labelRef.current, { color: textColor }, { duration: 0 });
-    if (iconRef.current) animate(iconRef.current, { color: iconColor }, { duration: 0 });
-  }, [animate, restOffset.x, restOffset.y, textColor, iconColor]);
-
-  const runFill = useCallback(() => {
-    if (waterRef.current) {
-      animate(waterRef.current, { x: fullOffset.x, y: fullOffset.y }, DEFAULT_TRANSITION);
-    }
-    if (labelRef.current) animate(labelRef.current, { color: waterTextColor }, DEFAULT_TRANSITION);
-    if (iconRef.current) animate(iconRef.current, { color: iconHoverColor }, DEFAULT_TRANSITION);
-  }, [animate, fullOffset.x, fullOffset.y, waterTextColor, iconHoverColor]);
-
-  const runDrain = useCallback(() => {
-    if (waterRef.current) {
-      animate(waterRef.current, { x: restOffset.x, y: restOffset.y }, DEFAULT_TRANSITION);
-    }
-    if (labelRef.current) animate(labelRef.current, { color: textColor }, DEFAULT_TRANSITION);
-    if (iconRef.current) animate(iconRef.current, { color: iconColor }, DEFAULT_TRANSITION);
-  }, [animate, restOffset.x, restOffset.y, textColor, iconColor]);
-
-  /* sync fill state ─ */
-  useEffect(() => {
-    if (hovered.current || focused.current) runFill();
-    else resetToEmpty();
-  }, [resetToEmpty, runFill]);
-
-  const sync = useCallback(() => {
-    const want = hovered.current || focused.current;
-    if (want === filled.current) return;
-    filled.current = want;
-    if (want) { runFill(); } else { runDrain(); }
-  }, [runFill, runDrain]);
-
   const onPointerEnter = useCallback(() => {
-    if (disabled) return;
-    hovered.current = true;
-    sync();
-  }, [sync, disabled]);
+    if (!disabled) setIsHovered(true);
+  }, [disabled]);
 
   const onPointerLeave = useCallback(() => {
-    hovered.current = false;
-    sync();
-  }, [sync]);
+    setIsHovered(false);
+  }, []);
 
-  const onFocus = useCallback(
-    (e: React.FocusEvent<HTMLElement>) => {
-      if (disabled) return;
-      let visible = true;
-      try { visible = e.currentTarget.matches(':focus-visible'); } catch { /* fallback */ }
-      if (!visible) return;
-      focused.current = true;
-      sync();
-    },
-    [sync, disabled]
-  );
+  const onFocus = useCallback(() => {
+    if (!disabled) setIsHovered(true);
+  }, [disabled]);
 
   const onBlur = useCallback(() => {
-    focused.current = false;
-    sync();
-  }, [sync]);
+    setIsHovered(false);
+  }, []);
 
-  /* ── crest positioning ── */
   const CREST = 16;
   const AHEAD = 15;
   const crestFrame: React.CSSProperties = {
@@ -240,8 +134,7 @@ export function SlideFillButton({
   };
 
   return (
-    <motion.button
-      ref={scope}
+    <button
       type={type}
       disabled={disabled}
       onClick={onClick}
@@ -262,7 +155,7 @@ export function SlideFillButton({
         borderRadius: 9999,
         border: 'none',
         background: fill,
-        color: textColor,
+        color: isHovered ? waterTextColor : textColor,
         fontFamily: 'inherit',
         fontSize: 15,
         fontWeight: 600,
@@ -272,13 +165,12 @@ export function SlideFillButton({
         textDecoration: 'none',
         WebkitTapHighlightColor: 'transparent',
         opacity: disabled ? 0.5 : 1,
-        transition: 'transform 0.35s ease, opacity 0.35s ease',
+        transition: 'transform 0.35s ease, opacity 0.35s ease, color 0.35s ease',
         ...style,
       }}
     >
       {/* ── Water fill layer ── */}
-      <motion.div
-        ref={waterRef}
+      <div
         aria-hidden="true"
         style={{
           position: 'absolute',
@@ -286,8 +178,8 @@ export function SlideFillButton({
           background: waterColor,
           pointerEvents: 'none',
           zIndex: 1,
-          x: restOffset.x,
-          y: restOffset.y,
+          transform: isHovered ? `translate3d(${fullOffset.x}, ${fullOffset.y}, 0)` : `translate3d(${restOffset.x}, ${restOffset.y}, 0)`,
+          transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
         }}
       >
         {/* Wave crest container */}
@@ -300,25 +192,25 @@ export function SlideFillButton({
           }}
         >
           <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 100%' }}>
-            {/* Back wave (slower, subtle) */}
-            <motion.svg
-              ref={backRef}
+            {/* Back wave (CSS animated) */}
+            <svg
               viewBox="0 0 400 30"
               preserveAspectRatio="none"
+              className="animate-wave-back"
               style={{ ...layerStyle, opacity: 0.45 }}
             >
               <path d={BACK_PATH} fill={waterColor} />
-            </motion.svg>
+            </svg>
 
-            {/* Front wave (faster, prominent) */}
-            <motion.svg
-              ref={frontRef}
+            {/* Front wave (CSS animated) */}
+            <svg
               viewBox="0 0 400 30"
               preserveAspectRatio="none"
+              className="animate-wave-front"
               style={layerStyle}
             >
               <path d={FRONT_PATH} fill={waterColor} />
-            </motion.svg>
+            </svg>
 
             {/* Solid fill below the wave edge */}
             <div
@@ -333,40 +225,40 @@ export function SlideFillButton({
             />
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* ── Arrow icon ── */}
-      <motion.span
-        ref={iconRef}
+      <span
         aria-hidden="true"
         style={{
           position: 'relative',
           zIndex: 2,
           fontSize: 18,
           lineHeight: 1,
-          color: iconColor,
+          color: isHovered ? iconHoverColor : iconColor,
           flex: 'none',
           pointerEvents: 'none',
           display: 'inline-flex',
           alignItems: 'center',
+          transition: 'color 0.35s ease',
         }}
       >
         →
-      </motion.span>
+      </span>
 
       {/* ── Label text ── */}
-      <motion.span
-        ref={labelRef}
+      <span
         style={{
           position: 'relative',
           zIndex: 2,
-          color: textColor,
+          color: isHovered ? waterTextColor : textColor,
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
+          transition: 'color 0.35s ease',
         }}
       >
         {label}
-      </motion.span>
-    </motion.button>
+      </span>
+    </button>
   );
 }

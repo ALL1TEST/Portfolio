@@ -138,6 +138,22 @@
   background-clip: text;
 }
 
+/* GPU Accelerated Wave Animation */
+@keyframes wave-slide-back {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes wave-slide-front {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+.animate-wave-back {
+  animation: wave-slide-back 0.81s linear infinite;
+}
+.animate-wave-front {
+  animation: wave-slide-front 0.6s linear infinite;
+}
+
 /* Animated gradient border */
 @property --angle {
   syntax: '<angle>';

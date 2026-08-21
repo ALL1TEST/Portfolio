@@ -1,6 +1,7 @@
 import { publicRoute, withAuth } from '@/lib/api-helpers';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { revalidateTag, revalidatePath } from '@/lib/revalidate';
 
 export const GET = publicRoute(async () => {
   const data = await prisma.experience.findMany({ orderBy: { displayOrder: 'asc' } });
@@ -20,7 +21,6 @@ export const POST = withAuth(async (req: Request) => {
   const res = await prisma.experience.create({
     data: { ...body, technologies: normalizeTechnologies(body.technologies) },
   });
-  const { revalidateTag, revalidatePath } = await import('next/cache');
   revalidateTag('resume');
   revalidatePath('/resume');
   revalidatePath('/dashboard/resume');
@@ -37,7 +37,6 @@ export const PUT = withAuth(async (req: Request) => {
         prisma.experience.update({ where: { id: item.id }, data: { displayOrder: item.displayOrder } })
       )
     );
-    const { revalidateTag, revalidatePath } = await import('next/cache');
     revalidateTag('resume');
     revalidatePath('/resume');
     revalidatePath('/dashboard/resume');
@@ -49,7 +48,6 @@ export const PUT = withAuth(async (req: Request) => {
     where: { id: body.id },
     data: { ...body, technologies: normalizeTechnologies(body.technologies) },
   });
-  const { revalidateTag, revalidatePath } = await import('next/cache');
   revalidateTag('resume');
   revalidatePath('/resume');
   revalidatePath('/dashboard/resume');
@@ -61,7 +59,6 @@ export const DELETE = withAuth(async (req: Request) => {
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
   await prisma.experience.delete({ where: { id } });
-  const { revalidateTag, revalidatePath } = await import('next/cache');
   revalidateTag('resume');
   revalidatePath('/resume');
   revalidatePath('/dashboard/resume');
