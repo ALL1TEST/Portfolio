@@ -205,7 +205,13 @@ function OriginkitBaseDigitalRain(props: DigitalRainProps) {
                 raf = 0
                 return
             }
-            const dt = last ? Math.min((time - last) / 1000, 0.05) : 1 / 60
+            const isMobile = (typeof window !== "undefined" ? window.innerWidth : 360) < 768
+            const elapsed = last ? (time - last) / 1000 : 1 / 60
+            if (isMobile && elapsed < 0.032) {
+                raf = requestAnimationFrame(loop)
+                return
+            }
+            const dt = Math.min(elapsed, 0.05)
             last = time
             draw(dt)
             raf = requestAnimationFrame(loop)

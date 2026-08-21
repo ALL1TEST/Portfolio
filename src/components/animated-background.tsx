@@ -40,6 +40,7 @@ export function AnimatedBackground() {
   }, []);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) return;
     prefersReducedMotion.current = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
