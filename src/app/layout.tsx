@@ -70,14 +70,13 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: "/manifest.json",
     icons: {
       icon: [
+        { url: "/favicon.ico", sizes: "any" },
         { url: "/logo.png", type: "image/png" },
         { url: "/logo.svg", type: "image/svg+xml" },
-        { url: "/favicon.ico", sizes: "any" },
       ],
-      shortcut: ["/logo.png"],
+      shortcut: ["/favicon.ico"],
       apple: [
         { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-        { url: "/logo.png", type: "image/png" },
       ],
     },
     openGraph: {
