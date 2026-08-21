@@ -449,6 +449,9 @@ export default function SettingsPage() {
         setProfile(data);
         setOriginal(data);
         setPendingFiles({});
+        if (data?.logoUrl && typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('logo-updated', { detail: { logoUrl: data.logoUrl } }));
+        }
         console.log(`[PROFILE_SAVE][REQUEST_ID: ${reqId}] Request successful and frontend state updated`);
         toast.success('Profile saved successfully');
       } else { 

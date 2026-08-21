@@ -84,6 +84,20 @@ function NavContent({
       }
     };
     fetchProfile();
+
+    const handleLogoUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ logoUrl?: string }>;
+      if (customEvent.detail?.logoUrl) {
+        setProfile((prev) => ({ ...prev, logoUrl: customEvent.detail?.logoUrl }));
+      } else {
+        fetchProfile();
+      }
+    };
+
+    window.addEventListener('logo-updated', handleLogoUpdate);
+    return () => {
+      window.removeEventListener('logo-updated', handleLogoUpdate);
+    };
   }, [pathname]);
 
   const handleNav = useCallback(

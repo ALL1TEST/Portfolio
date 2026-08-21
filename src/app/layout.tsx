@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { getProfile } from "@/lib/data-fetching";
 import { generateRootJsonLd } from "@/lib/json-ld";
+import { DynamicFaviconSync } from "@/components/dynamic-favicon-sync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = "https://www.codevirtox.dev";
   const fullName = profile?.fullName ?? "Abdellah Ait-Si";
   const brandName = profile?.brandName ?? "CodeVirtox";
-  const logoUrl = profile?.logoUrl || `${baseUrl}/logo.png`;
+  const version = profile?.updatedAt ? new Date(profile.updatedAt).getTime() : Date.now();
+  const rawLogo = profile?.logoUrl || `${baseUrl}/logo.png`;
+  const logoUrl = rawLogo.includes("?") ? rawLogo : `${rawLogo}?v=${version}`;
   const defaultTitle = `${brandName} | ${fullName} - Full Stack Developer Portfolio`;
   const description =
     profile?.shortBio ??
@@ -154,6 +157,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-dark text-white noise-bg`}
       >
+        <DynamicFaviconSync initialLogoUrl={profile?.logoUrl} />
         {children}
         <Toaster theme="dark" position="top-right" richColors />
       </body>

@@ -8,9 +8,13 @@ export function revalidateTag(tag: string) {
   }
 }
 
-export function revalidatePath(path: string) {
+export function revalidatePath(path: string, type?: 'page' | 'layout') {
   try {
-    nextRevalidatePath(path);
+    if (type) {
+      nextRevalidatePath(path, type);
+    } else {
+      nextRevalidatePath(path);
+    }
   } catch (error) {
     console.error(`Failed to revalidate path ${path}:`, error);
   }
