@@ -192,7 +192,8 @@ export default function MessagesPage() {
                 {messages.map((msg) => (
                   <TableRow
                     key={msg.id}
-                    className={`border-stroke hover:bg-dark/50 transition-colors ${!msg.read ? 'bg-brand/[0.03]' : ''}`}
+                    onClick={() => viewMessage(msg)}
+                    className={`border-stroke hover:bg-dark/60 transition-colors cursor-pointer ${!msg.read ? 'bg-brand/[0.04]' : ''}`}
                   >
                     <TableCell>
                       <div
@@ -217,7 +218,7 @@ export default function MessagesPage() {
                     <TableCell className="text-sm text-muted-text hidden lg:table-cell whitespace-nowrap">
                       {format(new Date(msg.createdAt), 'MMM d, yyyy HH:mm')}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -231,7 +232,7 @@ export default function MessagesPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                           align="end"
-                          className="w-44 bg-surface border-stroke text-white shadow-2xl shadow-black/60 rounded-xl p-1"
+                          className="w-40 bg-surface border-stroke text-white shadow-2xl shadow-black/60 rounded-xl p-1"
                         >
                           <DropdownMenuItem
                             onClick={() => viewMessage(msg)}
@@ -239,22 +240,6 @@ export default function MessagesPage() {
                           >
                             <Eye className="w-3.5 h-3.5 text-muted-text" />
                             <span>View Message</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => toggleReadStatus(msg)}
-                            className="cursor-pointer text-xs flex items-center gap-2 text-white/90 hover:text-white hover:bg-dark focus:bg-dark focus:text-white rounded-lg px-2.5 py-2"
-                          >
-                            {msg.read ? (
-                              <>
-                                <Mail className="w-3.5 h-3.5 text-muted-text" />
-                                <span>Mark as Unread</span>
-                              </>
-                            ) : (
-                              <>
-                                <Check className="w-3.5 h-3.5 text-brand" />
-                                <span>Mark as Read</span>
-                              </>
-                            )}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-stroke my-1" />
                           <DropdownMenuItem

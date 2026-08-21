@@ -32,15 +32,9 @@ export async function Hero() {
       <div className="absolute inset-0 grid-bg opacity-30" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-semibold tracking-widest uppercase text-brand bg-brand/10 rounded-full border border-brand/20 mb-2">
-          <span>{profile?.brandName ?? 'CodeVirtox'}</span>
-          <span>&bull;</span>
-          <span className="text-white/80">Developer Portfolio</span>
-        </div>
-
         <h1
           aria-label={`${fullName} - ${profile?.brandName ?? 'CodeVirtox'} Full Stack Developer`}
-          className="mt-4 text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none"
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none"
         >
           <span>{firstName}</span>
           <br />
