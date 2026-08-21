@@ -150,21 +150,23 @@ export function AnimatedBackground() {
         ctx.fillStyle = `rgba(154, 154, 154, ${p.opacity * 0.6})`;
         ctx.fill();
 
-        // Draw connections with squared distance optimization
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const cdx = p.x - p2.x;
-          const cdy = p.y - p2.y;
-          const cdistSq = cdx * cdx + cdy * cdy;
+        // Draw connections with squared distance optimization (desktop only)
+        if (w >= 768) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const cdx = p.x - p2.x;
+            const cdy = p.y - p2.y;
+            const cdistSq = cdx * cdx + cdy * cdy;
 
-          if (cdistSq < connDistSq) {
-            const opacity = (1 - Math.sqrt(cdistSq) / connectionDistance) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(53, 53, 53, ${opacity})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+            if (cdistSq < connDistSq) {
+              const opacity = (1 - Math.sqrt(cdistSq) / connectionDistance) * 0.15;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(53, 53, 53, ${opacity})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
           }
         }
       }
