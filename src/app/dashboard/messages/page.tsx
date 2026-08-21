@@ -4,17 +4,15 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { Eye, Check, Trash2, Mail, MailOpen, MoreVertical } from 'lucide-react';
+import { Trash2, Mail, MailOpen, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -96,27 +94,6 @@ export default function MessagesPage() {
       } catch {
         // Silently fail
       }
-    }
-  };
-
-  const toggleReadStatus = async (msg: ContactMessage) => {
-    const nextReadState = !msg.read;
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: msg.id, read: nextReadState }),
-      });
-      if (res.ok) {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === msg.id ? { ...m, read: nextReadState } : m))
-        );
-        toast.success(nextReadState ? 'Marked as read' : 'Marked as unread');
-      } else {
-        toast.error('Failed to update status');
-      }
-    } catch {
-      toast.error('Failed to update status');
     }
   };
 
@@ -232,25 +209,17 @@ export default function MessagesPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                           align="end"
-                          className="w-40 bg-surface border-stroke text-white shadow-2xl shadow-black/60 rounded-xl p-1"
+                          className="w-36 bg-surface border-stroke text-white shadow-2xl shadow-black/60 rounded-xl p-1"
                         >
-                          <DropdownMenuItem
-                            onClick={() => viewMessage(msg)}
-                            className="cursor-pointer text-xs flex items-center gap-2 text-white/90 hover:text-white hover:bg-dark focus:bg-dark focus:text-white rounded-lg px-2.5 py-2"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-muted-text" />
-                            <span>View Message</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator className="bg-stroke my-1" />
                           <DropdownMenuItem
                             onClick={() => {
                               setDeleteId(msg.id);
                               setDeleteOpen(true);
                             }}
-                            className="cursor-pointer text-xs flex items-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-300 rounded-lg px-2.5 py-2"
+                            className="cursor-pointer text-xs flex items-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-300 rounded-lg px-2.5 py-2 font-medium"
                           >
                             <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                            <span>Delete Message</span>
+                            <span>Delete</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

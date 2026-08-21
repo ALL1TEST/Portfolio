@@ -118,14 +118,16 @@ function OriginkitBaseDigitalRain(props: DigitalRainProps) {
         }
 
         function layout() {
-            const dpr = Math.min(1.5, window.devicePixelRatio || 1)
+            const isMobile = (typeof window !== "undefined" ? window.innerWidth : 360) < 768
+            const dpr = isMobile ? 1 : Math.min(1.5, window.devicePixelRatio || 1)
             w = wrap.clientWidth || 360
             h = wrap.clientHeight || 320
             canvas.width = Math.round(w * dpr)
             canvas.height = Math.round(h * dpr)
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
             span = Math.hypot(w, h)
-            cols = Math.max(1, Math.ceil(span / gap))
+            const effectiveGap = isMobile ? gap * 1.6 : gap
+            cols = Math.max(1, Math.ceil(span / effectiveGap))
             columns = Array.from({ length: cols }, () => ({
                 streams: [spawn(Math.random() * span)],
                 releaseAt: nextRelease(),

@@ -22,7 +22,7 @@ export function AnimatedBackground() {
   const initParticles = useCallback((width: number, height: number) => {
     const isMobile = width < 768;
     const count = isMobile
-      ? Math.min(Math.floor((width * height) / 30000), 22)
+      ? Math.min(Math.floor((width * height) / 45000), 12)
       : Math.min(Math.floor((width * height) / 18000), 55);
     const particles: Particle[] = [];
     for (let i = 0; i < count; i++) {
@@ -52,7 +52,8 @@ export function AnimatedBackground() {
     if (!ctx) return;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const isMobile = window.innerWidth < 768;
+      const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = Math.round(window.innerWidth * dpr);
       canvas.height = Math.round(window.innerHeight * dpr);
       canvas.style.width = `${window.innerWidth}px`;
