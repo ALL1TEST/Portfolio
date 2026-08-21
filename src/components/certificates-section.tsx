@@ -54,7 +54,7 @@ function CertificateCard({ cert, index }: { cert: Certificate; index: number }) 
       {hasImage ? (
         <Image
           src={cert.certificateImage}
-          alt={cert.title}
+          alt={`${cert.title} Certificate - Issued to Abdellah Ait-Si (${cert.issuer || 'CodeVirtox'})`}
           fill
           sizes="(max-width: 640px) 100vw, 50vw"
           className="certificate-card-image"
@@ -141,7 +141,7 @@ export function CertificatesSection() {
           {profile?.certificatesPageTitle && (
           <FocusReveal
             text={profile.certificatesPageTitle}
-            as="h2"
+            as="h1"
             className={CERT_TITLE_CLASSES}
             blur={20}
             staggerFrom="start"

@@ -4,12 +4,19 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { Eye, Check, Trash2, Mail, MailOpen } from 'lucide-react';
+import { Eye, Check, Trash2, Mail, MailOpen, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -92,19 +99,24 @@ export default function MessagesPage() {
     }
   };
 
-  const markAsRead = async (msg: ContactMessage) => {
+  const toggleReadStatus = async (msg: ContactMessage) => {
+    const nextReadState = !msg.read;
     try {
-      await fetch('/api/contact', {
+      const res = await fetch('/api/contact', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: msg.id, read: true }),
+        body: JSON.stringify({ id: msg.id, read: nextReadState }),
       });
-      setMessages((prev) =>
-        prev.map((m) => (m.id === msg.id ? { ...m, read: true } : m))
-      );
-      toast.success('Marked as read');
+      if (res.ok) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === msg.id ? { ...m, read: nextReadState } : m))
+        );
+        toast.success(nextReadState ? 'Marked as read' : 'Marked as unread');
+      } else {
+        toast.error('Failed to update status');
+      }
     } catch {
-      toast.error('Failed to update');
+      toast.error('Failed to update status');
     }
   };
 
@@ -168,26 +180,29 @@ export default function MessagesPage() {
             <Table>
               <TableHeader>
                 <TableRow className="border-stroke hover:bg-transparent">
-                  <TableHead className="text-muted-text font-medium">Status</TableHead>
+                  <TableHead className="w-12 text-muted-text font-medium">Status</TableHead>
                   <TableHead className="text-muted-text font-medium">From</TableHead>
                   <TableHead className="text-muted-text font-medium hidden sm:table-cell">Subject</TableHead>
                   <TableHead className="text-muted-text font-medium hidden md:table-cell">Preview</TableHead>
                   <TableHead className="text-muted-text font-medium hidden lg:table-cell">Date</TableHead>
-                  <TableHead className="text-muted-text font-medium text-right">Actions</TableHead>
+                  <TableHead className="w-16 text-muted-text font-medium text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {messages.map((msg) => (
                   <TableRow
                     key={msg.id}
-                    className={`border-stroke hover:bg-dark/50 ${!msg.read ? 'bg-brand/[0.03]' : ''}`}
+                    className={`border-stroke hover:bg-dark/50 transition-colors ${!msg.read ? 'bg-brand/[0.03]' : ''}`}
                   >
                     <TableCell>
-                      <div className={`w-2 h-2 rounded-full ${!msg.read ? 'bg-brand' : 'bg-stroke'}`} />
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full transition-colors ${!msg.read ? 'bg-brand shadow-sm shadow-brand/40' : 'bg-stroke'}`}
+                        title={msg.read ? 'Read' : 'Unread'}
+                      />
                     </TableCell>
                     <TableCell>
                       <div className="min-w-0">
-                        <p className={`text-sm truncate ${!msg.read ? 'font-semibold text-white' : 'text-white'}`}>
+                        <p className={`text-sm truncate ${!msg.read ? 'font-semibold text-white' : 'text-white/80'}`}>
                           {msg.name}
                         </p>
                         <p className="text-xs text-muted-text truncate">{msg.email}</p>
@@ -203,34 +218,57 @@ export default function MessagesPage() {
                       {format(new Date(msg.createdAt), 'MMM d, yyyy HH:mm')}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-text hover:text-white hover:bg-surface"
-                          onClick={() => viewMessage(msg)}
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </Button>
-                        {!msg.read && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-muted-text hover:text-brand hover:bg-surface"
-                            onClick={() => markAsRead(msg)}
+                            className="h-8 w-8 text-muted-text hover:text-white hover:bg-dark/80 focus-visible:ring-1 focus-visible:ring-brand data-[state=open]:bg-dark data-[state=open]:text-white transition-colors"
+                            aria-label="Message options"
                           >
-                            <Check className="w-3.5 h-3.5" />
+                            <MoreVertical className="w-4 h-4" />
                           </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-text hover:text-red-500 hover:bg-surface"
-                          onClick={() => { setDeleteId(msg.id); setDeleteOpen(true); }}
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-44 bg-surface border-stroke text-white shadow-2xl shadow-black/60 rounded-xl p-1"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
+                          <DropdownMenuItem
+                            onClick={() => viewMessage(msg)}
+                            className="cursor-pointer text-xs flex items-center gap-2 text-white/90 hover:text-white hover:bg-dark focus:bg-dark focus:text-white rounded-lg px-2.5 py-2"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-muted-text" />
+                            <span>View Message</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => toggleReadStatus(msg)}
+                            className="cursor-pointer text-xs flex items-center gap-2 text-white/90 hover:text-white hover:bg-dark focus:bg-dark focus:text-white rounded-lg px-2.5 py-2"
+                          >
+                            {msg.read ? (
+                              <>
+                                <Mail className="w-3.5 h-3.5 text-muted-text" />
+                                <span>Mark as Unread</span>
+                              </>
+                            ) : (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-brand" />
+                                <span>Mark as Read</span>
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-stroke my-1" />
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDeleteId(msg.id);
+                              setDeleteOpen(true);
+                            }}
+                            className="cursor-pointer text-xs flex items-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-300 rounded-lg px-2.5 py-2"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                            <span>Delete Message</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -242,19 +280,42 @@ export default function MessagesPage() {
 
       {/* View Message Dialog */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
-        <DialogContent className="bg-surface border-stroke max-w-lg">
+        <DialogContent className="bg-surface border-stroke sm:max-w-xl md:max-w-2xl w-[calc(100%-2rem)] max-h-[85vh] flex flex-col p-0 overflow-hidden gap-0 rounded-2xl shadow-2xl shadow-black/70">
           {viewingMessage && (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-white">{viewingMessage.subject}</DialogTitle>
-                <DialogDescription className="text-muted-text">
-                  from {viewingMessage.name} ({viewingMessage.email}) &middot;{' '}
-                  {format(new Date(viewingMessage.createdAt), 'MMMM d, yyyy \'at\' HH:mm')}
-                </DialogDescription>
-              </DialogHeader>
-              <Separator className="bg-stroke" />
-              <div className="max-h-96 overflow-y-auto">
-                <p className="text-sm text-white whitespace-pre-wrap leading-relaxed">
+              {/* Header & Metadata (pinned) */}
+              <div className="p-6 pb-4 pr-12 border-b border-stroke flex flex-col gap-3 bg-surface/95 backdrop-blur-xs shrink-0">
+                <DialogHeader className="text-left space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-brand">
+                      Subject
+                    </span>
+                  </div>
+                  <DialogTitle className="text-base sm:text-lg font-bold text-white leading-snug break-words [overflow-wrap:anywhere]">
+                    {viewingMessage.subject}
+                  </DialogTitle>
+                  <DialogDescription asChild>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-xs text-muted-text pt-1">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="font-semibold text-white/90">From:</span>
+                        <span className="text-white/80 font-medium truncate">{viewingMessage.name}</span>
+                        <span className="text-muted-text truncate">({viewingMessage.email})</span>
+                      </div>
+                      <span className="hidden sm:inline text-stroke">&bull;</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="font-semibold text-white/90">Date:</span>
+                        <span>
+                          {format(new Date(viewingMessage.createdAt), "MMM d, yyyy 'at' HH:mm")}
+                        </span>
+                      </div>
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+
+              {/* Message Content (scrollable) */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[calc(85vh-140px)]">
+                <p className="text-sm text-white/90 whitespace-pre-wrap leading-relaxed break-words [overflow-wrap:anywhere] select-text">
                   {viewingMessage.message}
                 </p>
               </div>

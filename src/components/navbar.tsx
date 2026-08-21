@@ -143,7 +143,7 @@ export function Navbar() {
                 {(profile ? profile.logoUrl : '/logo.png') && (
                   <Image
                     src={profile ? profile.logoUrl : '/logo.png'}
-                    alt="Logo"
+                    alt={`${profile?.brandName ?? 'CodeVirtox'} - ${profile?.fullName ?? 'Abdellah Ait-Si'} Logo`}
                     width={48}
                     height={48}
                     className="object-contain h-10 w-auto lg:h-12"

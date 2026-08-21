@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
-import { AuthProvider } from "@/components/auth-provider";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { getProfile } from "@/lib/data-fetching";
+import { generateRootJsonLd } from "@/lib/json-ld";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,66 +16,112 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { getProfile, getAppSettings } from "@/lib/data-fetching";
-
 export async function generateMetadata(): Promise<Metadata> {
   let profile: Awaited<ReturnType<typeof getProfile>> = null;
-  let appSettings: Awaited<ReturnType<typeof getAppSettings>> = null;
   try {
     profile = await getProfile();
-    appSettings = await getAppSettings();
   } catch (error) {
     console.error("Failed to fetch profile for metadata:", error);
   }
 
-  const logoUrl = profile ? (profile.logoUrl || undefined) : "/logo.png";
-  const fullName = profile?.fullName ?? 'Abdellah Ait-Si';
-  const brandName = profile?.brandName ?? 'CodeVirtox';
-  const title = profile?.brandName ? `${fullName} | ${brandName}` : "Abdellah Ait-Si | Full Stack Developer & AI Automation";
-  const description = profile?.shortBio ?? "Full Stack Developer specializing in React, Laravel, modern web applications, AI tools, and workflow automation.";
+  const baseUrl = "https://www.codevirtox.dev";
+  const fullName = profile?.fullName ?? "Abdellah Ait-Si";
+  const brandName = profile?.brandName ?? "CodeVirtox";
+  const logoUrl = profile?.logoUrl || `${baseUrl}/logo.png`;
+  const defaultTitle = `${brandName} | ${fullName} - Full Stack Developer Portfolio`;
+  const description =
+    profile?.shortBio ??
+    "CodeVirtox is the personal developer portfolio and professional brand of Abdellah Ait-Si, a Full Stack Developer specializing in React, Next.js, Laravel, scalable web applications, and AI workflow automation.";
 
   return {
-    title,
+    metadataBase: new URL(baseUrl),
+    title: {
+      default: defaultTitle,
+      template: `%s | ${brandName}`,
+    },
     description,
     keywords: [
-      "Abdellah Ait-Si",
       "CodeVirtox",
+      "Codevirtox",
+      "CodeVirtox Portfolio",
+      "CodeVirtox Developer Portfolio",
+      "Abdellah Ait-Si",
+      "Abdellah Ait SI",
+      "Abdellah Ait-Si developer",
+      "Abdellah Ait-Si Full Stack Developer",
+      "Abdellah Ait-Si CodeVirtox",
       "Full Stack Developer",
-      "React",
-      "Laravel",
-      "Next.js",
-      "AI Automation",
-      "Web Developer",
-      "Morocco",
+      "React Developer",
+      "Next.js Developer",
+      "Laravel Developer",
+      "AI Automation Developer",
+      "Web Developer Morocco",
+      "Software Engineer Morocco",
     ],
-    authors: [{ name: fullName }],
-    ...(logoUrl && { icons: { icon: logoUrl } }),
+    authors: [{ name: fullName, url: baseUrl }],
+    creator: fullName,
+    publisher: brandName,
+    alternates: {
+      canonical: baseUrl,
+    },
+    icons: {
+      icon: [
+        { url: "/logo.png", type: "image/png" },
+        { url: "/logo.svg", type: "image/svg+xml" },
+      ],
+      apple: [{ url: "/logo.png" }],
+    },
     openGraph: {
-      title,
+      title: defaultTitle,
       description,
+      url: baseUrl,
       siteName: brandName,
       type: "website",
       locale: "en_US",
-      ...(logoUrl && { images: [logoUrl] }),
+      images: [
+        {
+          url: logoUrl,
+          width: 1200,
+          height: 630,
+          alt: `${brandName} - ${fullName} Developer Portfolio`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: defaultTitle,
       description,
-      ...(logoUrl && { images: [logoUrl] }),
+      images: [logoUrl],
+      creator: "@CodeVirtox",
     },
     robots: {
       index: true,
       follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let profile: Awaited<ReturnType<typeof getProfile>> = null;
+  try {
+    profile = await getProfile();
+  } catch (error) {
+    // Silently continue with defaults
+  }
+
+  const jsonLd = generateRootJsonLd(profile);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -91,6 +138,10 @@ export default function RootLayout({
             gtag('config', 'G-E8NW4EHWKG');
           `}
         </Script>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-dark text-white noise-bg`}
@@ -101,3 +152,4 @@ export default function RootLayout({
     </html>
   );
 }
+

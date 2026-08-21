@@ -9,6 +9,7 @@ interface SectionHeadingProps {
   title: string;
   description?: string;
   align?: 'left' | 'center';
+  as?: 'h1' | 'h2' | 'h3';
 }
 
 const TITLE_CLASSES = 'text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight';
@@ -19,6 +20,7 @@ export function SectionHeading({
   title,
   description,
   align = 'center',
+  as = 'h2',
 }: SectionHeadingProps) {
   return (
     <div
@@ -33,7 +35,7 @@ export function SectionHeading({
       )}
       <FocusReveal
         text={title}
-        as="h2"
+        as={as}
         className={TITLE_CLASSES}
         blur={20}
         staggerFrom="start"
@@ -55,3 +57,4 @@ export function SectionHeading({
     </div>
   );
 }
+

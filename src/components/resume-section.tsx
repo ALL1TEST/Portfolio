@@ -72,7 +72,12 @@ export function ResumeSection() {
         {/* Resume Intro */}
         <div className="mb-20 text-center max-w-3xl mx-auto">
           <ScrollReveal>
-            <div className="skills-label mb-4">RESUME</div>
+            <span className="skills-label mb-4 inline-block">RESUME &amp; EXPERIENCE</span>
+          </ScrollReveal>
+          <ScrollReveal delay={0.05}>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+              Resume &amp; Technical Experience
+            </h1>
           </ScrollReveal>
           <ScrollReveal delay={0.1}>
             {profile?.resumeIntro ? (

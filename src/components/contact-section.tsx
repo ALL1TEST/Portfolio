@@ -76,6 +76,7 @@ export function ContactSection() {
               labelStyle="skills"
               title={profile?.contactPageTitle ?? "Let's Build Something Great Together."}
               description={profile?.contactPageDescription || undefined}
+              as="h1"
             />
           )}
         </div>

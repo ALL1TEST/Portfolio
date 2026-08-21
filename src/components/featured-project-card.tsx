@@ -35,7 +35,7 @@ export function FeaturedProjectCard({ project, index }: { project: Project; inde
           >
             <Image
               src={project.projectImage}
-              alt={project.title}
+              alt={`${project.title} - Project by Abdellah Ait-Si (CodeVirtox)`}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"

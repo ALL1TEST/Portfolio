@@ -56,7 +56,7 @@ export async function AboutPreview() {
                 {profile?.profileImage ? (
                   <Image
                     src={profile.profileImage}
-                    alt={profile?.fullName || 'Abdellah Ait-Si'}
+                    alt={`${profile?.fullName || 'Abdellah Ait-Si'} - Full Stack Web Developer (${profile?.brandName || 'CodeVirtox'})`}
                     fill
                     sizes="(max-width: 768px) 100vw, 448px"
                     className="object-cover"
@@ -77,7 +77,7 @@ export async function AboutPreview() {
             {/* Intro Label */}
             <ScrollReveal direction="right" delay={0.1}>
               <span className="inline-block text-xs font-semibold tracking-widest uppercase text-brand mb-3">
-                A bit about me
+                About {profile?.fullName ?? 'Abdellah Ait-Si'} &bull; {profile?.brandName ?? 'CodeVirtox'}
               </span>
             </ScrollReveal>
 
