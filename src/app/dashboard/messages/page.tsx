@@ -4,17 +4,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { Trash2, Mail, MailOpen, MoreVertical } from 'lucide-react';
+import { Trash2, Mail, MailOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -196,33 +190,19 @@ export default function MessagesPage() {
                       {format(new Date(msg.createdAt), 'MMM d, yyyy HH:mm')}
                     </TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-text hover:text-white hover:bg-dark/80 focus-visible:ring-1 focus-visible:ring-brand data-[state=open]:bg-dark data-[state=open]:text-white transition-colors"
-                            aria-label="Message options"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="w-36 bg-surface border-stroke text-white shadow-2xl shadow-black/60 rounded-xl p-1"
-                        >
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setDeleteId(msg.id);
-                              setDeleteOpen(true);
-                            }}
-                            className="cursor-pointer text-xs flex items-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-300 rounded-lg px-2.5 py-2 font-medium"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                            <span>Delete</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setDeleteId(msg.id);
+                          setDeleteOpen(true);
+                        }}
+                        className="h-8 w-8 text-muted-text hover:text-red-400 hover:bg-red-500/10 focus-visible:ring-1 focus-visible:ring-red-400 transition-colors rounded-lg"
+                        title="Delete Message"
+                        aria-label="Delete Message"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

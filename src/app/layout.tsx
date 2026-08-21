@@ -66,16 +66,17 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: baseUrl,
     },
+    manifest: "/manifest.json",
     icons: {
       icon: [
-        { url: "/favicon.ico", sizes: "any" },
-        { url: "/logo.png", type: "image/png" },
-        { url: "/logo.svg", type: "image/svg+xml" },
+        { url: "/favicon.ico?v=2", sizes: "any" },
+        { url: "/logo.png?v=2", type: "image/png" },
+        { url: "/logo.svg?v=2", type: "image/svg+xml" },
       ],
-      shortcut: ["/favicon.ico", "/logo.png"],
+      shortcut: ["/favicon.ico?v=2", "/logo.png?v=2"],
       apple: [
-        { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-        { url: "/logo.png", type: "image/png" },
+        { url: "/apple-touch-icon.png?v=2", sizes: "180x180", type: "image/png" },
+        { url: "/logo.png?v=2", type: "image/png" },
       ],
     },
     openGraph: {
@@ -132,6 +133,11 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
+        <link rel="icon" href="/logo.png?v=2" type="image/png" />
+        <link rel="icon" href="/logo.svg?v=2" type="image/svg+xml" />
+        <link rel="shortcut icon" href="/favicon.ico?v=2" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-E8NW4EHWKG"
           strategy="lazyOnload"

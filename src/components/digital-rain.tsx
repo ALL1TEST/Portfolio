@@ -1,5 +1,3 @@
-// ASCII Rain — Originkit
-// Originkit preset `custom-style` — props baked into the default export.
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";

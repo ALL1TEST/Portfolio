@@ -103,10 +103,11 @@ export function HeroGlow() {
     let maxParticles = window.innerWidth < 768 ? 14 : 30;
 
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const isMobile = window.innerWidth < 768;
+      dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
       w = window.innerWidth;
       h = window.innerHeight;
-      maxParticles = w < 768 ? 14 : 30;
+      maxParticles = isMobile ? 0 : 30;
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       canvas.style.width = `${w}px`;

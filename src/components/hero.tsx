@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { SlideFillButton } from '@/components/ui/slide-fill-button';
-import { HeroGlow } from './hero-glow';
-import DigitalRain from './digital-rain';
+import { HeroEffects } from './hero-effects';
 import { getProfile } from '@/lib/data-fetching';
 
 export async function Hero() {
@@ -17,18 +16,7 @@ export async function Hero() {
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      <HeroGlow />
-      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
-        <DigitalRain
-          headColor="rgba(255,57,0,0.45)"
-          trailColor="rgba(154,154,154,0.15)"
-          glyphSize={14}
-          speed={5}
-          density={30}
-          trail={18}
-          shuffle={true}
-        />
-      </div>
+      <HeroEffects />
       <div className="absolute inset-0 grid-bg opacity-30" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

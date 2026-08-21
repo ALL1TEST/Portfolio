@@ -16,8 +16,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  poweredByHeader: false,
   async headers() {
     return [
+      {
+        source: '/(logo.png|logo.svg|favicon.ico|apple-icon.png|icon.png)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
       {
         source: '/:path*',
         headers: [
@@ -56,6 +66,9 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-tooltip',
       '@radix-ui/react-tabs',
       '@radix-ui/react-switch',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-scroll-area',
+      '@radix-ui/react-select',
     ],
   },
 };

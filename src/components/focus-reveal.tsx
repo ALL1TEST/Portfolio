@@ -1,15 +1,4 @@
-// Focus Reveal — Originkit
-// Originkit preset `custom-style` — defaults rewritten to match preview.
 "use client";
-
-// Focus Reveal — Originkit (framer-motion)
-// Props set in the preview:
-//   text: "FOCUS REVEAL"
-//   blur: 20
-//   staggerFrom: "start"
-//
-// Typography: prefer `className` (Tailwind). Inline `font` / `color` are
-// optional overrides only — defaults must not fight utility classes.
 
 import {
   motion,
