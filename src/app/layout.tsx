@@ -136,6 +136,8 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-E8NW4EHWKG"
           strategy="lazyOnload"

@@ -103,10 +103,7 @@
     "typescript": "^5"
   },
   "browserslist": [
-    "Chrome >= 90",
-    "Edge >= 90",
-    "Safari >= 15",
-    "Firefox >= 90",
+    "defaults and fully supports es6-module",
     "not dead"
   ]
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Menu, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -13,11 +14,14 @@ interface HeaderProps {
 }
 
 export function DashboardHeader({ title, onMenuClick, userName }: HeaderProps) {
+  const router = useRouter();
+
   const handleLogout = async () => {
     try {
       await signOut({ redirect: false });
       toast.success('Logged out');
-      window.location.href = '/login';
+      router.push('/login');
+      router.refresh();
     } catch {
       toast.error('Failed to logout');
     }

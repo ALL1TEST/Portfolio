@@ -46,12 +46,12 @@ export async function FeaturedProjects() {
             {/* View All Projects CTA */}
             <ScrollReveal delay={0.3}>
               <div className="mt-12 lg:mt-16 text-center">
-                <Link href="/projects">
-                  <SlideFillButton
-                    label="View All Projects"
-                    variant="secondary"
-                  />
-                </Link>
+                <SlideFillButton
+                  href="/projects"
+                  label="View All Projects"
+                  ariaLabel="View All Projects - Explore full portfolio of Abdellah Ait-Si"
+                  variant="secondary"
+                />
               </div>
             </ScrollReveal>
           </>

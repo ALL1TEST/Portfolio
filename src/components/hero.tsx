@@ -47,19 +47,19 @@ export async function Hero() {
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/projects">
-            <SlideFillButton
-              label="View My Work"
-              variant="primary"
-            />
-          </Link>
+          <SlideFillButton
+            href="/projects"
+            label="View My Work"
+            ariaLabel="View My Work - Explore projects by Abdellah Ait-Si"
+            variant="primary"
+          />
 
-          <Link href="/contact">
-            <SlideFillButton
-              label="Contact Me"
-              variant="secondary"
-            />
-          </Link>
+          <SlideFillButton
+            href="/contact"
+            label="Contact Me"
+            ariaLabel="Contact Me - Get in touch with Abdellah Ait-Si"
+            variant="secondary"
+          />
         </div>
       </div>
     </section>

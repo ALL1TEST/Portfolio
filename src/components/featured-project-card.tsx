@@ -106,6 +106,7 @@ export function FeaturedProjectCard({ project, index }: { project: Project; inde
               href={project.liveDemoUrl || project.githubUrl || '#'}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`View ${project.title} project live demo or repository`}
               className="group/vp relative inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-brand rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-brand/25 hover:scale-105 active:scale-95"
             >
               <span className="absolute inset-0 bg-white/0 group-hover/vp:bg-white/10 transition-colors duration-300" />
@@ -117,6 +118,7 @@ export function FeaturedProjectCard({ project, index }: { project: Project; inde
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={`View source code for ${project.title} on GitHub`}
                 className="flex items-center gap-1.5 text-sm font-medium text-white/40 hover:text-white/70 transition-colors duration-300"
               >
                 <Github className="w-4 h-4" />

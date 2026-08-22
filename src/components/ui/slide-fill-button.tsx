@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import Link from 'next/link';
 
-/* ── helpers ─────────────────────────────────────────────── */
+/* -- helpers ------------------------------------------------ */
 
 const getOffset = (percent: number): { x: string; y: string } => {
   const clamped = Math.max(0, Math.min(100, percent));
@@ -27,13 +28,14 @@ const wavePath = (period: number, amp: number, invert = false): string => {
 const BACK_PATH = wavePath(200, 9, true);
 const FRONT_PATH = wavePath(100, 10);
 
-
-/* ── types ──────────────────────────────────────────────── */
+/* -- types -------------------------------------------------- */
 
 export type SlideFillVariant = 'primary' | 'secondary';
 
 type SlideFillButtonProps = {
   label: string;
+  href?: string;
+  ariaLabel?: string;
   variant?: SlideFillVariant;
   disabled?: boolean;
   onClick?: () => void;
@@ -43,7 +45,7 @@ type SlideFillButtonProps = {
   children?: React.ReactNode;
 };
 
-/* ── variant presets ─────────────────────────────────────── */
+/* -- variant presets ---------------------------------------- */
 
 const PRESETS: Record<
   SlideFillVariant,
@@ -74,10 +76,12 @@ const PRESETS: Record<
   },
 };
 
-/* ── component ──────────────────────────────────────────── */
+/* -- component ---------------------------------------------- */
 
 export function SlideFillButton({
   label,
+  href,
+  ariaLabel,
   variant = 'primary',
   disabled = false,
   onClick,
@@ -133,43 +137,35 @@ export function SlideFillButton({
     height: '100%',
   };
 
-  return (
-    <button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      onPointerEnter={onPointerEnter}
-      onPointerLeave={onPointerLeave}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      className={className}
-      style={{
-        position: 'relative',
-        overflow: 'hidden',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 10,
-        minHeight: 56,
-        padding: '0 28px',
-        borderRadius: 9999,
-        border: 'none',
-        background: fill,
-        color: isHovered ? waterTextColor : textColor,
-        fontFamily: 'inherit',
-        fontSize: 15,
-        fontWeight: 600,
-        letterSpacing: '-0.01em',
-        lineHeight: '1.5em',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        textDecoration: 'none',
-        WebkitTapHighlightColor: 'transparent',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'transform 0.35s ease, opacity 0.35s ease, color 0.35s ease',
-        ...style,
-      }}
-    >
-      {/* ── Water fill layer ── */}
+  const commonStyle: React.CSSProperties = {
+    position: 'relative',
+    overflow: 'hidden',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    minHeight: 56,
+    padding: '0 28px',
+    borderRadius: 9999,
+    border: 'none',
+    background: fill,
+    color: isHovered ? waterTextColor : textColor,
+    fontFamily: 'inherit',
+    fontSize: 15,
+    fontWeight: 600,
+    letterSpacing: '-0.01em',
+    lineHeight: '1.5em',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    textDecoration: 'none',
+    WebkitTapHighlightColor: 'transparent',
+    opacity: disabled ? 0.5 : 1,
+    transition: 'transform 0.35s ease, opacity 0.35s ease, color 0.35s ease',
+    ...style,
+  };
+
+  const content = (
+    <>
+      {/* Water fill layer */}
       <div
         aria-hidden="true"
         style={{
@@ -192,7 +188,7 @@ export function SlideFillButton({
           }}
         >
           <div style={{ position: 'absolute', inset: 0, transformOrigin: '50% 100%' }}>
-            {/* Back wave (CSS animated) */}
+            {/* Back wave */}
             <svg
               viewBox="0 0 400 30"
               preserveAspectRatio="none"
@@ -202,7 +198,7 @@ export function SlideFillButton({
               <path d={BACK_PATH} fill={waterColor} />
             </svg>
 
-            {/* Front wave (CSS animated) */}
+            {/* Front wave */}
             <svg
               viewBox="0 0 400 30"
               preserveAspectRatio="none"
@@ -212,7 +208,7 @@ export function SlideFillButton({
               <path d={FRONT_PATH} fill={waterColor} />
             </svg>
 
-            {/* Solid fill below the wave edge */}
+            {/* Solid fill below wave edge */}
             <div
               style={{
                 position: 'absolute',
@@ -227,7 +223,7 @@ export function SlideFillButton({
         </div>
       </div>
 
-      {/* ── Arrow icon ── */}
+      {/* Arrow icon */}
       <span
         aria-hidden="true"
         style={{
@@ -246,7 +242,7 @@ export function SlideFillButton({
         →
       </span>
 
-      {/* ── Label text ── */}
+      {/* Label text */}
       <span
         style={{
           position: 'relative',
@@ -259,6 +255,41 @@ export function SlideFillButton({
       >
         {label}
       </span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        aria-label={ariaLabel || label}
+        onClick={onClick}
+        onPointerEnter={onPointerEnter}
+        onPointerLeave={onPointerLeave}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        className={className}
+        style={commonStyle}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type={type}
+      aria-label={ariaLabel || label}
+      disabled={disabled}
+      onClick={onClick}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      className={className}
+      style={commonStyle}
+    >
+      {content}
     </button>
   );
 }
