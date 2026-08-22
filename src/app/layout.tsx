@@ -71,15 +71,15 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     manifest: "/manifest.json",
     icons: {
-      icon: [
-        { url: logoUrl, type: "image/png" },
-        { url: "/favicon.ico", sizes: "any" },
-        { url: "/logo.png", type: "image/png" },
-      ],
+      icon: profile?.logoUrl
+        ? [{ url: logoUrl, type: "image/png" }]
+        : [
+            { url: "/favicon.ico", sizes: "any" },
+            { url: "/logo.png", type: "image/png" },
+          ],
       shortcut: [logoUrl],
       apple: [
         { url: logoUrl, sizes: "180x180", type: "image/png" },
-        { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
       ],
     },
     openGraph: {

@@ -7,16 +7,19 @@ export function updateBrowserFavicon(url: string) {
 
   const versionedUrl = url.includes('?') ? `${url}&v=${Date.now()}` : `${url}?v=${Date.now()}`;
 
-  // Find or create icon links
+  // Remove existing icon links to prevent stale/default icon caching
+  const existingLinks = document.querySelectorAll<HTMLLinkElement>(
+    'link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]'
+  );
+  existingLinks.forEach((el) => el.remove());
+
+  // Find or create fresh icon links
   const rels = ['icon', 'shortcut icon', 'apple-touch-icon'];
   rels.forEach((rel) => {
-    let link = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = rel;
-      document.head.appendChild(link);
-    }
+    const link = document.createElement('link');
+    link.rel = rel;
     link.href = versionedUrl;
+    document.head.appendChild(link);
   });
 }
 

@@ -40,6 +40,18 @@ export default function LoginPage() {
       }
     };
     fetchProfile();
+
+    const handleLogoUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ logoUrl?: string }>;
+      if (customEvent.detail?.logoUrl) {
+        setProfile((prev) => (prev ? { ...prev, logoUrl: customEvent.detail!.logoUrl! } : { logoUrl: customEvent.detail?.logoUrl }));
+      } else {
+        fetchProfile();
+      }
+    };
+
+    window.addEventListener('logo-updated', handleLogoUpdate);
+    return () => window.removeEventListener('logo-updated', handleLogoUpdate);
   }, []);
 
   const resetFormState = useCallback(() => {

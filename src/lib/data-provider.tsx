@@ -80,8 +80,23 @@ export function DataProvider({ children, initialData }: { children: ReactNode, i
     // If server did not provide initialData, fetch on client
     if (!initialData) {
       fetchData();
+    } else if (initialData.profile) {
+      setProfile(initialData.profile);
     }
   }, [fetchData, initialData]);
+
+  useEffect(() => {
+    const handleLogoUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ logoUrl?: string }>;
+      if (customEvent.detail?.logoUrl) {
+        setProfile((prev) => (prev ? { ...prev, logoUrl: customEvent.detail!.logoUrl! } : null));
+      } else {
+        fetchData();
+      }
+    };
+    window.addEventListener('logo-updated', handleLogoUpdate);
+    return () => window.removeEventListener('logo-updated', handleLogoUpdate);
+  }, [fetchData]);
 
   // Auto-refresh when user switches back to this tab (e.g., after editing in dashboard)
   useEffect(() => {
