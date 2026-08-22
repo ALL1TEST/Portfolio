@@ -59,7 +59,7 @@ const PRESETS: Record<
   }
 > = {
   primary: {
-    fill: '#FF3900',
+    fill: '#D83000',
     textColor: '#FFFFFF',
     waterColor: '#FFFFFF',
     waterTextColor: '#030303',
@@ -151,8 +151,8 @@ export function SlideFillButton({
     background: fill,
     color: isHovered ? waterTextColor : textColor,
     fontFamily: 'inherit',
-    fontSize: 15,
-    fontWeight: 600,
+    fontSize: 16,
+    fontWeight: 700,
     letterSpacing: '-0.01em',
     lineHeight: '1.5em',
     cursor: disabled ? 'not-allowed' : 'pointer',
