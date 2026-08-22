@@ -118,6 +118,25 @@ export function Navbar() {
     exit: { opacity: 0, x: -8, transition: { duration: 0.2 } },
   };
 
+  const normalizePath = (path: string | null | undefined): string => {
+    if (!path) return '/';
+    const clean = path.split('?')[0].split('#')[0];
+    if (clean.length > 1 && clean.endsWith('/')) {
+      return clean.slice(0, -1);
+    }
+    return clean;
+  };
+
+  const currentPath = normalizePath(pathname);
+
+  const isLinkActive = (href: string) => {
+    const targetPath = normalizePath(href);
+    if (targetPath === '/') {
+      return currentPath === '/';
+    }
+    return currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
+  };
+
   return (
     <>
       <motion.header
@@ -163,7 +182,7 @@ export function Navbar() {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href;
+                const isActive = isLinkActive(link.href);
                 return (
                   <Link
                     key={link.href}
@@ -181,15 +200,7 @@ export function Navbar() {
                     }`}
                   >
                     {isActive && (
-                      <motion.span
-                        layoutId="nav-active"
-                        className="absolute inset-0 bg-surface rounded-lg border border-stroke/50"
-                        transition={{
-                          type: 'spring',
-                          stiffness: 380,
-                          damping: 30,
-                        }}
-                      />
+                      <span className="absolute inset-0 bg-surface rounded-lg border border-stroke/50 animate-in fade-in zoom-in-95 duration-200" />
                     )}
                     <span className="relative z-10">{link.label}</span>
                   </Link>
@@ -247,7 +258,7 @@ export function Navbar() {
               {/* Navigation items */}
               <nav className="flex flex-col">
                 {navLinks.map((link) => {
-                  const isActive = pathname === link.href;
+                  const isActive = isLinkActive(link.href);
                   return (
                     <motion.button
                       key={link.href}
@@ -267,11 +278,7 @@ export function Navbar() {
                         <span className="relative">
                           {link.label}
                           {isActive && (
-                            <motion.span
-                              layoutId="mobile-nav-indicator"
-                              className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-brand"
-                              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                            />
+                            <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-brand animate-in fade-in zoom-in-75 duration-200" />
                           )}
                         </span>
                       </span>
